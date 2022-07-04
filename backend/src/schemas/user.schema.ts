@@ -76,7 +76,7 @@ export class User {
 }
 
 @Schema()
-class UserSkill {
+export class UserSkill {
   @Prop({ required: true, ref: 'Skill', type: mongoose.Schema.Types.ObjectId })
   skill: Skill;
   @Prop({ required: true })
@@ -84,3 +84,5 @@ class UserSkill {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+export const UserSkillSchema = SchemaFactory.createForClass(UserSkill);
