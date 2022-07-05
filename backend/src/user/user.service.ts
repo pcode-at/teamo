@@ -7,43 +7,88 @@ import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { PrismaClient, UserSkills } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
+import { searchForUsers } from "src/algorithms/search.algorithm";
+import { UserAndSkills } from "src/types/userAndSkills.type";
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) { }
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const createUser = new this.userModel(createUserDto);
     return createUser.save();
   }
 
-  async search(search: SearchDto): Promise<UserSkills[]> {
+  async search(search: SearchDto): Promise<UserAndSkills[]> {
     const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
     const required = search.parameters.filter(search => search.required).map(search => search.value);
-    if (attributes.includes("location")) {
-      const location = search.parameters.find(search => search.attribute === "location").value;
 
-      return prisma.userSkills.findMany({
-        where: {
-          user: {
-            location,
+    let location,
+      department,
+      maxAge,
+      minAge,
+      gender = undefined;
+
+    if (attributes.includes("location")) location = search.parameters.find(search => search.attribute === "location").value;
+    if (attributes.includes("department")) department = search.parameters.find(search => search.attribute === "department").value;
+    if (attributes.includes("maxAge")) maxAge = search.parameters.find(search => search.attribute === "maxAge").value;
+    if (attributes.includes("minAge")) minAge = search.parameters.find(search => search.attribute === "minAge").value;
+    if (attributes.includes("gender")) gender = search.parameters.find(search => search.attribute === "gender").value;
+
+    const skills = prisma.userSkills.findMany({
+      where: {
+        user: {
+          location,
+          departments: {
+            hasEvery: department,
           },
-          skill: {
-            name: {
-              in: required,
-            }
+          birthDate: {
+            gte: new Date(new Date().getFullYear() - minAge),
+            lte: new Date(new Date().getFullYear() - maxAge),
+          },
+          gender,
+        },
+
+        skill: {
+          name: {
+            in: required,
           },
         },
-        include: {
-          skill: true,
-          user: true,
-        },
-      });
+      },
+      include: {
+        skill: true,
+        user: true,
+      },
+    });
 
-    }
-    throw new BadRequestException('Location is required');
+    let findResult = searchForUsers(await skills, search);
+
+    return findResult;
+
+    //throw new BadRequestException('Location is required');
+  }
+
+  async recommend(projectId: string): Promise<UserAndSkills[]> {
+    const existingMember = await prisma.project.findOne({
+      where: {
+        id: projectId,
+      },
+      include: {
+        members: true,
+      },
+    });
+
+    const users = await prisma.userSkills.findMany({
+      include: {
+        skill: true,
+        user: true,
+      },
+    });
+
+    const recommendedUsers = recommendUsers(users);
+    return null;
   }
 
   async findAll(): Promise<User[]> {
@@ -86,7 +131,7 @@ export class UserService {
         },
         rating: skill.rating,
       },
-    })
+    });
   }
 
   async getSkills(skillId) {
@@ -97,7 +142,7 @@ export class UserService {
       include: {
         user: true,
         skill: true,
-      }
+      },
     });
   }
 
