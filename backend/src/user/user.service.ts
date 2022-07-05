@@ -5,7 +5,7 @@ import { User, UserDocument } from "src/schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PrismaClient, UserSkills } from "@prisma/client";
+import { PrismaClient, users, UserSkills } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
 import { searchForUsers } from "src/algorithms/search.algorithm";
 import { UserAndSkills } from "src/types/userAndSkills.type";
@@ -16,9 +16,18 @@ const prisma = new PrismaClient();
 export class UserService {
   constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const createUser = new this.userModel(createUserDto);
-    return createUser.save();
+
+  async create(createUserDto: CreateUserDto): Promise<users> {
+    return await prisma.users.create({
+      data: {
+        ...createUserDto,
+        birthDate: new Date(createUserDto.birthDate.toString()),
+        authorization: {
+          accessTokens: [],
+          refreshTokens: [],
+        },
+      }
+    });
   }
 
   async search(search: SearchDto): Promise<UserAndSkills[]> {
@@ -117,7 +126,7 @@ export class UserService {
   }
 
   async addSkill(skill: SkillDto) {
-    let update = await prisma.userSkills.create({
+    await prisma.userSkills.create({
       data: {
         user: {
           connect: {
@@ -130,6 +139,19 @@ export class UserService {
           },
         },
         rating: skill.rating,
+      },
+    });
+  }
+
+  async getSkillsForUser(identifier: string) {
+    return await prisma.userSkills.findMany({
+      where: {
+        user: {
+          identifier,
+        },
+      },
+      include: {
+        skill: true,
       },
     });
   }

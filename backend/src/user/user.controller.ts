@@ -10,8 +10,8 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
 
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+  async create(@Body() create: CreateUserDto) {
+    return await this.userService.create(create);
   }
 
   @Get()
@@ -30,8 +30,8 @@ export class UserController {
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  update(@Param("id") id: string, @Body() update: UpdateUserDto) {
+    return this.userService.update(+id, update);
   }
 
   @Delete(":id")
@@ -47,5 +47,10 @@ export class UserController {
   @Get('skill/:skillId')
   async getSkills(@Param('skillId') skillId: string) {
     return await this.userService.getSkills(skillId);
+  }
+
+  @Get('skill/user/:identifier')
+  async getSkillsByUser(@Param('identifier') identifier: string) {
+    return await this.userService.getSkillsForUser(identifier);
   }
 }

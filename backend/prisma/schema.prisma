@@ -48,6 +48,7 @@ model users {
   gender        String
   identifier    String              @unique()
   location      String
+  phoneNumber   String
   name          String
   password      String
   photo         String
