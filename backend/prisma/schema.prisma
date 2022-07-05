@@ -41,7 +41,6 @@ model teamo {
 
 model users {
   id            String             @id @default(auto()) @map("_id") @db.ObjectId
-  v             Int                @map("__v")
   authorization UsersAuthorization
   birthDate     DateTime           @db.Date
   departments   String[]
@@ -49,6 +48,7 @@ model users {
   gender        String
   identifier    String             @unique()
   location      String
+  phoneNumber   String
   name          String
   password      String
   photo         String

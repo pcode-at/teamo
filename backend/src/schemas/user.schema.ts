@@ -69,7 +69,7 @@ export class User {
   departments: string[];
 
   @Prop({ ref: "UserSkill", type: mongoose.Schema.Types.ObjectId })
-  skills: UserSkill[];
+  skills?: UserSkill[];
 
   @Prop(
     raw({
