@@ -7,8 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+type SkillsSkillMatrix {
+  aggregation String
+  rating      Int
+}
+
+type UsersAuthorization {
+  accessTokens  String[]
+  refreshTokens String[]
+}
+
+model UsersSkills {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  rating   String
+  skill    skills  @relation(fields: [skillsId], references: [id])
+  skillsId String  @db.ObjectId
+  users    users?  @relation(fields: [usersId], references: [id])
+  usersId  String? @db.ObjectId
+}
+
+model skills {
+  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  skillMatrix SkillsSkillMatrix[]
+  UsersSkills UsersSkills[]
+}
+
 model teamo {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
   text String
+}
+
+model users {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  v             Int                @map("__v")
+  authorization UsersAuthorization
+  birthDate     DateTime           @db.Date
+  departments   String[]
+  email         String
+  gender        String
+  identifier    String             @unique()
+  name          String
+  password      String
+  photo         String
+  roles         String[]
+  skills        UsersSkills[]
 }

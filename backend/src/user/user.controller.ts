@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/commo
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { SearchDto } from "./dto/search.dto";
 
 @Controller("api/user")
 export class UserController {
@@ -15,6 +16,11 @@ export class UserController {
   @Get()
   async findAll() {
     return await this.userService.findAll();
+  }
+
+  @Post("/search")
+  async search(@Body() search: SearchDto) {
+    return await this.userService.search(search);
   }
 
   @Get(":identifier")

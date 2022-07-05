@@ -1,6 +1,6 @@
-import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Date, Document } from 'mongoose';
-import { Skill } from './skill.schema';
+import { Prop, raw, Schema, SchemaFactory } from "@nestjs/mongoose";
+import mongoose, { Date, Document } from "mongoose";
+import { Skill } from "./skill.schema";
 
 export type UserDocument = User & Document;
 
@@ -54,6 +54,9 @@ export class User {
   gender: string;
 
   @Prop()
+  location: string;
+
+  @Prop()
   photo: string;
 
   @Prop()
@@ -65,19 +68,21 @@ export class User {
   @Prop()
   departments: string[];
 
-  @Prop({ ref: 'UserSkill', type: mongoose.Schema.Types.ObjectId })
+  @Prop({ ref: "UserSkill", type: mongoose.Schema.Types.ObjectId })
   skills: UserSkill[];
 
-  @Prop(raw({
-    accessTokens: { type: [String] },
-    refreshTokens: { type: [String] }
-  }))
+  @Prop(
+    raw({
+      accessTokens: { type: [String] },
+      refreshTokens: { type: [String] },
+    }),
+  )
   authorization: Record<string, any>;
 }
 
 @Schema()
 export class UserSkill {
-  @Prop({ required: true, ref: 'Skill', type: mongoose.Schema.Types.ObjectId })
+  @Prop({ required: true, ref: "Skill", type: mongoose.Schema.Types.ObjectId })
   skill: Skill;
   @Prop({ required: true })
   rating: number;
