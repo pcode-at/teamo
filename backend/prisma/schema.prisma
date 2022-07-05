@@ -17,20 +17,20 @@ type UsersAuthorization {
   refreshTokens String[]
 }
 
-model UsersSkills {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  rating   String
-  skill    skills  @relation(fields: [skillsId], references: [id])
-  skillsId String  @db.ObjectId
-  users    users?  @relation(fields: [usersId], references: [id])
-  usersId  String? @db.ObjectId
+model UserSkills {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  rating     String
+  skill      skills  @relation(fields: [skillsId], references: [id])
+  skillsId   String  @db.ObjectId
+  user       users?  @relation(fields: [identifier], references: [id])
+  identifier String? @db.ObjectId
 }
 
 model skills {
   id          String              @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   skillMatrix SkillsSkillMatrix[]
-  UsersSkills UsersSkills[]
+  UsersSkills UserSkills[]
 }
 
 model teamo {
@@ -48,9 +48,10 @@ model users {
   email         String
   gender        String
   identifier    String             @unique()
+  location      String
   name          String
   password      String
   photo         String
   roles         String[]
-  skills        UsersSkills[]
+  skills        UserSkills[]
 }

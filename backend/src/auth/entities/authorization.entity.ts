@@ -1,7 +1,7 @@
 import { HttpResponse } from "src/entities/http-response.entity";
 
 export interface Authorization extends HttpResponse {
-  status: number;
+  statusCode: number;
   error?: string;
   message: string;
   data?: any;

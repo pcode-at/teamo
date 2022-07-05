@@ -2,11 +2,12 @@ import { IsNotEmpty } from "class-validator";
 
 export class SearchDto {
   @IsNotEmpty()
-  searches: SearchAttribute[];
+  parameters: SearchAttribute[];
 }
 
 class SearchAttribute {
   attribute: string;
   value: string;
-  mustHave: boolean;
+  rating?: number;
+  required: boolean;
 }

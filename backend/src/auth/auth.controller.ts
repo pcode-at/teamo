@@ -10,7 +10,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post("/login")
   async login(@Res() response, @Body() body: LoginDto) {
-    const { status, ...data } = await this.authService.login(body);
+    const { statusCode: status, ...data } = await this.authService.login(body);
     return response.status(status).json(data);
   }
 }

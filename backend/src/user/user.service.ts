@@ -1,42 +1,49 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User, UserDocument } from "src/schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, UserSkills } from "@prisma/client";
+import { SkillDto } from "./dto/skill.dto";
+
 const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const createUser = new this.userModel(createUserDto);
     return createUser.save();
   }
 
-  async search(search: SearchDto): Promise<User[]> {
-    const mustHave = search.searches.filter(search => search.mustHave).map(search => search.attribute);
-    if (mustHave.includes("location")) {
-      const location = search.searches.find(search => search.attribute === "location").value;
+  async search(search: SearchDto): Promise<UserSkills[]> {
+    const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
+    const required = search.parameters.filter(search => search.required).map(search => search.value);
+    if (attributes.includes("location")) {
+      const location = search.parameters.find(search => search.attribute === "location").value;
 
-      return this.userModel
-        .find({
-          where: {
+      return prisma.userSkills.findMany({
+        where: {
+          user: {
             location,
-            skills: {
-              skill: {
-                name: {
-                  in: mustHave,
-                },
-              },
-            },
           },
-        })
-        .exec();
+          skill: {
+            name: {
+              in: required,
+            }
+          },
+        },
+        include: {
+          skill: true,
+          user: true,
+        },
+      });
+
     }
+    throw new BadRequestException('Location is required');
   }
 
   async findAll(): Promise<User[]> {
@@ -62,6 +69,36 @@ export class UserService {
       //return user.save();
     }
     return null;
+  }
+
+  async addSkill(skill: SkillDto) {
+    let update = await prisma.userSkills.create({
+      data: {
+        user: {
+          connect: {
+            identifier: skill.identifier,
+          },
+        },
+        skill: {
+          connect: {
+            id: skill.skill,
+          },
+        },
+        rating: skill.rating,
+      },
+    })
+  }
+
+  async getSkills(skillId) {
+    return await prisma.userSkills.findMany({
+      where: {
+        id: skillId,
+      },
+      include: {
+        user: true,
+        skill: true,
+      }
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

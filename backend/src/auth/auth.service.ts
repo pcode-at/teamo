@@ -25,7 +25,7 @@ export class AuthService {
     await this.userService.findOneAndUpdate(payload.identifier, accessToken);
 
     return {
-      status: 200,
+      statusCode: 200,
       message: "Login successful",
       accessToken,
     };
