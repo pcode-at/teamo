@@ -26,7 +26,7 @@ const StyledInputField = styled("input", {
 
   fontFamily: "Arial",
   fontWeight: "bold",
-  background: "blue",
+  background: "$brand-100",
   outline: "none",
   fontSize: "1.2rem",
   lineHeight: "1.5rem",
