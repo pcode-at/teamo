@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "../../../stitches.config";
-import { InputFieldCore } from "../InputfieldCore/InputFieldCore";
+import { InputFieldCore } from "../InputFieldCore/InputFieldCore";
 
 type Props = {
   inputType: "text" | "date" | "email" | "number" | "datetime-local";
