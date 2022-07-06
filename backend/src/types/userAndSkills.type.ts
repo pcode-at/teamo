@@ -1,4 +1,4 @@
-import { SkillsSkillMatrix } from "@prisma/client";
+import { SkillMatrix } from "@prisma/client";
 
 export class UserAndSkills {
   identifier: string;
@@ -17,7 +17,7 @@ export class UserAndSkills {
 }
 
 export class SkillAndRating {
-  skillMatrix: SkillsSkillMatrix[];
+  skillMatrix: SkillMatrix[];
   rating: string;
   name: string;
 }

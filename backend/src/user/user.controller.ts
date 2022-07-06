@@ -1,21 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { SkillDto } from "./dto/skill.dto";
+import { UserResponse, UserResponses } from "src/entities/user-response.entity";
 
 @Controller("api/user")
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
-  async create(@Body() create: CreateUserDto) {
+  async create(@Body() create: CreateUserDto): Promise<UserResponse> {
     return await this.userService.create(create);
   }
 
   @Get()
-  async findAll() {
+  async findAll(): Promise<UserResponses> {
     return await this.userService.findAll();
   }
 
@@ -39,18 +41,18 @@ export class UserController {
     return this.userService.remove(+id);
   }
 
-  @Post('skill')
+  @Post("skill")
   async addSkill(@Body() skill: SkillDto) {
     return await this.userService.addSkill(skill);
   }
 
-  @Get('skill/:skillId')
-  async getSkills(@Param('skillId') skillId: string) {
+  @Get("skill/:skillId")
+  async getSkills(@Param("skillId") skillId: string) {
     return await this.userService.getSkills(skillId);
   }
 
-  @Get('skill/user/:identifier')
-  async getSkillsByUser(@Param('identifier') identifier: string) {
+  @Get("skill/user/:identifier")
+  async getSkillsByUser(@Param("identifier") identifier: string) {
     return await this.userService.getSkillsForUser(identifier);
   }
 }

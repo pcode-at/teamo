@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { use } from "passport";
 import { UserService } from "src/user/user.service";
+import { jwtConstants } from "./constants";
 import { LoginDto } from "./dto/login.dto";
 import { Authorization } from "./entities/authorization.entity";
 
@@ -12,8 +12,8 @@ export class AuthService {
   async validateUser(identifier: string, pass: string): Promise<any> {
     const user = await this.userService.findOne(identifier);
     //encrypt using bcrypt here (10 rounds)
-    if (user && user.password === pass) {
-      const { password, ...result } = user;
+    if (user && user.data.password === pass) {
+      const { password, ...result } = user.data;
       return result;
     }
     return null;
@@ -22,12 +22,18 @@ export class AuthService {
   async login(payload: LoginDto): Promise<Authorization> {
     const userIdentifier = { identifier: payload.identifier };
     const accessToken = this.jwtService.sign(userIdentifier);
-    await this.userService.findOneAndUpdate(payload.identifier, accessToken);
-
-    return {
-      statusCode: 200,
+    const refreshToken = this.jwtService.sign({ identifier: { userIdentifier } }, { expiresIn: jwtConstants.refreshTokenExpiryTime });
+    const authorization = new Authorization({
+      statusCode: 201,
       message: "Login successful",
-      accessToken,
-    };
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    });
+
+    await this.userService.updateAuthorization(payload.identifier, authorization);
+
+    return authorization;
   }
 }

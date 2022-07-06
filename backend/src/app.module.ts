@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { CacheModule, Module } from "@nestjs/common";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -8,7 +8,15 @@ import { AuthModule } from "./auth/auth.module";
 import "dotenv/config";
 
 @Module({
-  imports: [MongooseModule.forRoot(process.env.DATABASE_URL), UserModule, ProjectModule, AuthModule],
+  imports: [
+    MongooseModule.forRoot(process.env.DATABASE_URL),
+    UserModule,
+    ProjectModule,
+    AuthModule,
+    CacheModule.register({
+      isGlobal: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
