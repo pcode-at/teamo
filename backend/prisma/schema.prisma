@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-type SkillsSkillMatrix {
+type SkillMatrix {
   aggregation String
   rating      Int
 }
@@ -17,7 +17,7 @@ type UsersAuthorization {
   refreshTokens String[]
 }
 
-model UserSkills {
+model userSkills {
   id         String  @id @default(auto()) @map("_id") @db.ObjectId
   rating     String
   skill      skills  @relation(fields: [skillsId], references: [id])
@@ -27,44 +27,49 @@ model UserSkills {
 }
 
 model skills {
-  id          String              @id @default(auto()) @map("_id") @db.ObjectId
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  skillMatrix SkillsSkillMatrix[]
-  UsersSkills UserSkills[]
-}
-
-model teamo {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  text String
+  skillMatrix SkillMatrix[]
+  UsersSkills userSkills[]
+  project     projects?     @relation(fields: [projectId], references: [id])
+  projectId   String?       @db.ObjectId
 }
 
 model users {
-  id            String              @id @default(auto()) @map("_id") @db.ObjectId
-  authorization UsersAuthorization?
-  birthDate     DateTime            @db.Date
-  departments   String[]
-  email         String
-  gender        String
-  identifier    String              @unique()
-  location      String
-  phoneNumber   String
-  name          String
-  password      String
-  photo         String
-  roles         String[]
-  skills        UserSkills[]
+  id              String              @id @default(auto()) @map("_id") @db.ObjectId
+  authorization   UsersAuthorization?
+  birthDate       DateTime            @db.Date
+  departments     String[]
+  email           String
+  gender          String
+  identifier      String              @unique()
+  location        String
+  phoneNumber     String
+  name            String
+  password        String
+  photo           String
+  roles           String[]
+  skills          userSkills[]
+  projectsCreated projects[]          @relation(name: "creator")
+  projectIds      String[]            @db.ObjectId
+  bookmarkedIn    projects[]          @relation(name: "bookmarks", fields: [bookmarkedInIds], references: [id])
+  bookmarkedInIds String[]            @map("projectsWhereBookMarkedIds") @db.ObjectId
+  projects        projects[]          @relation(name: "projectMembers", fields: [projectsIds], references: [id])
+  projectsIds     String[]            @db.ObjectId
 }
 
-model project {
+model projects {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   description  String
   creationDate DateTime @db.Date
   lastEdited   DateTime @db.Date
   status       String
-  // creator users @relation(name:"creator")
-  // members users[] @relation(name:"members")
-  // skills skills[]
-  // bookmarks users[] @relation(name:"bookmarks")
-
+  creator      users    @relation(name: "creator", fields: [creatorId], references: [id])
+  creatorId    String   @db.ObjectId
+  members      users[]  @relation(name: "bookmarks", fields: [memberIds], references: [id])
+  memberIds    String[] @db.ObjectId
+  skills       skills[]
+  skillIds     String[] @db.ObjectId
+  bookmarks    users[]  @relation(name: "projectMembers", fields: [bookmarkIds], references: [id])
+  bookmarkIds  String[] @db.ObjectId
 }
