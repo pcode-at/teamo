@@ -9,12 +9,12 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserResponse, UserResponses } from "src/entities/user-response.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { log } from "console";
-import { Authorization } from "src/auth/entities/authorization.entity";
 import { PrismaClient, users, userSkills } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
 import { searchForUsers } from "src/algorithms/search.algorithm";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
+import { Authorization, AuthorizationResponse } from "src/auth/entities/authorization.entity";
 
 const prisma = new PrismaClient();
 
@@ -87,8 +87,8 @@ export class UserService {
   async updateAuthorization(identifier: string, authorization: Authorization) {
     const user = await this.findOne(identifier);
 
-    user.data.authorization.accessTokens.push(authorization.data?.accessToken);
-    user.data.authorization.refreshTokens.push(authorization.data?.refreshToken);
+    user.data.authorization.accessTokens.push(authorization.accessToken);
+    user.data.authorization.refreshTokens.push(authorization.refreshToken);
 
     await this.updateOne(identifier, user.data);
   }
