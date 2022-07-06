@@ -13,7 +13,7 @@ type Props = {
 const StyledButton = styled("button", {
   width: "fit-content",
   padding: "$spacing-2x $spacing-3x",
-  border: "none",
+  border: "transparent $borderWidths$border-width-medium solid",
   borderRadius: "$border-radius-medium",
 
   color: "$neutral-100",
@@ -27,8 +27,13 @@ const StyledButton = styled("button", {
 
   "&:disabled": {
     cursor: "not-allowed",
-    backgroundColor: "$neutral-200",
-    color: "$neutral-500",
+    backgroundColor: "$brand-100",
+    color: "$neutral-100",
+  },
+
+  "&:focus": {
+    outline: "none",
+    border: "$brand-400 $borderWidths$border-width-medium solid",
   },
 
   variants: {
