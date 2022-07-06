@@ -6,20 +6,21 @@ import { User, UserDocument } from "src/schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { PrismaClient, users } from "@prisma/client";
-import { SkillDto } from "./dto/skill.dto";
-import { searchForUsers } from "src/algorithms/search.algorithm";
-import { UserAndSkills } from "src/types/userAndSkills.type";
 import { UserResponse, UserResponses } from "src/entities/user-response.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { log } from "console";
 import { Authorization } from "src/auth/entities/authorization.entity";
+import { PrismaClient, users, userSkills } from "@prisma/client";
+import { SkillDto } from "./dto/skill.dto";
+import { searchForUsers } from "src/algorithms/search.algorithm";
+import { UserAndSkills } from "src/types/userAndSkills.type";
+import { recommendUsers } from "src/algorithms/recommend.algorithm";
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>, @Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>, @Inject(CACHE_MANAGER) private readonly cacheManager: Cache) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     const user = await prisma.users.create({
@@ -45,11 +46,23 @@ export class UserService {
       where: {
         identifier,
       },
+      include: {
+        skills: {
+          include: {
+            skill: true,
+          },
+        },
+      },
     });
     if (user) {
       return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
     }
     return new UserResponse({ statusCode: 404, message: "User not found" });
+  }
+  async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
+
+    const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
+    return null;
   }
 
   async updateOne(identifier: string, user: UserEntity): Promise<UserResponse> {
@@ -66,17 +79,20 @@ export class UserService {
       },
     });
     return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
+
+
+    //return this.userModel.findOne({ identifier }).populate("skill").exec();
   }
 
   async updateAuthorization(identifier: string, authorization: Authorization) {
-    const user = await this.findOne(identifier);  
+    const user = await this.findOne(identifier);
 
     user.data.authorization.accessTokens.push(authorization.data?.accessToken);
     user.data.authorization.refreshTokens.push(authorization.data?.refreshToken);
 
     await this.updateOne(identifier, user.data);
   }
-  
+
   async addSkill(skill: SkillDto) {
     await prisma.userSkills.create({
       data: {

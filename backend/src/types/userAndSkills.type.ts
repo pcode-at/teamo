@@ -14,6 +14,10 @@ export class UserAndSkills {
   photo: string;
   roles: string[];
   skills: SkillAndRating[];
+
+  constructor(partial: Partial<UserAndSkills>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class SkillAndRating {
