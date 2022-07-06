@@ -3,7 +3,7 @@ import { JwtService } from "@nestjs/jwt";
 import { UserService } from "src/user/user.service";
 import { jwtConstants } from "./constants";
 import { LoginDto } from "./dto/login.dto";
-import { Authorization } from "./entities/authorization.entity";
+import { AuthorizationResponse } from "./entities/authorization.entity";
 
 @Injectable()
 export class AuthService {
@@ -19,11 +19,11 @@ export class AuthService {
     return null;
   }
 
-  async login(payload: LoginDto): Promise<Authorization> {
+  async login(payload: LoginDto): Promise<AuthorizationResponse> {
     const userIdentifier = { identifier: payload.identifier };
     const accessToken = this.jwtService.sign(userIdentifier);
     const refreshToken = this.jwtService.sign({ identifier: { userIdentifier } }, { expiresIn: jwtConstants.refreshTokenExpiryTime });
-    const authorization = new Authorization({
+    const authorization = new AuthorizationResponse({
       statusCode: 201,
       message: "Login successful",
       data: {

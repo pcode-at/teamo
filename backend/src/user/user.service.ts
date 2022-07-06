@@ -13,7 +13,7 @@ import { UserAndSkills } from "src/types/userAndSkills.type";
 import { UserResponse, UserResponses } from "src/entities/user-response.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { log } from "console";
-import { Authorization } from "src/auth/entities/authorization.entity";
+import { Authorization, AuthorizationResponse } from "src/auth/entities/authorization.entity";
 
 const prisma = new PrismaClient();
 
@@ -69,14 +69,14 @@ export class UserService {
   }
 
   async updateAuthorization(identifier: string, authorization: Authorization) {
-    const user = await this.findOne(identifier);  
+    const user = await this.findOne(identifier);
 
-    user.data.authorization.accessTokens.push(authorization.data?.accessToken);
-    user.data.authorization.refreshTokens.push(authorization.data?.refreshToken);
+    user.data.authorization.accessTokens.push(authorization.accessToken);
+    user.data.authorization.refreshTokens.push(authorization.refreshToken);
 
     await this.updateOne(identifier, user.data);
   }
-  
+
   async addSkill(skill: SkillDto) {
     await prisma.userSkills.create({
       data: {

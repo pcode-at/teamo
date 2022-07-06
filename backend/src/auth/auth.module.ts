@@ -7,6 +7,7 @@ import { JwtModule, JwtService } from "@nestjs/jwt";
 import { jwtConstants } from "./constants";
 import { JwtStrategy } from "./jwt.strategy";
 import { LocalStrategy } from "./local.strategy";
+import { RefreshModule } from "./refresh/refresh.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LocalStrategy } from "./local.strategy";
       secret: jwtConstants.secret,
       signOptions: { expiresIn: "900s" },
     }),
+    RefreshModule,
   ],
   providers: [AuthService, UserService, JwtStrategy, LocalStrategy],
   controllers: [AuthController],
