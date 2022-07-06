@@ -4,7 +4,6 @@ import { globalCss } from "../stitches.config";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import "../utils/skeleton.css";
-import { IdProvider } from "@radix-ui/react-id";
 
 const globalStyles = globalCss({
   "*": {
@@ -23,18 +22,16 @@ function App({ Component, pageProps }: AppProps) {
   const queryClient = new QueryClient();
 
   return (
-    <IdProvider>
-      <SkeletonTheme
-        baseColor=""
-        highlightColor=""
-        duration={1.3}
-      >
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </SkeletonTheme>
-    </IdProvider>
+    <SkeletonTheme
+      baseColor=""
+      highlightColor=""
+      duration={1.3}
+    >
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </SkeletonTheme>
   );
 }
 
