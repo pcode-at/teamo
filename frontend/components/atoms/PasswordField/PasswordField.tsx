@@ -3,18 +3,15 @@ import { styled } from "../../../stitches.config";
 import { InputFieldCore } from "../InputFieldCore/InputFieldCore";
 
 type Props = {
-  inputType: "text" | "date" | "email" | "number" | "datetime-local";
   value?: string;
   onChange: Function;
   icon?: any;
   required?: boolean;
   label?: string;
   showLabel?: boolean;
-  regex?: RegExp;
   setValidInput?: Function;
   errorMessage?: string;
-  min?: string;
-  max?: string;
+  regex: RegExp;
 };
 
 const StyledInputField = styled("input", {
@@ -24,17 +21,12 @@ const StyledInputField = styled("input", {
   padding: "0.5rem 0",
   borderBottom: "solid 1px transparent",
 
-  fontFamily: "Arial",
   fontWeight: "bold",
   background: "$brand-100",
   outline: "none",
   fontSize: "1.2rem",
   lineHeight: "1.5rem",
-  color: "black",
-
-  ["&:focus"]: {
-    borderBottom: "solid 1px red",
-  },
+  color: "$neutral-800",
 });
 
 const StyledLabel = styled("label", {
@@ -48,52 +40,66 @@ const ErrorMessage = styled("span", {
   color: "red",
 });
 
-export const InputField: React.FC<Props> = ({
-  inputType,
+export const PasswordField: React.FC<Props> = ({
   value,
   onChange,
   icon,
   required = false,
   label = "",
   showLabel = true,
-  regex,
   setValidInput,
   errorMessage = "",
-  min,
-  max,
+  regex,
 }) => {
   const [isInputValid, setIsInputValid] = React.useState(null);
 
-  function updateValidation(event) {
-    if (regex) {
-      let inputValueValid = regex.test(event.target.value);
-      if (setValidInput) {
-        setValidInput(inputValueValid);
-      }
-      if (isInputValid == null && !inputValueValid) {
-        if (regex.test(event.target.value)) {
-          setIsInputValid(false);
-        }
-      } else {
-        setIsInputValid(inputValueValid);
-      }
-    }
-    onChange(event.target.value);
-  }
-
   return (
     <>
-      <InputFieldCore icon={icon} required={required} label={label} showLabel={showLabel}>
+      <InputFieldCore
+        icon={icon}
+        required={required}
+        label={label}
+        showLabel={showLabel}
+      >
         <StyledLabel>
           <StyledInputField
-            type={inputType}
+            type={"password"}
             value={value}
             name={label}
             placeholder={label}
-            onChange={updateValidation}
+            onChange={(e) => {
+              onChange(e.target.value);
+              if (regex) {
+                const isValid = regex.test(e.target.value);
+                if (setValidInput) {
+                  setValidInput(isValid);
+                }
+                if (isInputValid == null && !isValid) {
+                  if (regex.test(e.target.value)) {
+                    setIsInputValid(false);
+                  }
+                } else {
+                  setIsInputValid(isValid);
+                }
+              }
+            }}
+            onBlur={(e) => {
+              onChange(e.target.value);
+              if (regex) {
+                const isValid = regex.test(e.target.value);
+                if (setValidInput) {
+                  setValidInput(isValid);
+                }
+                if (isInputValid == null && !isValid) {
+                  if (regex.test(e.target.value)) {
+                    setIsInputValid(false);
+                  }
+                } else {
+                  setIsInputValid(isValid);
+                }
+              }
+            }}
             {...(required && { required: true })}
-            {...(min && { min })}
-            {...(max && { max })}
           />
         </StyledLabel>
       </InputFieldCore>

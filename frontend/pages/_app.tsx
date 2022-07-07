@@ -1,10 +1,7 @@
 import { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { globalCss } from "../stitches.config";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
 import "../utils/skeleton.css";
-import { IdProvider } from "@radix-ui/react-id";
 
 const globalStyles = globalCss({
   "*": {
@@ -12,30 +9,21 @@ const globalStyles = globalCss({
     margin: 0,
     padding: 0,
   },
+  body: {
+    fontFamily: "Poppins, sans-serif",
+    fontWeight: "$regular",
+    overflowX: "hidden",
+    backgroundColor: "$background",
+    minHeight: "100vh",
+  },
 });
-
-import { SkeletonTheme } from "react-loading-skeleton";
 
 function App({ Component, pageProps }: AppProps) {
   globalStyles();
 
   const router = useRouter();
-  const queryClient = new QueryClient();
 
-  return (
-    <IdProvider>
-      <SkeletonTheme
-        baseColor=""
-        highlightColor=""
-        duration={1.3}
-      >
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryClientProvider>
-      </SkeletonTheme>
-    </IdProvider>
-  );
+  return <Component {...pageProps} router={router} />;
 }
 
 export default App;

@@ -1,11 +1,11 @@
 import React from 'react';
 import { ComponentMeta } from '@storybook/react';
 import { disabledStorybookArgTypesFromStitches } from '../../../.storybook/helper';
-import { Button } from './Button';
+import { Checkbox } from './Checkbox';
 
 export default {
-  title: 'Atoms/Button',
-  component: Button,
+  title: 'Atoms/Checkbox',
+  component: Checkbox,
   argTypes: {
     size: {
       options: ['medium', 'small'],
@@ -17,18 +17,12 @@ export default {
     },
     ...disabledStorybookArgTypesFromStitches,
   },
-} as ComponentMeta<typeof Button>;
+} as ComponentMeta<typeof Checkbox>;
 
-export const Default = () => <Button>Kontaktieren</Button>;
+export const Default = () => <Checkbox>Kontaktieren</Checkbox>;
 
 export const Small = () => (
-  <Button size={"small"}>
+  <Checkbox size={"small"}>
     Kontaktieren
-  </Button>
-);
-
-export const Disabled = () => (
-  <Button size={"small"} disabled={true}>
-    Kontaktieren
-  </Button>
+  </Checkbox>
 );
