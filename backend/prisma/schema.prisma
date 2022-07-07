@@ -7,8 +7,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model teamo {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  text String
+type SkillMatrix {
+  aggregation String
+  rating      Int
+}
+
+type UsersAuthorization {
+  accessTokens  String[]
+  refreshTokens String[]
+}
+
+model userSkills {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  rating     String
+  skill      skills @relation(fields: [skillsId], references: [id])
+  skillsId   String @db.ObjectId
+  user       users  @relation(fields: [identifier], references: [id])
+  identifier String @db.ObjectId
+}
+
+model skills {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  skillMatrix     SkillMatrix[]
+  UsersSkills     userSkills[]
+  SkillWithRating SkillWithRating[]
+}
+
+model users {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  authorization     UsersAuthorization?
+  birthDate         DateTime            @db.Date
+  departments       String[]
+  email             String
+  gender            String
+  identifier        String              @unique()
+  location          String
+  phoneNumber       String
+  name              String
+  password          String
+  photo             String
+  roles             String[]
+  skills            userSkills[]
+  projectsCreated   projects[]          @relation(name: "creator")
+  projectCreatedIds String[]            @db.ObjectId
+  bookmarkedIn      projects[]          @relation(name: "bookmarks", fields: [bookmarkedInIds], references: [id])
+  bookmarkedInIds   String[]            @map("projectsWhereBookMarkedIds") @db.ObjectId
+  projects          projects[]          @relation(name: "projectMembers", fields: [projectsIds], references: [id])
+  projectsIds       String[]            @db.ObjectId
+}
+
+model projects {
+  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  description  String
+  creationDate DateTime          @db.Date
+  lastEdited   DateTime          @db.Date
+  status       String
+  creator      users             @relation(name: "creator", fields: [creatorId], references: [id])
+  creatorId    String            @db.ObjectId
+  members      users[]           @relation(name: "bookmarks", fields: [memberIds], references: [id])
+  memberIds    String[]          @db.ObjectId
+  skills       SkillWithRating[]
+  skillIds     String[]          @db.ObjectId
+  bookmarks    users[]           @relation(name: "projectMembers", fields: [bookmarkIds], references: [id])
+  bookmarkIds  String[]          @db.ObjectId
+}
+
+model SkillWithRating {
+  skillRatingId String   @id @default(auto()) @map("_id") @db.ObjectId
+  skill         skills   @relation(fields: [skillId], references: [id])
+  skillId       String   @db.ObjectId
+  rating        Int
+  projects      projects @relation(fields: [projectsId], references: [id])
+  projectsId    String   @db.ObjectId
 }
