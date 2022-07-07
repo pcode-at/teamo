@@ -1,7 +1,7 @@
 import { AppProps } from "next/app";
 import { useRouter } from "next/router";
+import ProtectedRoute from "../components/atoms/ProtectedRoute";
 import { globalCss } from "../stitches.config";
-import "../utils/skeleton.css";
 
 const globalStyles = globalCss({
   "*": {
@@ -10,7 +10,7 @@ const globalStyles = globalCss({
     padding: 0,
   },
   body: {
-    fontFamily: "Poppins, sans-serif",
+    fontFamily: "comic-sans, sans-serif",
     fontWeight: "$regular",
     overflowX: "hidden",
     backgroundColor: "$background",
@@ -23,7 +23,11 @@ function App({ Component, pageProps }: AppProps) {
 
   const router = useRouter();
 
-  return <Component {...pageProps} router={router} />;
+  return (
+    <ProtectedRoute router={router}>
+      <Component {...pageProps} router={router} />
+    </ProtectedRoute>
+  );
 }
 
 export default App;
