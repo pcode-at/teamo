@@ -27,11 +27,11 @@ model userSkills {
 }
 
 model skills {
-  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
   name            String
   skillMatrix     SkillMatrix[]
   UsersSkills     userSkills[]
-  SkillWithRating SkillWithRating[]
+  SkillWithRating skillRating[]
 }
 
 model users {
@@ -58,22 +58,22 @@ model users {
 }
 
 model projects {
-  id           String            @id @default(auto()) @map("_id") @db.ObjectId
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
   description  String
-  creationDate DateTime          @db.Date
-  lastEdited   DateTime          @db.Date
+  creationDate DateTime      @db.Date
+  lastEdited   DateTime      @db.Date
   status       String
-  creator      users             @relation(name: "creator", fields: [creatorId], references: [id])
-  creatorId    String            @db.ObjectId
-  members      users[]           @relation(name: "bookmarks", fields: [memberIds], references: [id])
-  memberIds    String[]          @db.ObjectId
-  skills       SkillWithRating[]
-  skillIds     String[]          @db.ObjectId
-  bookmarks    users[]           @relation(name: "projectMembers", fields: [bookmarkIds], references: [id])
-  bookmarkIds  String[]          @db.ObjectId
+  creator      users         @relation(name: "creator", fields: [creatorId], references: [id])
+  creatorId    String        @db.ObjectId
+  members      users[]       @relation(name: "bookmarks", fields: [memberIds], references: [id])
+  memberIds    String[]      @db.ObjectId
+  skills       skillRating[]
+  skillIds     String[]      @db.ObjectId
+  bookmarks    users[]       @relation(name: "projectMembers", fields: [bookmarkIds], references: [id])
+  bookmarkIds  String[]      @db.ObjectId
 }
 
-model SkillWithRating {
+model skillRating {
   skillRatingId String   @id @default(auto()) @map("_id") @db.ObjectId
   skill         skills   @relation(fields: [skillId], references: [id])
   skillId       String   @db.ObjectId
