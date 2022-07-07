@@ -5,6 +5,9 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 import { ProjectModule } from "./project/project.module";
 import { AuthModule } from "./auth/auth.module";
+import { SkillController } from './skill/skill.controller';
+import { SkillService } from './skill/skill.service';
+import { SkillModule } from './skill/skill.module';
 import "dotenv/config";
 
 @Module({
@@ -16,8 +19,9 @@ import "dotenv/config";
     CacheModule.register({
       isGlobal: true,
     }),
+    SkillModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, SkillController],
+  providers: [AppService, SkillService],
 })
 export class AppModule {}

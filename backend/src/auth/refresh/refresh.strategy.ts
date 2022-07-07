@@ -24,7 +24,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh-tok
 
   async validate(request: Request, payload: any) {
     const refreshToken = request?.body?.token;
-    console.log(payload);
 
     const identifier = payload.identifier.userIdentifier.identifier;
     const isValid = await this.refreshService.getToken(identifier, refreshToken);

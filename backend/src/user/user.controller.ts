@@ -1,22 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor, Req, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { SkillDto } from "./dto/skill.dto";
 import { UserResponse, UserResponses } from "src/entities/user-response.entity";
+import { Request } from "express";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   async create(@Body() create: CreateUserDto): Promise<UserResponse> {
     return await this.userService.create(create);
   }
 
-  @Get()
+  @Get('/all')
   async findAll(): Promise<UserResponses> {
     return await this.userService.findAll();
   }
@@ -26,9 +28,11 @@ export class UserController {
     return await this.userService.search(search);
   }
 
-  @Get(":identifier")
-  findOne(@Param("identifier") identifier: string) {
-    return this.userService.findOne(identifier);
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  findOne(@Req() request: Request) {
+    const jwt = request.headers.authorization.split(' ')[1];
+    return this.userService.findOneDetailed(jwt);
   }
 
   @Patch(":id")

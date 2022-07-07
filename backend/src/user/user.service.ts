@@ -8,19 +8,21 @@ import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserResponse, UserResponses } from "src/entities/user-response.entity";
 import { UserEntity } from "src/entities/user.entity";
-import { log } from "console";
-import { PrismaClient, users, userSkills } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
 import { searchForUsers } from "src/algorithms/search.algorithm";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
-import { Authorization, AuthorizationResponse } from "src/auth/entities/authorization.entity";
+import { Authorization } from "src/auth/entities/authorization.entity";
+import { AuthService } from "src/auth/auth.service";
+import { JwtService } from "@nestjs/jwt";
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>, @Inject(CACHE_MANAGER) private readonly cacheManager: Cache) { }
+  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>, @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly jwtService: JwtService) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     const user = await prisma.users.create({
@@ -46,6 +48,27 @@ export class UserService {
       where: {
         identifier,
       },
+    });
+    if (user) {
+      return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
+    }
+    return new UserResponse({ statusCode: 404, message: "User not found" });
+  }
+  async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
+
+    const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
+    return null;
+  }
+
+  async findOneDetailed(jwt: string): Promise<UserResponse> {
+    const decoded = await this.jwtService.decode(jwt);
+    //@ts-ignore
+    const identifier = decoded.identifier.userIdentifier.identifier
+
+    const user = await prisma.users.findUnique({
+      where: {
+        identifier: identifier,
+      },
       include: {
         skills: {
           include: {
@@ -59,15 +82,10 @@ export class UserService {
     }
     return new UserResponse({ statusCode: 404, message: "User not found" });
   }
-  async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
-
-    const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
-    return null;
-  }
 
   async updateOne(identifier: string, user: UserEntity): Promise<UserResponse> {
     const { id, ...rest } = user;
-    // console.log(rest.authorization);
+
 
     const updatedUser = await prisma.users.update({
       where: {
@@ -87,8 +105,8 @@ export class UserService {
   async updateAuthorization(identifier: string, authorization: Authorization) {
     const user = await this.findOne(identifier);
 
-    user.data.authorization.accessTokens.push(authorization.accessToken);
-    user.data.authorization.refreshTokens.push(authorization.refreshToken);
+    if (authorization.accessToken) user.data.authorization.accessTokens.push(authorization.accessToken);
+    if (authorization.refreshToken) user.data.authorization.refreshTokens.push(authorization.refreshToken);
 
     await this.updateOne(identifier, user.data);
   }
