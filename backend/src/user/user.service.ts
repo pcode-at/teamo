@@ -1,4 +1,4 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cache } from "cache-manager";
 import { Model } from "mongoose";
@@ -14,7 +14,6 @@ import { searchForUsers } from "src/algorithms/search.algorithm";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
 import { Authorization } from "src/auth/entities/authorization.entity";
-import { AuthService } from "src/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 
 const prisma = new PrismaClient();
@@ -97,9 +96,6 @@ export class UserService {
       },
     });
     return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
-
-
-    //return this.userModel.findOne({ identifier }).populate("skill").exec();
   }
 
   async updateAuthorization(identifier: string, authorization: Authorization) {
