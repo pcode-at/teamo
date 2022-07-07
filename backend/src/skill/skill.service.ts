@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 @Injectable()
 export class SkillService {
 
-
     async findAll(): Promise<SkillResponse> {
         const skills = await prisma.skills.findMany();
         return new SkillResponse({
