@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "../../../stitches.config";
 
 type Props = {
+  children: React.ReactNode;
   icon?: any;
   required?: boolean;
   label?: string;
