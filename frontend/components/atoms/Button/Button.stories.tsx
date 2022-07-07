@@ -7,12 +7,12 @@ export default {
   title: 'Atoms/Button',
   component: Button,
   argTypes: {
-    color: {
-      options: ['red', 'blue', 'white'],
+    size: {
+      options: ['medium', 'small'],
       control: { type: 'radio' },
     },
-    type: {
-      options: ['primary', 'secondary'],
+    disabled: {
+      options: [true, false],
       control: { type: 'radio' },
     },
     ...disabledStorybookArgTypesFromStitches,
@@ -21,25 +21,14 @@ export default {
 
 export const Default = () => <Button>Kontaktieren</Button>;
 
-export const PrimaryRed = () => (
-  <Button type="primary" color="red">
+export const Small = () => (
+  <Button size={"small"}>
     Kontaktieren
   </Button>
 );
 
-export const PrimaryBlue = () => (
-  <Button type="primary" color="blue">
+export const Disabled = () => (
+  <Button size={"small"} disabled={true}>
     Kontaktieren
   </Button>
 );
-
-export const PrimaryWhite = () => (
-  <Button type="primary" color="white">
-    Kontaktieren
-  </Button>
-);
-PrimaryWhite.parameters = {
-  backgrounds: { default: 'whiteSmoke' },
-};
-
-export const Secondary = () => <Button type="secondary">Kontaktieren</Button>;

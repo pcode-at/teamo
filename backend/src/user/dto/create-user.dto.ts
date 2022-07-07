@@ -1,6 +1,6 @@
 import { Type } from "class-transformer";
 import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber } from "class-validator";
-import { Date } from "mongoose";
+import mongoose, { Date } from "mongoose";
 import { IsStrongPassword } from "src/decorators/IsStrongPassword";
 
 export class CreateUserDto {
@@ -23,8 +23,6 @@ export class CreateUserDto {
     @IsNotEmpty()
     phoneNumber: string;
 
-    @IsDate()
-    @Type(() => Date)
     @IsNotEmpty()
     birthDate: Date;
 
@@ -41,4 +39,7 @@ export class CreateUserDto {
     @IsOptional()
     @IsNotEmpty()
     departments: string[];
+
+    @IsNotEmpty()
+    location: string;
 }
