@@ -2,9 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { ElasticsearchService } from "@nestjs/elasticsearch";
 import { skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
+import { SearchDto } from "src/user/dto/search.dto";
 
-const { events } = require("@elastic/elasticsearch");
-console.log(events);
+import { estypes } from "@elastic/elasticsearch";
 
 const client = new ElasticsearchService({
   node: "https://localhost:9200/",
@@ -58,7 +58,7 @@ export class ElasticService {
       document: {
         location: user.location,
         departments: user.departments,
-        skills: [skills],
+        skills: skills,
       },
     });
 
@@ -80,6 +80,93 @@ export class ElasticService {
         },
       },
     });
+  }
+
+  async search(search: SearchDto) {
+    const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
+
+    const required = search.parameters.filter(search => search.required).map(search => search.value);
+
+    const searchQuery = {
+      index: "users",
+      body: {
+        query: {
+          function_score: {
+            query: {
+              bool: {
+                must: [],
+              },
+            },
+            functions: [],
+          },
+        },
+      },
+    };
+
+    searchQuery.body.query.function_score.query.bool.must.push({
+      terms: {
+        "skills.skill": required,
+      },
+    });
+
+    // searchQuery.body.query.bool.must.push({
+    //   match: {
+    //     skills: {
+    //       skill: required,
+    //     },
+    //   },
+    // });
+
+    if (attributes.includes("location")) {
+      searchQuery.body.query.function_score.query.bool.must.push({
+        terms: {
+          location: search.parameters.find(search => search.attribute === "location").value,
+        },
+      });
+    }
+    if (attributes.includes("department")) {
+      searchQuery.body.query.function_score.query.bool.must.push({
+        terms: {
+          departments: search.parameters.find(search => search.attribute === "department").value,
+        },
+      });
+    }
+
+    let skills = search.parameters.filter(paramter => paramter.attribute === "skill");
+
+    skills.forEach((paramter, index) => {
+      searchQuery.body.query.function_score.functions.push({
+        filter: {
+          bool: {
+            must: [
+              {
+                match: {
+                  "skills.skill": paramter.value,
+                },
+              },
+              {
+                bool: {
+                  should: {
+                    match: {
+                      "skills.rating": paramter.rating,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+        weight: ((skills.length - index) / skills.length) * 10,
+      });
+    });
+
+    console.log(JSON.stringify(searchQuery, null, 4));
+
+    const result = await client.search(searchQuery);
+
+    console.log(result);
+
+    return result;
   }
 }
 

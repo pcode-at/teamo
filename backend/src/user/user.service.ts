@@ -21,8 +21,11 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>, @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
-    private readonly jwtService: JwtService) { }
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     const user = await prisma.users.create({
@@ -55,7 +58,6 @@ export class UserService {
     return new UserResponse({ statusCode: 404, message: "User not found" });
   }
   async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
-
     const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
     return null;
   }
@@ -63,7 +65,7 @@ export class UserService {
   async findOneDetailed(jwt: string): Promise<UserResponse> {
     const decoded = await this.jwtService.decode(jwt);
     //@ts-ignore
-    const identifier = decoded.identifier.userIdentifier.identifier
+    const identifier = decoded.identifier.userIdentifier.identifier;
 
     const user = await prisma.users.findUnique({
       where: {
@@ -86,7 +88,6 @@ export class UserService {
   async updateOne(identifier: string, user: UserEntity): Promise<UserResponse> {
     const { id, ...rest } = user;
 
-
     const updatedUser = await prisma.users.update({
       where: {
         identifier,
@@ -97,7 +98,6 @@ export class UserService {
       },
     });
     return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
-
 
     //return this.userModel.findOne({ identifier }).populate("skill").exec();
   }
@@ -183,13 +183,8 @@ export class UserService {
         user: {
           location,
           departments: {
-            hasEvery: department,
+            hasSome: department,
           },
-          birthDate: {
-            gte: new Date(new Date().getFullYear() - minAge),
-            lte: new Date(new Date().getFullYear() - maxAge),
-          },
-          gender,
         },
 
         skill: {
