@@ -1,4 +1,4 @@
-import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cache } from "cache-manager";
 import { Model } from "mongoose";
@@ -14,7 +14,6 @@ import { searchForUsers } from "src/algorithms/search.algorithm";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
 import { Authorization } from "src/auth/entities/authorization.entity";
-import { AuthService } from "src/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 
 const prisma = new PrismaClient();
@@ -67,7 +66,7 @@ export class UserService {
 
     const user = await prisma.users.findUnique({
       where: {
-        identifier: identifier,
+        identifier,
       },
       include: {
         skills: {
