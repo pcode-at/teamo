@@ -15,6 +15,9 @@ import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
 import { Authorization } from "src/auth/entities/authorization.entity";
 import { JwtService } from "@nestjs/jwt";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcrypt');
+
 
 const prisma = new PrismaClient();
 
@@ -24,9 +27,13 @@ export class UserService {
     private readonly jwtService: JwtService) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
+    let password = createUserDto.password
+    let hashed = await bcrypt.hash(password, 10);
+
     const user = await prisma.users.create({
       data: {
         ...createUserDto,
+        password: hashed,
         birthDate: new Date(createUserDto.birthDate.toString()),
         authorization: {
           accessTokens: [],

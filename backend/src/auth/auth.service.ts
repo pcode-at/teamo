@@ -5,6 +5,8 @@ import { UserService } from "src/user/user.service";
 import { jwtConstants } from "./constants";
 import { LoginDto } from "./dto/login.dto";
 import { Authorization, AuthorizationResponse } from "./entities/authorization.entity";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const bcrypt = require('bcrypt');
 
 @Injectable()
 export class AuthService {
@@ -12,8 +14,8 @@ export class AuthService {
 
   async validateUser(identifier: string, pass: string): Promise<any> {
     const user = (await this.userService.findOne(identifier)).data as UserEntity;
-    //encrypt using bcrypt here (10 rounds)
-    if (user && user.password === pass) {
+
+    if (user && bcrypt.compareSync(pass, user.password)) {
       const { password, ...result } = user;
       return result;
     }

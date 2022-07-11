@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, Controller, Get, UseInterceptors } from '@nestjs/common';
 import { SkillResponse } from 'src/entities/skill.entity';
 import { SkillService } from './skill.service';
 
