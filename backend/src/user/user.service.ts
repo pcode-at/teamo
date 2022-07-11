@@ -1,4 +1,4 @@
-import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Cache } from "cache-manager";
 import { Model } from "mongoose";
@@ -153,12 +153,37 @@ export class UserService {
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+    let user;
+    try {
+      user = await prisma.users.update({
+        where: {
+          identifier: id,
+        },
+        data: {
+          ...updateUserDto,
+          birthDate: new Date(updateUserDto.birthDate.toString()),
+        },
+      })
+    } catch {
+      throw new BadRequestException("Something went wrong while updating the user");
+    }
+    return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(user) });
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string): Promise<UserResponse> {
+    try {
+      await prisma.users.delete({
+        where: {
+          identifier: id,
+        },
+      });
+    } catch {
+      throw new BadRequestException("Something went wrong while deleting the user");
+    }
+    return new UserResponse({ statusCode: 200, message: "User deleted successfully" });
+
   }
 
   async search(search: SearchDto): Promise<UserAndSkills[]> {

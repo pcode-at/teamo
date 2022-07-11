@@ -36,13 +36,13 @@ export class UserController {
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() update: UpdateUserDto) {
-    return this.userService.update(+id, update);
+  update(@Param("id") id: string, @Body() update: UpdateUserDto): Promise<UserResponse> {
+    return this.userService.update(id, update);
   }
 
   @Delete(":id")
-  remove(@Param("id") id: string) {
-    return this.userService.remove(+id);
+  remove(@Param("id") id: string): Promise<UserResponse> {
+    return this.userService.remove(id);
   }
 
   @Post("skill")
