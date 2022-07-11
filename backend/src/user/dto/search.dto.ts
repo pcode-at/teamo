@@ -10,6 +10,6 @@ export class SearchDto {
 class SearchAttribute {
   attribute: string;
   value: string;
-  rating?: number | number[];
+  rating?: number;
   required: boolean;
 }
