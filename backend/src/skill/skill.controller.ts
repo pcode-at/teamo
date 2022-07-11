@@ -2,7 +2,7 @@ import { ClassSerializerInterceptor, Controller, Get, UseInterceptors } from '@n
 import { SkillResponse } from 'src/entities/skill.entity';
 import { SkillService } from './skill.service';
 
-@Controller('/api/skill')
+@Controller('api/skill')
 @UseInterceptors(ClassSerializerInterceptor)
 export class SkillController {
     constructor(private readonly skillService: SkillService) { }

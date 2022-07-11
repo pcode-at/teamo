@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var client_1 = require("@prisma/client");
+var node_fetch_1 = require("node-fetch");
 var prisma = new client_1.PrismaClient();
 function seedElastic() {
     return __awaiter(this, void 0, void 0, function () {
@@ -50,7 +51,7 @@ function seedElastic() {
                     users.forEach(function (user) { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, fetch("http://localhost:3000/api/elastic/insertUser/".concat(user.identifier), {
+                                case 0: return [4 /*yield*/, (0, node_fetch_1["default"])("http://localhost:3000/api/elastic/insertUser/".concat(user.identifier), {
                                         method: "POST"
                                     })];
                                 case 1:

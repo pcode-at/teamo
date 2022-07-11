@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { ElasticsearchService } from "@nestjs/elasticsearch";
-import { skills, users, userSkills } from "@prisma/client";
+import { PrismaClient, skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
+import { SearchEntity, SearchResponse } from "src/entities/search.entity";
+import { UserEntity } from "src/entities/user.entity";
 import { SearchDto } from "src/user/dto/search.dto";
 
-import { estypes } from "@elastic/elasticsearch";
+const prisma = new PrismaClient();
 
 const client = new ElasticsearchService({
   node: "https://localhost:9200/",
@@ -38,9 +40,7 @@ const client = new ElasticsearchService({
 // }
 @Injectable()
 export class ElasticService {
-  constructor() {} //private readonly elasticsearchService: ElasticsearchService
-
-  // insert Data from user into elastic user with skills
+  constructor() { }
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
@@ -62,7 +62,7 @@ export class ElasticService {
       },
     });
 
-    console.log(result);
+    // console.log(result);
 
     return result;
   }
@@ -153,7 +153,48 @@ export class ElasticService {
     return resultDTO;
   }
 
-  async search(search: SearchDto) {
+
+  async search(search: SearchDto): Promise<SearchResponse> {
+    const results = await this.prepareSearch(search);
+    const mappedUsers = [] as UserEntity[];
+    for (const user of results.users) {
+      let userData = await this.getUserData(user.identifier);
+      mappedUsers.push(new UserEntity({ ...userData, score: user.score }));
+    }
+
+    return new SearchResponse({
+      statusCode: 201,
+      message: "Successfully found users",
+      data: new SearchEntity({
+        maxScore: results.maxScore,
+        users: mappedUsers.map(user => new UserEntity(user)),
+      })
+
+    })
+  }
+
+  async getUserData(identifier: string) {
+    return await prisma.users.findUnique({
+      where: {
+        identifier,
+      },
+      include: {
+        skills: {
+          select: {
+            rating: true,
+            skill: {
+              select: {
+                name: true,
+              }
+            }
+          }
+
+        }
+      }
+    });
+  }
+
+  async prepareSearch(search: SearchDto) {
     const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
 
     const required = search.parameters.filter(search => search.required).map(search => search.value);
@@ -238,7 +279,7 @@ export class ElasticService {
       delete searchQuery.body.query.function_score.query.bool.filter;
     }
 
-    console.log(JSON.stringify(searchQuery, null, 4));
+    // console.log(JSON.stringify(searchQuery, null, 4));
 
     let modified: boolean = false;
 
@@ -247,7 +288,7 @@ export class ElasticService {
     if (result.hits.hits.length === 0 && searchQuery.body.query.function_score.query.bool.filter.length > 0) {
       let skillsFromMustToShould = searchQuery.body.query.function_score.query.bool.filter;
       delete searchQuery.body.query.function_score.query.bool.filter;
-      //types object wrong
+
       //@ts-ignore
       searchQuery.body.query.function_score.query.bool.should.push(skillsFromMustToShould.map(paramter => paramter.terms));
       result = await client.search(searchQuery);
