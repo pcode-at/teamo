@@ -42,7 +42,7 @@ export class ElasticService {
 
   // insert Data from user into elastic user with skills
 
-  async insertUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
+  async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
 
     user.skills.forEach(skill => {
@@ -82,6 +82,77 @@ export class ElasticService {
     });
   }
 
+  async recommend(skillsNeeded: SkillElastic[], accurate: boolean, peopleNeeded: number) {
+    let skillsPerPerson = 1;
+
+    if (accurate) skillsPerPerson = skillsNeeded.length / peopleNeeded;
+
+    let skills = skillsNeeded.map(skill => {
+      return skill.skill;
+    });
+
+    const searchQuery = {
+      index: "users",
+      body: {
+        query: {
+          function_score: {
+            query: {
+              bool: {
+                must: {
+                  match_all: {},
+                },
+                should: [
+                  {
+                    terms: {
+                      "skills.skill": skills,
+                    },
+                  },
+                ],
+                minimum_should_match: Math.floor(skillsPerPerson),
+              },
+            },
+            functions: [],
+          },
+        },
+      },
+    };
+
+    skillsNeeded.forEach(paramter => {
+      searchQuery.body.query.function_score.functions.push({
+        filter: {
+          bool: {
+            must: {
+              match: {
+                "skills.skill": paramter.skill,
+              },
+            },
+          },
+        },
+        gauss: {
+          "skills.rating": {
+            origin: paramter.rating,
+            scale: 1,
+          },
+        },
+      });
+    });
+
+    const result = await client.search(searchQuery);
+
+    const resultDTO = {
+      users: [],
+    };
+
+    result.hits.hits.forEach(hit => {
+      resultDTO.users.push({
+        identifier: hit._id,
+        score: hit._score,
+      });
+    });
+
+    return resultDTO;
+  }
+
   async search(search: SearchDto) {
     const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
 
@@ -94,7 +165,17 @@ export class ElasticService {
           function_score: {
             query: {
               bool: {
-                must: [],
+                must: {
+                  match_all: {},
+                },
+                should: [
+                  {
+                    terms: {
+                      "skills.skill": [],
+                    },
+                  },
+                ],
+                filter: [],
               },
             },
             functions: [],
@@ -103,29 +184,23 @@ export class ElasticService {
       },
     };
 
-    searchQuery.body.query.function_score.query.bool.must.push({
-      terms: {
-        "skills.skill": required,
-      },
-    });
-
-    // searchQuery.body.query.bool.must.push({
-    //   match: {
-    //     skills: {
-    //       skill: required,
-    //     },
-    //   },
-    // });
+    if (required.length > 0) {
+      searchQuery.body.query.function_score.query.bool.filter.push({
+        terms: {
+          "skills.skill": required,
+        },
+      });
+    }
 
     if (attributes.includes("location")) {
-      searchQuery.body.query.function_score.query.bool.must.push({
+      searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
           location: search.parameters.find(search => search.attribute === "location").value,
         },
       });
     }
     if (attributes.includes("department")) {
-      searchQuery.body.query.function_score.query.bool.must.push({
+      searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
           departments: search.parameters.find(search => search.attribute === "department").value,
         },
@@ -135,38 +210,64 @@ export class ElasticService {
     let skills = search.parameters.filter(paramter => paramter.attribute === "skill");
 
     skills.forEach((paramter, index) => {
+      if (!paramter.required) {
+        searchQuery.body.query.function_score.query.bool.should[0].terms["skills.skill"].push(paramter.value);
+      }
+
       searchQuery.body.query.function_score.functions.push({
         filter: {
           bool: {
-            must: [
-              {
-                match: {
-                  "skills.skill": paramter.value,
-                },
+            must: {
+              match: {
+                "skills.skill": paramter.value,
               },
-              {
-                bool: {
-                  should: {
-                    match: {
-                      "skills.rating": paramter.rating,
-                    },
-                  },
-                },
-              },
-            ],
+            },
           },
         },
         weight: ((skills.length - index) / skills.length) * 10,
+        gauss: {
+          "skills.rating": {
+            origin: paramter.rating,
+            scale: 1,
+          },
+        },
       });
     });
 
+    if (searchQuery.body.query.function_score.query.bool.filter.length === 0) {
+      delete searchQuery.body.query.function_score.query.bool.filter;
+    }
+
     console.log(JSON.stringify(searchQuery, null, 4));
 
-    const result = await client.search(searchQuery);
+    let modified: boolean = false;
 
-    console.log(result);
+    let result = await client.search(searchQuery);
 
-    return result;
+    if (result.hits.hits.length === 0 && searchQuery.body.query.function_score.query.bool.filter.length > 0) {
+      let skillsFromMustToShould = searchQuery.body.query.function_score.query.bool.filter;
+      delete searchQuery.body.query.function_score.query.bool.filter;
+      //types object wrong
+      //@ts-ignore
+      searchQuery.body.query.function_score.query.bool.should.push(skillsFromMustToShould.map(paramter => paramter.terms));
+      result = await client.search(searchQuery);
+      modified = true;
+    }
+
+    const resultDTO = {
+      searchModified: modified,
+      maxScore: result.hits.max_score,
+      users: [],
+    };
+
+    result.hits.hits.forEach(hit => {
+      resultDTO.users.push({
+        identifier: hit._id,
+        score: hit._score,
+      });
+    });
+
+    return resultDTO;
   }
 }
 
@@ -175,23 +276,23 @@ class SkillElastic {
   skill: string;
 }
 
-client.diagnostic.on("request", (err, result) => {
-  const { id } = result.meta.request;
-  const { context } = result.meta;
-  if (err) {
-    console.log({ error: err, reqId: id, context });
-  }
-});
+// client.diagnostic.on("request", (err, result) => {
+//   const { id } = result.meta.request;
+//   const { context } = result.meta;
+//   if (err) {
+//     console.log({ error: err, reqId: id, context });
+//   }
+// });
 
-client.diagnostic.on("request", (err, result) => {
-  if (err) {
-    console.log("Error:");
-    console.error(err);
-  } else {
-    console.log("Info:");
-    console.info(result);
-  }
-});
+// client.diagnostic.on("request", (err, result) => {
+//   if (err) {
+//     console.log("Error:");
+//     console.error(err);
+//   } else {
+//     console.log("Info:");
+//     console.info(result);
+//   }
+// });
 
 // client.diagnostic.on("serialization", (err, result) => {
 //   console.log(err, result);

@@ -24,7 +24,7 @@ export class ElasticController {
       },
     });
 
-    this.elastic.insertUser(user);
+    this.elastic.migrateUser(user);
   }
 
   @Post("/search")
