@@ -8,39 +8,16 @@ import { useState } from "react";
 import { logout } from "../utils/authHelper";
 import { useRouter } from "next/router";
 import { Button } from "../components/atoms/Button/Button";
+import { ProfilePageInfoSection } from "../components/organisms/ProfilePageInfoSection/ProfilePageInfoSection";
+import { ProfilePageSkills } from "../components/organisms/ProfilePageSkills/ProfilePageSkills";
 
 export default function Home() {
-  const Router = useRouter();
-
-  const [user, setUser] = useState(null);
-
-  if (!user) {
-    getUser()
-      .then((user) => {
-        console.log(user);
-        setUser(user);
-      })
-      .catch(() => {});
-  }
-
   return (
     <>
       <Navbar></Navbar>
 
-      {user && (
-        <>
-          <h1>Hello {user.name}</h1>
-          <p>You are at the profile page</p>
-          <Button
-            onClick={() => {
-              logout();
-              Router.push("/login");
-            }}
-          >
-            Logout
-          </Button>
-        </>
-      )}
+      <ProfilePageInfoSection></ProfilePageInfoSection>
+      <ProfilePageSkills></ProfilePageSkills>
     </>
   );
 }

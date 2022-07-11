@@ -49,17 +49,17 @@ export default class Document extends NextDocument {
        url('/fonts/poppins-v15-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
        url('/fonts/poppins-v15-latin-700.svg#Poppins') format('svg'); /* Legacy iOS */
 }
-/* poppins-900 - latin */
+/* poppins-800 - latin */
 @font-face {
   font-family: 'Poppins';
   font-style: normal;
-  font-weight: 900;
+  font-weight: 800;
   font-display: swap;
   src: local(''),
-       url('/fonts/poppins-v15-latin-900.woff2') format('woff2'), /* Super Modern Browsers */
-       url('/fonts/poppins-v15-latin-900.woff') format('woff'), /* Modern Browsers */
-       url('/fonts/poppins-v15-latin-900.ttf') format('truetype'), /* Safari, Android, iOS */
-       url('/fonts/poppins-v15-latin-900.svg#Poppins') format('svg'); /* Legacy iOS */
+       url('/fonts/poppins-v15-latin-800.woff2') format('woff2'), /* Super Modern Browsers */
+       url('/fonts/poppins-v15-latin-800.woff') format('woff'), /* Modern Browsers */
+       url('/fonts/poppins-v15-latin-800.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('/fonts/poppins-v15-latin-800.svg#Poppins') format('svg'); /* Legacy iOS */
 }
 #__next {
   height: 100%;

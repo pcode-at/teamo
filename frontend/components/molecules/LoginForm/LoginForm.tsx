@@ -15,10 +15,10 @@ const LoginFormLayout = styled("div", {
   flexDirection: "column",
   justifyContent: "center",
   width: "100%",
-  padding: "$spacing-4x",
+  padding: "$4x",
 
   backgroundColor: "$brand-300",
-  borderRadius: "$border-radius-medium",
+  borderRadius: "$2x",
 });
 
 export const LoginForm: React.FC<Props> = ({}) => {

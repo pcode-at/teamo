@@ -12,7 +12,7 @@ const NavbarLayout = styled("div", {
   justifyContent: "space-between",
   alignItems: "center",
   width: "100%",
-  padding: "$spacing-2x",
+  padding: "$2x",
   backgroundColor: "$brand-300",
 });
 
@@ -54,14 +54,10 @@ export const Navbar: React.FC<Props> = ({}) => {
         </Link>
         <NavigationItems>
           <Link href="/" passHref>
-            <StyledLink>
-              HOME
-            </StyledLink>
+            <StyledLink>HOME</StyledLink>
           </Link>
           <Link href="/login" passHref>
-            <StyledLink>
-              LOGIN
-            </StyledLink>
+            <StyledLink>LOGIN</StyledLink>
           </Link>
           <Link href="/profile" passHref>
             <StyledLink>
