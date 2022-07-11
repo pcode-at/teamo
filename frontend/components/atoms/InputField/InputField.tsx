@@ -1,6 +1,7 @@
 import React from "react";
 import { styled } from "../../../stitches.config";
 import { InputFieldCore } from "../InputFieldCore/InputFieldCore";
+import type * as Stitches from "@stitches/react";
 
 type Props = {
   inputType: "text" | "date" | "email" | "number" | "datetime-local";
@@ -15,13 +16,14 @@ type Props = {
   errorMessage?: string;
   min?: string;
   max?: string;
+  size?: Stitches.VariantProps<typeof StyledInputField>["size"];
 };
 
 const StyledInputField = styled("input", {
   display: "inline-block",
-  width: "100%",
   border: "none",
-  padding: "0.5rem 0",
+  padding: "$1x $2x",
+  borderRadius: "$1x",
   borderBottom: "solid 1px transparent",
 
   fontFamily: "Arial",
@@ -34,6 +36,33 @@ const StyledInputField = styled("input", {
 
   ["&:focus"]: {
     borderBottom: "solid 1px red",
+  },
+
+  variants: {
+    size: {
+      small: {
+        width: "45px",
+      },
+      fitParent: {
+        width: "100%",
+      },
+    },
+  },
+
+  // remove arrows from number input
+  "-webkit-appearance": "none",
+  "-moz-appearance": "none",
+  "&::-webkit-outer-spin-button": {
+    "-webkit-appearance": "none",
+    margin: 0,
+  },
+  "&::-webkit-inner-spin-button": {
+    "-webkit-appearance": "none",
+    margin: 0,
+  },
+
+  defaultVariants: {
+    size: "fitParent",
   },
 });
 
@@ -61,6 +90,7 @@ export const InputField: React.FC<Props> = ({
   errorMessage = "",
   min,
   max,
+  size = "fitParent",
 }) => {
   const [isInputValid, setIsInputValid] = React.useState(null);
 
@@ -83,7 +113,12 @@ export const InputField: React.FC<Props> = ({
 
   return (
     <>
-      <InputFieldCore icon={icon} required={required} label={label} showLabel={showLabel}>
+      <InputFieldCore
+        icon={icon}
+        required={required}
+        label={label}
+        showLabel={showLabel}
+      >
         <StyledLabel>
           <StyledInputField
             type={inputType}
@@ -91,6 +126,7 @@ export const InputField: React.FC<Props> = ({
             name={label}
             placeholder={label}
             onChange={updateValidation}
+            size={size}
             {...(required && { required: true })}
             {...(min && { min })}
             {...(max && { max })}
