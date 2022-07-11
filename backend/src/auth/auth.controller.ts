@@ -1,5 +1,4 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
+import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { AuthorizationResponse } from "./entities/authorization.entity";
@@ -8,7 +7,7 @@ import { JwtRefreshTokenAuthGuard } from "./refresh/refresh-auth.guard";
 
 @Controller("/api/auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @UseGuards(LocalAuthGuard)
   @Post("/login")
@@ -18,7 +17,13 @@ export class AuthController {
 
   @UseGuards(JwtRefreshTokenAuthGuard)
   @Post("/refresh")
-  async refresh(@Req() request): Promise<any> {
-    return { accessToken: request.user };
+  async refresh(@Req() request): Promise<AuthorizationResponse> {
+    return new AuthorizationResponse({
+      statusCode: 201,
+      message: "Token refreshed",
+      data: {
+        accessToken: request.user
+      },
+    });
   }
 }

@@ -59,6 +59,7 @@ model users {
 
 model projects {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
   description  String
   creationDate DateTime      @db.Date
   lastEdited   DateTime      @db.Date
