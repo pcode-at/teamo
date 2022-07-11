@@ -4,7 +4,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { SkillDto } from "./dto/skill.dto";
-import { UserResponse, UserResponses } from "src/entities/user-response.entity";
+import { UserResponse } from "src/entities/user-response.entity";
 import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
@@ -19,7 +19,7 @@ export class UserController {
   }
 
   @Get('/all')
-  async findAll(): Promise<UserResponses> {
+  async findAll(): Promise<UserResponse> {
     return await this.userService.findAll();
   }
 

@@ -6,7 +6,7 @@ import { User, UserDocument } from "src/schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { UserResponse, UserResponses } from "src/entities/user-response.entity";
+import { UserResponse } from "src/entities/user-response.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { PrismaClient } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
@@ -37,9 +37,9 @@ export class UserService {
     return new UserResponse({ statusCode: 201, message: "User created successfully", data: new UserEntity(user) });
   }
 
-  async findAll(): Promise<UserResponses> {
+  async findAll(): Promise<UserResponse> {
     const users = await prisma.users.findMany();
-    return new UserResponses({ statusCode: 200, message: "Users found successfully", data: users.map(user => new UserEntity(user)) });
+    return new UserResponse({ statusCode: 200, message: "Users found successfully", data: users.map(user => new UserEntity(user)) });
   }
 
   async findOne(identifier: string): Promise<UserResponse> {
@@ -102,12 +102,12 @@ export class UserService {
   }
 
   async updateAuthorization(identifier: string, authorization: Authorization) {
-    const user = await this.findOne(identifier);
+    const user = await (await this.findOne(identifier)).data as UserEntity;
 
-    if (authorization.accessToken) user.data.authorization.accessTokens.push(authorization.accessToken);
-    if (authorization.refreshToken) user.data.authorization.refreshTokens.push(authorization.refreshToken);
+    if (authorization.accessToken) user.authorization.accessTokens.push(authorization.accessToken);
+    if (authorization.refreshToken) user.authorization.refreshTokens.push(authorization.refreshToken);
 
-    await this.updateOne(identifier, user.data);
+    await this.updateOne(identifier, user);
   }
 
   async addSkill(skill: SkillDto) {
