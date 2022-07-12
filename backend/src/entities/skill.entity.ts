@@ -1,19 +1,17 @@
-import { Exclude } from "class-transformer";
+import { Exclude, Transform } from "class-transformer";
 import { HttpResponse } from "./http-response.entity";
 
-export class SkillResponse implements SkillEntity, HttpResponse {
+export class SkillResponse implements HttpResponse {
     statusCode: number;
     message: string;
     error?: string;
-    data?: any;
+    data?: SkillEntity[];
     id: string;
     name: string;
-    skillMatrix: SkillRating[];
 
     constructor(partial: Partial<SkillResponse>) {
         Object.assign(this, partial);
     }
-
 }
 
 export class SkillEntity {
@@ -26,6 +24,7 @@ export class SkillEntity {
     constructor(partial: Partial<SkillEntity>) {
         Object.assign(this, partial);
     }
+
 }
 
 export class SkillRating {
