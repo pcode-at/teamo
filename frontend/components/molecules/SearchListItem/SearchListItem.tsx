@@ -52,6 +52,7 @@ const InputLayout = styled("div", {
   flexDirection: "row",
   alignItems: "center",
   justifyContent: "space-between",
+  padding: "$2x",
 });
 
 const RemoveIconLayout = styled("button", {

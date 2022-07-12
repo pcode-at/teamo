@@ -25,6 +25,7 @@ const SearchAddSkillLayout = styled("div", {
   alignItems: "center",
   width: "100%",
   borderRadius: "$2x",
+  marginTop: "$2x",
 
   backgroundColor: "$neutral-100",
 });
@@ -61,6 +62,7 @@ const SkillListLayout = styled("div", {
   padding: "$1x 0",
   borderRadius: "$2x",
   backgroundColor: "$neutral-100",
+  marginTop: "$2x",
   overflow: "auto",
 });
 
@@ -68,7 +70,7 @@ const SkillListItemLayout = styled("button", {
   display: "flex",
   width: "100%",
 
-  borderRadius: "$2x",
+  borderRadius: "$1x",
   backgroundColor: "$brand-100",
   cursor: "pointer",
   padding: "$1x $2x",

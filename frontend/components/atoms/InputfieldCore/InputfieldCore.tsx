@@ -14,7 +14,6 @@ const InputFieldLayout = styled("div", {
   alignItems: "center",
   width: "100%",
   border: "none",
-  padding: "10px",
   gap: "20px",
 
   background: "$backgroundTertiary",

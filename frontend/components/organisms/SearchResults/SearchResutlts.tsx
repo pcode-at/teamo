@@ -8,6 +8,7 @@ import { Button } from "../../atoms/Button/Button";
 import { SearchAddSkill } from "../../molecules/SearchAddSkill/SearchAddSkill";
 import { searchElastic } from "../../../utils/requests/search";
 import { useQuery } from "react-query";
+import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -31,7 +32,14 @@ type Props = {
   }[];
 };
 
-const SearchResultsLayout = styled("div", {});
+const SearchResultsLayout = styled("div", {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gridGap: "$2x",
+    padding: "$2x",
+    width: "100%",
+    height: "100%",
+});
 
 export const SearchResults: React.FC<Props> = ({ items }) => {
   let mappedItems = items.map((item, index) => {
@@ -63,8 +71,7 @@ export const SearchResults: React.FC<Props> = ({ items }) => {
         {results.users.map((user, index) => {
             console.log(user);
           return (<>
-            {user.name}({user.score}) - {user.skills.map ((skill) => (<>{skill.skill.name}({skill.rating})  {"    "}</>))}
-            <br/>
+            <SearchResultItem user={user} />
           </>)
         })}
       </SearchResultsLayout>
