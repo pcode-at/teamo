@@ -169,8 +169,7 @@ export class ElasticService {
         maxScore: results.maxScore,
         users: mappedUsers.map(user => new UserEntity(user)),
       })
-
-    })
+    });
   }
 
   async getUserData(identifier: string) {

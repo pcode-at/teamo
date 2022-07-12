@@ -27,7 +27,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password
@@ -193,68 +193,4 @@ export class UserService {
 
   }
 
-  async search(search: SearchDto): Promise<UserAndSkills[]> {
-    const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
-    const required = search.parameters.filter(search => search.required).map(search => search.value);
-
-    let location,
-      department,
-      maxAge,
-      minAge,
-      gender = undefined;
-
-    if (attributes.includes("location")) location = search.parameters.find(search => search.attribute === "location").value;
-    if (attributes.includes("department")) department = search.parameters.find(search => search.attribute === "department").value;
-    if (attributes.includes("maxAge")) maxAge = search.parameters.find(search => search.attribute === "maxAge").value;
-    if (attributes.includes("minAge")) minAge = search.parameters.find(search => search.attribute === "minAge").value;
-    if (attributes.includes("gender")) gender = search.parameters.find(search => search.attribute === "gender").value;
-
-    const skills = prisma.userSkills.findMany({
-      where: {
-        user: {
-          location,
-          departments: {
-            hasSome: department,
-          },
-        },
-
-        skill: {
-          name: {
-            in: required,
-          },
-        },
-      },
-      include: {
-        skill: true,
-        user: true,
-      },
-    });
-
-    let findResult = searchForUsers(await skills, search);
-
-    return findResult;
-
-    //throw new BadRequestException('Location is required');
-  }
-
-  // async recommend(projectId: string): Promise<UserAndSkills[]> {
-  //   const existingMember = await prisma.project.findOne({
-  //     where: {
-  //       id: projectId,
-  //     },
-  //     include: {
-  //       members: true,
-  //     },
-  //   });
-
-  //   const users = await prisma.userSkills.findMany({
-  //     include: {
-  //       skill: true,
-  //       user: true,
-  //     },
-  //   });
-
-  //   const recommendedUsers = recommendUsers(users);
-  //   return null;
-  // }
 }

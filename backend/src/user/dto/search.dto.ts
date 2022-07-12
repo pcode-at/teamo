@@ -9,7 +9,7 @@ export class SearchDto {
 
 class SearchAttribute {
   attribute: string;
-  value: string;
+  value: string | string[];
   rating?: number;
   required: boolean;
 }
