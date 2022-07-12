@@ -5,6 +5,7 @@ import SvgUser from "../../atoms/svg/SvgUser";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { SearchListItem } from "../../molecules/SearchListItem/SearchListItem";
 import { Button } from "../../atoms/Button/Button";
+import { SearchAddSkill } from "../../molecules/SearchAddSkill/SearchAddSkill";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -17,13 +18,23 @@ const reorder = (list, startIndex, endIndex) => {
 
 const grid = 8;
 
-type Props = {};
+type Props = {
+  items: {
+    id: string;
+    content: {
+      title: string;
+      skillId: string;
+      rating: string;
+    };
+  }[];
+  setItems: (items: any[]) => void;
+};
 
 const SearchBarLayout = styled("div", {
   padding: "$5x",
   height: "100%",
 
-  backgroundColor: "$neutral-200",
+  backgroundColor: "$brand-100",
 });
 
 const StyledList = styled("div", {
@@ -36,10 +47,7 @@ const StyledList = styled("div", {
   backgroundColor: "$neutral-100",
 });
 
-export const SearchBar: React.FC<Props> = ({}) => {
-  const [items, setItems] = React.useState([]);
-  const [newSkillName, setNewSkillName] = React.useState("");
-  const [newSkillRating, setNewSkillRating] = React.useState("");
+export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
   const [itemCount, setItemCount] = React.useState(0);
 
   function onDragEnd(result) {
@@ -62,7 +70,9 @@ export const SearchBar: React.FC<Props> = ({}) => {
     );
   }
 
-  console.log(items);
+  function deleteSkill(id: string) {
+    setItems(items.filter((item) => item.id !== id));
+  }
 
   return (
     <>
@@ -87,6 +97,7 @@ export const SearchBar: React.FC<Props> = ({}) => {
                           <SearchListItem
                             item={item}
                             updateSkillRating={updateSkillRating}
+                            deleteSkill={deleteSkill}
                           >
                             {item.content}
                           </SearchListItem>
@@ -95,42 +106,32 @@ export const SearchBar: React.FC<Props> = ({}) => {
                     </Draggable>
                   ))}
                   {provided.placeholder}
+                  <SearchAddSkill
+                    addSearchSkill={(
+                      skill: string,
+                      rating: string,
+                      id: string
+                    ): void => {
+                      setItems([
+                        ...items,
+                        {
+                          id: `skill-${itemCount}`,
+                          content: {
+                            title: skill,
+                            skillId: id,
+                            rating,
+                          },
+                        },
+                      ]);
+                      setItemCount(itemCount + 1);
+                    }}
+                    items={items}
+                  ></SearchAddSkill>
                 </StyledList>
               </div>
             )}
           </Droppable>
         </DragDropContext>
-        <InputField
-          inputType={"text"}
-          label={"Name"}
-          value={newSkillName}
-          onChange={setNewSkillName}
-        ></InputField>
-        <InputField
-          inputType={"number"}
-          label={"Rating"}
-          value={newSkillRating}
-          onChange={setNewSkillRating}
-        ></InputField>
-        <Button
-          onClick={() => {
-            setItems([
-              ...items,
-              {
-                id: "item-" + itemCount,
-                content: {
-                  title: newSkillName,
-                  rating: newSkillRating,
-                },
-              },
-            ]);
-            setNewSkillName("");
-            setNewSkillRating("");
-            setItemCount(itemCount + 1);
-          }}
-        >
-          Add Skill to list
-        </Button>
       </SearchBarLayout>
     </>
   );

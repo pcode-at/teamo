@@ -70,6 +70,7 @@ export class UserService {
 
   async findOneDetailed(jwt: string): Promise<UserResponse> {
     const decoded = await this.jwtService.decode(jwt);
+    //@ts-ignore
     const identifier = decoded.identifier;
     
     const user = await prisma.users.findUnique({

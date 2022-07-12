@@ -8,7 +8,7 @@ export class SearchDto {
 }
 
 class SearchAttribute {
-  attribute: string;
+  attribute: "skill" | "department" | "location";	
   value: string | string[];
   rating?: number;
   required: boolean;
