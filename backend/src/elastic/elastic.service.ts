@@ -40,7 +40,7 @@ const client = new ElasticsearchService({
 // }
 @Injectable()
 export class ElasticService {
-  constructor() { }
+  constructor() {}
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
@@ -87,51 +87,67 @@ export class ElasticService {
 
     if (accurate) skillsPerPerson = skillsNeeded.length / peopleNeeded;
 
-    let skills = skillsNeeded.map(skill => {
-      return skill.skill;
-    });
-
     const searchQuery = {
       index: "users",
       body: {
         query: {
           function_score: {
+            boost_mode: "replace",
             query: {
               bool: {
-                must: {
-                  match_all: {},
-                },
-                should: [
-                  {
-                    terms: {
-                      "skills.skill": skills,
-                    },
-                  },
-                ],
+                should: [],
                 minimum_should_match: Math.floor(skillsPerPerson),
+                must: [],
               },
             },
-            functions: [],
+            score_mode: "sum",
+            functions: [
+              {
+                script_score: {
+                  script: "_score",
+                },
+              },
+            ],
           },
         },
       },
     };
 
+    searchQuery.body.query.function_score.query.bool.should.push({
+      match_all: {},
+    });
+
     skillsNeeded.forEach(paramter => {
-      searchQuery.body.query.function_score.functions.push({
-        filter: {
-          bool: {
-            must: {
-              match: {
-                "skills.skill": paramter.skill,
+      searchQuery.body.query.function_score.query.bool.should.push({
+        nested: {
+          path: "skills",
+          query: {
+            function_score: {
+              boost_mode: "sum",
+              score_mode: "multiply",
+              functions: [
+                {
+                  exp: {
+                    "skills.rating": {
+                      offset: 0,
+                      origin: paramter.rating,
+                      scale: 1,
+                    },
+                  },
+                },
+              ],
+              query: {
+                bool: {
+                  should: [
+                    {
+                      match: {
+                        "skills.skill": paramter.skill as string,
+                      },
+                    },
+                  ],
+                },
               },
             },
-          },
-        },
-        gauss: {
-          "skills.rating": {
-            origin: paramter.rating,
-            scale: 1,
           },
         },
       });
@@ -153,7 +169,6 @@ export class ElasticService {
     return resultDTO;
   }
 
-
   async search(search: SearchDto): Promise<SearchResponse> {
     const results = await this.prepareSearch(search);
     const mappedUsers = [] as UserEntity[];
@@ -168,7 +183,7 @@ export class ElasticService {
       data: new SearchEntity({
         maxScore: results.maxScore,
         users: mappedUsers.map(user => new UserEntity(user)),
-      })
+      }),
     });
   }
 
@@ -184,63 +199,69 @@ export class ElasticService {
             skill: {
               select: {
                 name: true,
-              }
-            }
-          }
-
-        }
-      }
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   async prepareSearch(search: SearchDto) {
     const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
 
-    const required = search.parameters.filter(search => search.required).map(search => search.value);
+    const required = search.parameters
+      .filter(search => search.required)
+      .map(search => {
+        if (search.value) search.value;
+      });
+
+    if (!required) return;
 
     const searchQuery = {
       index: "users",
       body: {
         query: {
           function_score: {
+            boost_mode: "replace",
             query: {
               bool: {
-                must: {
-                  match_all: {},
-                },
-                should: [
-                  {
-                    terms: {
-                      "skills.skill": [],
-                    },
-                  },
-                ],
-                filter: [],
+                should: [],
+                must: [],
               },
             },
-            functions: [],
+            score_mode: "sum",
+            functions: [
+              {
+                script_score: {
+                  script: "_score",
+                },
+              },
+            ],
           },
         },
       },
     };
 
-    if (required.length > 0) {
-      searchQuery.body.query.function_score.query.bool.filter.push({
-        terms: {
-          "skills.skill": required,
-        },
-      });
-    }
+    searchQuery.body.query.function_score.query.bool.should.push({
+      match_all: {},
+    });
+
+    // searchQuery.body.query.function_score.functions.push({
+    //   script_score: {
+    //     script: 0,
+    //   },
+    // });
 
     if (attributes.includes("location")) {
-      searchQuery.body.query.function_score.query.bool.filter.push({
+      searchQuery.body.query.function_score.query.bool.must.push({
         terms: {
           location: search.parameters.find(search => search.attribute === "location").value,
         },
       });
     }
     if (attributes.includes("department")) {
-      searchQuery.body.query.function_score.query.bool.filter.push({
+      searchQuery.body.query.function_score.query.bool.must.push({
         terms: {
           departments: search.parameters.find(search => search.attribute === "department").value,
         },
@@ -250,49 +271,47 @@ export class ElasticService {
     let skills = search.parameters.filter(paramter => paramter.attribute === "skill");
 
     skills.forEach((paramter, index) => {
-      if (!paramter.required) {
-        searchQuery.body.query.function_score.query.bool.should[0].terms["skills.skill"].push(paramter.value);
-      }
-
-      searchQuery.body.query.function_score.functions.push({
-        filter: {
-          bool: {
-            must: {
-              match: {
-                "skills.skill": paramter.value,
+      searchQuery.body.query.function_score.query.bool.should.push({
+        nested: {
+          path: "skills",
+          query: {
+            function_score: {
+              boost_mode: "sum",
+              score_mode: "multiply",
+              functions: [
+                {
+                  exp: {
+                    "skills.rating": {
+                      offset: 0,
+                      origin: paramter.rating,
+                      scale: 1,
+                    },
+                  },
+                  weight: ((skills.length - index) / skills.length) * 100,
+                },
+              ],
+              query: {
+                bool: {
+                  should: [
+                    {
+                      match: {
+                        "skills.skill": paramter.value as string,
+                      },
+                    },
+                  ],
+                },
               },
             },
-          },
-        },
-        weight: ((skills.length - index) / skills.length) * 10,
-        gauss: {
-          "skills.rating": {
-            origin: paramter.rating,
-            scale: 1,
           },
         },
       });
     });
 
-    if (searchQuery.body.query.function_score.query.bool.filter.length === 0) {
-      delete searchQuery.body.query.function_score.query.bool.filter;
-    }
-
-    // console.log(JSON.stringify(searchQuery, null, 4));
+    console.log(JSON.stringify(searchQuery, null, 4));
 
     let modified: boolean = false;
 
     let result = await client.search(searchQuery);
-
-    if (result.hits.hits.length === 0 && searchQuery.body.query.function_score.query.bool.filter.length > 0) {
-      let skillsFromMustToShould = searchQuery.body.query.function_score.query.bool.filter;
-      delete searchQuery.body.query.function_score.query.bool.filter;
-
-      //@ts-ignore
-      searchQuery.body.query.function_score.query.bool.should.push(skillsFromMustToShould.map(paramter => paramter.terms));
-      result = await client.search(searchQuery);
-      modified = true;
-    }
 
     const resultDTO = {
       searchModified: modified,
