@@ -7,6 +7,7 @@ type Props = {
   disabled?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  onClick?: () => void;
   children: React.ReactNode;
 };
 
@@ -17,12 +18,12 @@ const StyledButton = styled("button", {
   borderRadius: "$border-radius-medium",
 
   color: "$neutral-100",
-  backgroundColor: "$brand-200",
+  backgroundColor: "$brand-400",
   cursor: "pointer",
   transition: "all 0.2s ease-in-out",
 
   "&:hover": {
-    backgroundColor: "$brand-400",
+    backgroundColor: "$brand-500",
   },
 
   "&:disabled": {
@@ -33,6 +34,7 @@ const StyledButton = styled("button", {
 
   "&:focus": {
     outline: "none",
+    backgroundColor: "$brand-200",
     border: "$brand-400 $borderWidths$border-width-medium solid",
   },
 
@@ -41,6 +43,7 @@ const StyledButton = styled("button", {
       medium: {},
       small: {
         padding: "$spacing-1x $spacing-3x",
+        
       },
     },
   },
@@ -51,11 +54,12 @@ export const Button: React.FC<Props> = ({
   disabled = false,
   leftIcon,
   rightIcon,
+  onClick,
   children,
 }) => {
   return (
     <>
-      <StyledButton size={size} disabled={disabled}>
+      <StyledButton size={size} disabled={disabled} onClick={onClick}>
         {children}
       </StyledButton>
     </>

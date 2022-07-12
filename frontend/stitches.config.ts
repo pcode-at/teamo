@@ -22,6 +22,7 @@ export const styles = {
       "brand-200": "#b7ccde",
       "brand-300": "#6f93af",
       "brand-400": "#245a91",
+      "brand-500": "#153967",
     },
     shadows: {
     },
