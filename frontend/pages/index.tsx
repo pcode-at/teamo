@@ -12,7 +12,7 @@ import { Button } from "../components/atoms/Button/Button";
 export default function Home() {
     const Router = useRouter();
 
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState(undefined);
 
     if(!user) {
   getUser()
