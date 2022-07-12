@@ -5,7 +5,7 @@ export class SkillResponse implements HttpResponse {
     statusCode: number;
     message: string;
     error?: string;
-    data?: SkillEntity[];
+    data?: SkillEntity | SkillEntity[];
     id: string;
     name: string;
 

@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Controller, Get, UseInterceptors } from '@nestjs/common';
+import { ClassSerializerInterceptor, Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import { SkillResponse } from 'src/entities/skill.entity';
 import { SkillService } from './skill.service';
 
@@ -12,4 +12,10 @@ export class SkillController {
     async getAll(): Promise<SkillResponse> {
         return await this.skillService.findAll();
     }
+
+    @Get(":id")
+    async getOne(@Param('id') id: string): Promise<SkillResponse> {
+        return await this.skillService.findOne(id);
+    }
+
 }

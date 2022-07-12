@@ -15,4 +15,17 @@ export class SkillService {
             data: skills.map(skill => new SkillEntity(skill))
         });
     }
+
+    async findOne(id: string): Promise<SkillResponse> {
+        const skill = await prisma.skills.findUnique({
+            where: {
+                id
+            }
+        });
+        return new SkillResponse({
+            statusCode: 200,
+            message: "Skill found successfully",
+            data: new SkillEntity(skill)
+        });
+    }
 }

@@ -1,5 +1,6 @@
 import { UsersAuthorization } from "@prisma/client";
 import { Exclude } from "class-transformer";
+import { SkillEntity } from "./skill.entity";
 
 export class UserEntity {
   @Exclude()

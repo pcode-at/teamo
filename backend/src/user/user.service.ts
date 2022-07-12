@@ -117,22 +117,29 @@ export class UserService {
     await this.updateOne(identifier, user);
   }
 
-  async addSkill(skill: SkillDto) {
-    await prisma.userSkills.create({
-      data: {
-        user: {
-          connect: {
-            identifier: skill.identifier,
+  async addSkill(skill: SkillDto): Promise<UserResponse> {
+    let user;
+    try {
+
+      await prisma.userSkills.create({
+        data: {
+          user: {
+            connect: {
+              identifier: skill.identifier,
+            },
           },
-        },
-        skill: {
-          connect: {
-            id: skill.skill,
+          skill: {
+            connect: {
+              id: skill.skill,
+            },
           },
+          rating: skill.rating,
         },
-        rating: skill.rating,
-      },
-    });
+      });
+    } catch {
+      throw new BadRequestException("Something went wrong while adding a skill");
+    }
+    return new UserResponse({ statusCode: 200, message: "Skill added successfully", data: new UserEntity(user) });
   }
 
   async getSkillsForUser(identifier: string) {
@@ -176,7 +183,6 @@ export class UserService {
       throw new BadRequestException("Something went wrong while updating the user");
     }
     return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(user) });
-
   }
 
   async remove(id: string): Promise<UserResponse> {
@@ -190,7 +196,5 @@ export class UserService {
       throw new BadRequestException("Something went wrong while deleting the user");
     }
     return new UserResponse({ statusCode: 200, message: "User deleted successfully" });
-
   }
-
 }
