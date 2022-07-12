@@ -26,7 +26,7 @@ const StyledLink = styled("a", {
 
   "&:focus": {
     outline: "none",
-    border: "$brand-400 $borderWidths$border-width-medium solid",
+    border: "$brand-400 $borderWidths$medium solid",
   },
 
   variants: {
