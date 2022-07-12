@@ -6,20 +6,9 @@ export class UserResponse implements HttpResponse {
   statusCode: number;
   message: string;
   error?: string;
-  data?: UserEntity;
+  data?: UserEntity | UserEntity[];
 
   constructor(partial: Partial<UserResponse>) {
-    Object.assign(this, partial);
-  }
-}
-
-export class UserResponses implements HttpResponse {
-  statusCode: number;
-  message: string;
-  error?: string;
-  data?: UserEntity[];
-
-  constructor(partial: Partial<UserResponses>) {
     Object.assign(this, partial);
   }
 }

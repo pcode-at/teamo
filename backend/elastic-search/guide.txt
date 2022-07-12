@@ -1,0 +1,26 @@
+If there are problems with starting the docker cluster, you are either going to have to get another ca.crt file from one of the docker container.
+
+The command to get this ca to your folder would be: docker cp <docker-container name>:/usr/share/elasticsearch/config/certs/ca/ca.crt .
+    For the docker container name use one of the three that start with elastic-search-es
+
+You also need to set the max map count to 2262144:
+    Linux: 
+            grep vm.max_map_count /etc/sysctl.conf
+            vm.max_map_count=262144
+
+    Mac: 
+        docker-machine ssh
+        sudo sysctl -w vm.max_map_count=262144
+
+    Windows: 
+        Same as on Mac if you use Docker Desktop
+
+        With WSL 2 Backend:
+        wsl -d docker-desktop
+        sysctl -w vm.max_map_count=262144
+
+The full guide is under:
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+
+
+

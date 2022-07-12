@@ -21,6 +21,7 @@ export class UserEntity {
   projectIds: string[];
   bookmarkedInIds: string[];
   projectsIds: string[];
+  score?: number;
 
   @Exclude()
   password: string;

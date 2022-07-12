@@ -5,10 +5,13 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 import { ProjectModule } from "./project/project.module";
 import { AuthModule } from "./auth/auth.module";
-import { SkillController } from './skill/skill.controller';
-import { SkillService } from './skill/skill.service';
-import { SkillModule } from './skill/skill.module';
+import { SkillController } from "./skill/skill.controller";
+import { SkillService } from "./skill/skill.service";
+import { SkillModule } from "./skill/skill.module";
+import { ElasticController } from "./elastic/elastic.controller";
+import { ElasticModule } from "./elastic/elastic.module";
 import "dotenv/config";
+import { ElasticService } from "./elastic/elastic.service";
 
 @Module({
   imports: [
@@ -20,8 +23,9 @@ import "dotenv/config";
       isGlobal: true,
     }),
     SkillModule,
+    ElasticModule,
   ],
-  controllers: [AppController, SkillController],
-  providers: [AppService, SkillService],
+  controllers: [AppController, SkillController, ElasticController],
+  providers: [AppService, SkillService, ElasticService],
 })
 export class AppModule {}
