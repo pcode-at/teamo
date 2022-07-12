@@ -10,18 +10,18 @@ import { useRouter } from "next/router";
 import { Button } from "../components/atoms/Button/Button";
 
 export default function Home() {
-    const Router = useRouter();
+  const Router = useRouter();
 
-    const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-    if(!user) {
-  getUser()
-    .then((user) => {
-      console.log(user);
+  if (!user) {
+    getUser()
+      .then((user) => {
+        console.log(user);
         setUser(user);
-    })
-    .catch(() => {});
-    }
+      })
+      .catch(() => {});
+  }
 
   return (
     <>
@@ -29,13 +29,16 @@ export default function Home() {
 
       {user && (
         <>
-            <h1>Hello {user.name}</h1>
-            <p>You are logged in</p>
-            <Button onClick={() => {
-                logout();
-                Router.push("/login");
-            }
-            }>Logout</Button>
+          <h1>Hello {user.name}</h1>
+          <p>You are at the profile page</p>
+          <Button
+            onClick={() => {
+              logout();
+              Router.push("/login");
+            }}
+          >
+            Logout
+          </Button>
         </>
       )}
     </>
