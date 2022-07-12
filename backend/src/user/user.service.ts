@@ -72,7 +72,7 @@ export class UserService {
     const decoded = await this.jwtService.decode(jwt);
     //@ts-ignore
     const identifier = decoded.identifier;
-    
+
     const user = await prisma.users.findUnique({
       where: {
         identifier,
