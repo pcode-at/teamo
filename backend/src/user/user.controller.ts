@@ -23,11 +23,6 @@ export class UserController {
     return await this.userService.findAll();
   }
 
-  @Post("search")
-  async search(@Body() search: SearchDto) {
-    return await this.userService.search(search);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Get()
   findOne(@Req() request: Request) {

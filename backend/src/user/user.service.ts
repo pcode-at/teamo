@@ -27,7 +27,7 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password
@@ -71,7 +71,7 @@ export class UserService {
   async findOneDetailed(jwt: string): Promise<UserResponse> {
     const decoded = await this.jwtService.decode(jwt);
     //@ts-ignore
-    const identifier = decoded.identifier.userIdentifier.identifier;
+    const identifier = decoded.identifier;
 
     const user = await prisma.users.findUnique({
       where: {
@@ -117,22 +117,29 @@ export class UserService {
     await this.updateOne(identifier, user);
   }
 
-  async addSkill(skill: SkillDto) {
-    await prisma.userSkills.create({
-      data: {
-        user: {
-          connect: {
-            identifier: skill.identifier,
+  async addSkill(skill: SkillDto): Promise<UserResponse> {
+    let user;
+    try {
+
+      await prisma.userSkills.create({
+        data: {
+          user: {
+            connect: {
+              identifier: skill.identifier,
+            },
           },
-        },
-        skill: {
-          connect: {
-            id: skill.skill,
+          skill: {
+            connect: {
+              id: skill.skill,
+            },
           },
+          rating: skill.rating,
         },
-        rating: skill.rating,
-      },
-    });
+      });
+    } catch {
+      throw new BadRequestException("Something went wrong while adding a skill");
+    }
+    return new UserResponse({ statusCode: 200, message: "Skill added successfully", data: new UserEntity(user) });
   }
 
   async getSkillsForUser(identifier: string) {
@@ -176,7 +183,6 @@ export class UserService {
       throw new BadRequestException("Something went wrong while updating the user");
     }
     return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(user) });
-
   }
 
   async remove(id: string): Promise<UserResponse> {
@@ -190,71 +196,5 @@ export class UserService {
       throw new BadRequestException("Something went wrong while deleting the user");
     }
     return new UserResponse({ statusCode: 200, message: "User deleted successfully" });
-
   }
-
-  async search(search: SearchDto): Promise<UserAndSkills[]> {
-    const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
-    const required = search.parameters.filter(search => search.required).map(search => search.value);
-
-    let location,
-      department,
-      maxAge,
-      minAge,
-      gender = undefined;
-
-    if (attributes.includes("location")) location = search.parameters.find(search => search.attribute === "location").value;
-    if (attributes.includes("department")) department = search.parameters.find(search => search.attribute === "department").value;
-    if (attributes.includes("maxAge")) maxAge = search.parameters.find(search => search.attribute === "maxAge").value;
-    if (attributes.includes("minAge")) minAge = search.parameters.find(search => search.attribute === "minAge").value;
-    if (attributes.includes("gender")) gender = search.parameters.find(search => search.attribute === "gender").value;
-
-    const skills = prisma.userSkills.findMany({
-      where: {
-        user: {
-          location,
-          departments: {
-            hasSome: department,
-          },
-        },
-
-        skill: {
-          name: {
-            in: required,
-          },
-        },
-      },
-      include: {
-        skill: true,
-        user: true,
-      },
-    });
-
-    let findResult = searchForUsers(await skills, search);
-
-    return findResult;
-
-    //throw new BadRequestException('Location is required');
-  }
-
-  // async recommend(projectId: string): Promise<UserAndSkills[]> {
-  //   const existingMember = await prisma.project.findOne({
-  //     where: {
-  //       id: projectId,
-  //     },
-  //     include: {
-  //       members: true,
-  //     },
-  //   });
-
-  //   const users = await prisma.userSkills.findMany({
-  //     include: {
-  //       skill: true,
-  //       user: true,
-  //     },
-  //   });
-
-  //   const recommendedUsers = recommendUsers(users);
-  //   return null;
-  // }
 }

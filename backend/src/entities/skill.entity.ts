@@ -5,7 +5,7 @@ export class SkillResponse implements HttpResponse {
     statusCode: number;
     message: string;
     error?: string;
-    data?: SkillEntity[];
+    data?: SkillEntity | SkillEntity[];
     id: string;
     name: string;
 
@@ -15,16 +15,15 @@ export class SkillResponse implements HttpResponse {
 }
 
 export class SkillEntity {
-    @Exclude()
     id: string;
-
     name: string;
+
+    @Exclude()
     skillMatrix: SkillRating[]
 
     constructor(partial: Partial<SkillEntity>) {
         Object.assign(this, partial);
     }
-
 }
 
 export class SkillRating {
