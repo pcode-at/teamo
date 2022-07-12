@@ -15,7 +15,7 @@ const client = new ElasticsearchService({
     password: "elastic",
   },
   tls: {
-    ca: fs.readFileSync("./src/elastic/ca.crt"),
+    ca: fs.readFileSync("./src/elastic/cert/ca.crt"),
     rejectUnauthorized: false,
   },
   requestTimeout: 30000,
@@ -38,9 +38,10 @@ const client = new ElasticsearchService({
 //     }
 //   }
 // }
+
 @Injectable()
 export class ElasticService {
-  constructor() {}
+  constructor() { }
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
