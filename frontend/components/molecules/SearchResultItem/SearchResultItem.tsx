@@ -56,7 +56,6 @@ const SearchResultItemSkillsLayout = styled("div", {
 });
 
 export const SearchResultItem: React.FC<Props> = ({ user }) => {
-  console.log(user);
   return (
     <>
       <SearchResultItemLayout>
