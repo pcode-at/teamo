@@ -40,7 +40,7 @@ const client = new ElasticsearchService({
 // }
 @Injectable()
 export class ElasticService {
-  constructor() {}
+  constructor() { }
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
@@ -222,6 +222,7 @@ export class ElasticService {
     const searchQuery = {
       index: "users",
       body: {
+        size: 60,
         query: {
           function_score: {
             boost_mode: "replace",
@@ -281,12 +282,37 @@ export class ElasticService {
               score_mode: "multiply",
               functions: [
                 {
+                  filter: {
+                    range: {
+                      "skills.rating": {
+                        lte: paramter.rating,
+                      }
+                    }
+                  },
                   gauss: {
                     "skills.rating": {
                       offset: 0,
                       origin: paramter.rating,
-                      scale: 5,
-                      decay: 0.3,
+                      scale: 1,
+                      decay: 0.5,
+                    },
+                  },
+                  weight: ((skills.length - index) / skills.length) * 100,
+                },
+                {
+                  filter: {
+                    range: {
+                      "skills.rating": {
+                        gt: paramter.rating,
+                      }
+                    }
+                  },
+                  gauss: {
+                    "skills.rating": {
+                      offset: 0,
+                      origin: paramter.rating,
+                      scale: 1,
+                      decay: 0.51
                     },
                   },
                   weight: ((skills.length - index) / skills.length) * 100,
@@ -320,6 +346,8 @@ export class ElasticService {
       maxScore: result.hits.max_score,
       users: [],
     };
+
+    console.log(result.hits.hits.length);
 
     result.hits.hits.forEach(hit => {
       resultDTO.users.push({
