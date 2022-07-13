@@ -45,9 +45,6 @@ const SearchResultItemLayout = styled("div", {
   "&:hover": {
     backgroundColor: "$brand-200",
   },
-  "&:active": {
-    backgroundColor: "$brand-300",
-  },
 });
 
 const SearchResultItemSkillsLayout = styled("div", {

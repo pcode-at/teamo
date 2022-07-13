@@ -3,8 +3,6 @@ import { useQuery } from "react-query";
 import { styled } from "../../../stitches.config";
 import { getSkills } from "../../../utils/requests/skills";
 import { InputField } from "../../atoms/InputField/InputField";
-import SvgMove2 from "../../atoms/svg/SvgMove2";
-import SvgPlus from "../../atoms/svg/SvgPlus";
 
 type Props = {
   addSearchSkill: (skill: string, rating: string, id: string) => void;

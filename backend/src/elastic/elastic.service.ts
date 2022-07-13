@@ -171,6 +171,7 @@ export class ElasticService {
 
   async search(search: SearchDto): Promise<SearchResponse> {
     const results = await this.prepareSearch(search);
+    console.log(results);
     const mappedUsers = [] as UserEntity[];
     for (const user of results.users) {
       let userData = await this.getUserData(user.identifier);
@@ -280,11 +281,12 @@ export class ElasticService {
               score_mode: "multiply",
               functions: [
                 {
-                  exp: {
+                  gauss: {
                     "skills.rating": {
                       offset: 0,
                       origin: paramter.rating,
-                      scale: 1,
+                      scale: 5,
+                      decay: 0.3,
                     },
                   },
                   weight: ((skills.length - index) / skills.length) * 100,

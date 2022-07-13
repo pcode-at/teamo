@@ -34,11 +34,13 @@ type Props = {
 
 const SearchResultsLayout = styled("div", {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
     gridGap: "$2x",
     padding: "$2x",
     width: "100%",
-    height: "100%",
+    height: "fit-content",
+    maxHeight: "100%",
+    overflowY: "scroll",
 });
 
 export const SearchResults: React.FC<Props> = ({ items }) => {
@@ -69,7 +71,6 @@ export const SearchResults: React.FC<Props> = ({ items }) => {
     <>
       <SearchResultsLayout>
         {results.users.map((user, index) => {
-            console.log(user);
           return (<>
             <SearchResultItem user={user} />
           </>)

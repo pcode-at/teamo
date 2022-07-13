@@ -33,6 +33,7 @@ type Props = {
 const SearchBarLayout = styled("div", {
   padding: "$5x",
   height: "100%",
+  overflowY: "auto",
 
   backgroundColor: "$brand-100",
 });
