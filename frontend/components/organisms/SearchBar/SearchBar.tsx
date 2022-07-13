@@ -6,6 +6,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { SearchListItem } from "../../molecules/SearchListItem/SearchListItem";
 import { Button } from "../../atoms/Button/Button";
 import { SearchAddSkill } from "../../molecules/SearchAddSkill/SearchAddSkill";
+import { DropDown } from "../../molecules/DropDown/DropDown";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -33,6 +34,10 @@ type Props = {
 const SearchBarLayout = styled("div", {
   padding: "$5x",
   height: "100%",
+  overflowY: "auto",
+  display: "flex",
+  flexDirection: "column",
+  gap: "$3x",
 
   backgroundColor: "$brand-100",
 });
@@ -77,6 +82,7 @@ export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
   return (
     <>
       <SearchBarLayout>
+        <DropDown></DropDown>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="droppable">
             {(provided, snapshot) => (

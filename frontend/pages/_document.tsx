@@ -61,9 +61,6 @@ export default class Document extends NextDocument {
        url('/fonts/poppins-v15-latin-800.ttf') format('truetype'), /* Safari, Android, iOS */
        url('/fonts/poppins-v15-latin-800.svg#Poppins') format('svg'); /* Legacy iOS */
 }
-#__next {
-  height: 100%;
-}
 * {
   font-family: 'Poppins', sans-serif;
 }

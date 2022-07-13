@@ -16,9 +16,10 @@ import { SearchResults } from "../components/organisms/SearchResults/SearchResut
 
 const SearchLayout = styled("div", {
   display: "grid",
-  gridTemplateColumns: "1fr 2fr",
+  gridTemplateColumns: "1fr 3fr",
   width: "100%",
-  height: "100%",
+  height: "93vh",
+  overflow: "hidden",
 });
 
 export default function Home() {

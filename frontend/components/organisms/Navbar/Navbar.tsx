@@ -14,6 +14,7 @@ const NavbarLayout = styled("div", {
   width: "100%",
   padding: "$2x",
   backgroundColor: "$brand-300",
+  height: "7vh",
 });
 
 const LogoLayout = styled("div", {
