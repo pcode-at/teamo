@@ -23,4 +23,35 @@ The full guide is under:
     https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
 
 
+After that go the Kibana, link : http://localhost:5601/app/dev_tools#/console
+
+Log in with the 
+user: elastic
+password: elastic
+
+Then enter into the console :
+
+PUT users/ 
+{
+  "mappings": {
+    "properties": {
+      "location": {"type":"text"},
+      "departments" : {"type":"text"},
+      "skills":{
+        "type": "nested", 
+        "properties": {
+          "rating" : {"type":"integer"},
+          "skill": {"type":"text"}
+          }
+      }
+    }
+  }
+}
+
+After that start the elastic.seeding.js script in the folder ./backend/src/seedings  
+
+DO NOT RUN THE userskills.seeding.js script !
+
+
+
 
