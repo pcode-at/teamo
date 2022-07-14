@@ -4,7 +4,7 @@ export const styles = {
   theme: {
     colors: {
       "neutral-100": "#ffffff",
-      "neutral-200": "#dfdfdf",
+      "neutral-200": "#f3f3f3",
       "neutral-300": "#c2c2c2",
       "neutral-400": "#a3a3a3",
       "neutral-500": "#858585",

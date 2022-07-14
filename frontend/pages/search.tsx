@@ -23,7 +23,11 @@ const SearchLayout = styled("div", {
 });
 
 export default function Home() {
-  const [items, setItems] = React.useState([]);
+  const [items, setItems] = React.useState({
+    required: [],
+    should: [],
+    optional: [],
+  });
   return (
     <>
       <Navbar></Navbar>
