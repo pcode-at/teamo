@@ -40,7 +40,7 @@ const client = new ElasticsearchService({
 // }
 @Injectable()
 export class ElasticService {
-  constructor() { }
+  constructor() {}
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
@@ -209,15 +209,9 @@ export class ElasticService {
   }
 
   async prepareSearch(search: SearchDto) {
-    const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
+    const attributes = search.parameters.map(search => search.attribute);
 
-    const required = search.parameters
-      .filter(search => search.required)
-      .map(search => {
-        if (search.value) search.value;
-      });
-
-    if (!required) return;
+    if (!attributes) return;
 
     const searchQuery = {
       index: "users",
@@ -273,6 +267,9 @@ export class ElasticService {
     let skills = search.parameters.filter(paramter => paramter.attribute === "skill");
 
     skills.forEach((paramter, index) => {
+      let weight = 1;
+      if (paramter.bucket === "required") weight = 10;
+      if (paramter.bucket === "should") weight = 5;
       searchQuery.body.query.function_score.query.bool.should.push({
         nested: {
           path: "skills",
@@ -286,36 +283,36 @@ export class ElasticService {
                     range: {
                       "skills.rating": {
                         lte: paramter.rating,
-                      }
-                    }
+                      },
+                    },
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
                       decay: 0.5,
                     },
                   },
-                  weight: ((skills.length - index) / skills.length) * 100,
+                  weight: weight,
                 },
                 {
                   filter: {
                     range: {
                       "skills.rating": {
                         gt: paramter.rating,
-                      }
-                    }
+                      },
+                    },
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
-                      decay: 0.51
+                      decay: 0.51,
                     },
                   },
-                  weight: ((skills.length - index) / skills.length) * 100,
+                  weight: weight,
                 },
               ],
               query: {
