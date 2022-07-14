@@ -48,10 +48,15 @@ function seedElastic() {
                 case 0: return [4 /*yield*/, prisma.users.findMany()];
                 case 1:
                     users = _a.sent();
+                    return [4 /*yield*/, (0, node_fetch_1["default"])("http://localhost:3000/api/elastic/reimport", {
+                            method: "GET"
+                        })];
+                case 2:
+                    _a.sent();
                     users.forEach(function (user) { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, node_fetch_1["default"]("http://localhost:3000/api/elastic/insertUser/" + user.identifier, {
+                                case 0: return [4 /*yield*/, (0, node_fetch_1["default"])("http://localhost:3000/api/elastic/insertUser/".concat(user.identifier), {
                                         method: "POST"
                                     })];
                                 case 1:

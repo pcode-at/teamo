@@ -82,6 +82,32 @@ export class ElasticService {
     });
   }
 
+  async reimportData() {
+    client.deleteByQuery({
+      index: "users",
+      body: {
+        query: {
+          match_all: {},
+        },
+      },
+    });
+
+    client.indices.putMapping({
+      index: "users",
+      properties: {
+        location: { type: "text" },
+        departments: { type: "text" },
+        skills: {
+          type: "nested",
+          properties: {
+            rating: { type: "integer" },
+            skill: { type: "text" },
+          },
+        },
+      },
+    });
+  }
+
   async recommend(skillsNeeded: SkillElastic[], accurate: boolean, peopleNeeded: number) {
     let skillsPerPerson = 1;
 
@@ -129,7 +155,7 @@ export class ElasticService {
                 {
                   exp: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
                     },

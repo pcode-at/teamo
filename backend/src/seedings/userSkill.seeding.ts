@@ -13,14 +13,17 @@ async function seedUserSkills() {
 
   users.forEach(user => {
     // Get 10 random values of skills
-    const randomSkills = skills.filter(skill => skill.name != "English" && skill.name != "German").sort(() => Math.random() - 0.5).slice(0, 10);
+    const randomSkills = skills
+      .filter(skill => skill.name != "English" && skill.name != "German")
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 10);
 
     // Add the 10 skills with the user and a rating to the userSkills Array
     randomSkills.forEach(skill => {
       userSkills.push({
         user: user.identifier,
         skill: skill.id,
-        rating: Math.floor(Math.random() * 10) + 1,
+        rating: Math.floor(Math.random() * 9) + 1,
       });
     });
 
@@ -28,7 +31,7 @@ async function seedUserSkills() {
     userSkills.push({
       user: user.identifier,
       skill: skills.find(skill => skill.name == "German").id,
-      rating: Math.floor(Math.random() * 5) + 5,
+      rating: Math.floor(Math.random() * 6) + 4,
     });
 
     // Add English to the User with and 80% chance
@@ -39,10 +42,7 @@ async function seedUserSkills() {
         rating: Math.floor(Math.random() * 8) + 2,
       });
     }
-
   });
-
-
 
   for (let i = 0; i < userSkills.length; i++) {
     await prisma.userSkills.create({

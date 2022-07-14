@@ -55,20 +55,23 @@ function seedUserSkills() {
                     userSkills = [];
                     users.forEach(function (user) {
                         // Get 10 random values of skills
-                        var randomSkills = skills.filter(function (skill) { return skill.name != "English" && skill.name != "German"; }).sort(function () { return Math.random() - 0.5; }).slice(0, 10);
+                        var randomSkills = skills
+                            .filter(function (skill) { return skill.name != "English" && skill.name != "German"; })
+                            .sort(function () { return Math.random() - 0.5; })
+                            .slice(0, 10);
                         // Add the 10 skills with the user and a rating to the userSkills Array
                         randomSkills.forEach(function (skill) {
                             userSkills.push({
                                 user: user.identifier,
                                 skill: skill.id,
-                                rating: Math.floor(Math.random() * 10) + 1
+                                rating: Math.floor(Math.random() * 9) + 1
                             });
                         });
                         // Add German to the User
                         userSkills.push({
                             user: user.identifier,
                             skill: skills.find(function (skill) { return skill.name == "German"; }).id,
-                            rating: Math.floor(Math.random() * 5) + 5
+                            rating: Math.floor(Math.random() * 6) + 4
                         });
                         // Add English to the User with and 80% chance
                         if (Math.random() > 0.2) {
