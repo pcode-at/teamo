@@ -15,6 +15,7 @@ import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
 import { Authorization } from "src/auth/entities/authorization.entity";
 import { JwtService } from "@nestjs/jwt";
+import { LocationEntity, LocationResponse } from "src/entities/location.entity";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require('bcrypt');
 
@@ -198,12 +199,13 @@ export class UserService {
     return new UserResponse({ statusCode: 200, message: "User deleted successfully" });
   }
 
-  async getLocations() {
-    return await prisma.users.findMany({
+  async getLocations(): Promise<LocationResponse> {
+    const locations = await prisma.users.findMany({
       distinct: ['location'],
       select: {
         location: true,
       }
     })
+    return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
   }
 }

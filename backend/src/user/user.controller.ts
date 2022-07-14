@@ -7,6 +7,7 @@ import { SkillDto } from "./dto/skill.dto";
 import { UserResponse } from "src/entities/user-response.entity";
 import { Request } from "express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { LocationResponse } from "src/entities/location.entity";
 
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
@@ -56,7 +57,7 @@ export class UserController {
   }
 
   @Get('locations')
-  async getLocations() {
+  async getLocations(): Promise<LocationResponse> {
     return await this.userService.getLocations();
   }
 }
