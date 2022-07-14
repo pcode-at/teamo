@@ -54,4 +54,9 @@ export class UserController {
   async getSkillsByUser(@Param("identifier") identifier: string) {
     return await this.userService.getSkillsForUser(identifier);
   }
+
+  @Get('locations')
+  async getLocations() {
+    return await this.userService.getLocations();
+  }
 }

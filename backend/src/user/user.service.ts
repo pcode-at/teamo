@@ -197,4 +197,13 @@ export class UserService {
     }
     return new UserResponse({ statusCode: 200, message: "User deleted successfully" });
   }
+
+  async getLocations() {
+    return await prisma.users.findMany({
+      distinct: ['location'],
+      select: {
+        location: true,
+      }
+    })
+  }
 }
