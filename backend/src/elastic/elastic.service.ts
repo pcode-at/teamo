@@ -3,6 +3,7 @@ import { ElasticsearchService } from "@nestjs/elasticsearch";
 import { PrismaClient, skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
 import { SearchEntity, SearchResponse } from "src/entities/search.entity";
+import { SkillEntity } from "src/entities/skill.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { SearchDto } from "src/user/dto/search.dto";
 import { SkillDto } from "src/user/dto/skill.dto";
@@ -211,11 +212,54 @@ export class ElasticService {
 
   async search(search: SearchDto): Promise<SearchResponse> {
     const results = await this.prepareSearch(search);
-    console.log(results);
+
+    const requiredSkillIds = search.parameters.map((paramter) => {
+      return paramter.value
+    });
+
+    const requiredSkills = search.parameters.map((paramter) => {
+      return { id: paramter.value, rating: paramter.rating }
+    });
+
+
     const mappedUsers = [] as UserEntity[];
     for (const user of results.users) {
+      let userSkills = [] as SkillEntity[];
       let userData = await this.getUserData(user.identifier);
-      mappedUsers.push(new UserEntity({ ...userData, score: user.score }));
+
+      userData.skills = userData.skills.sort((a, b) => {
+        if (requiredSkillIds.includes(a.skill.id)) {
+          return -1;
+        }
+        if (requiredSkillIds.includes(b.skill.id)) {
+          return 1;
+        }
+        return 0;
+      });
+
+      userData.skills.map((currentSkill) => {
+        if (requiredSkillIds.includes(currentSkill.skill.id) && requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating)) {
+          userSkills.push(new SkillEntity({
+            ...currentSkill,
+            opacity: 1,
+          }));
+        }
+        else if (requiredSkillIds.includes(currentSkill.skill.id) && ((requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 || requiredSkills.find
+          (skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 2))) {
+          userSkills.push(new SkillEntity({
+            ...currentSkill,
+            opacity: 0.5,
+          }));
+        }
+        else {
+          userSkills.push(new SkillEntity({
+            ...currentSkill,
+            opacity: 0,
+          }));
+        }
+      });
+
+      mappedUsers.push(new UserEntity({ ...userData, skills: userSkills, score: user.score }));
     }
 
     return new SearchResponse({
@@ -240,6 +284,7 @@ export class ElasticService {
             skill: {
               select: {
                 name: true,
+                id: true,
               },
             },
           },
@@ -378,7 +423,7 @@ export class ElasticService {
       });
     });
 
-    console.log(JSON.stringify(searchQuery, null, 4));
+    // console.log(JSON.stringify(searchQuery, null, 4));
 
     let modified: boolean = false;
 
@@ -390,7 +435,7 @@ export class ElasticService {
       users: [],
     };
 
-    console.log(result.hits.hits.length);
+    // console.log(result.hits.hits.length);
 
     result.hits.hits.forEach(hit => {
       resultDTO.users.push({

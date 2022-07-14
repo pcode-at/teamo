@@ -12,6 +12,9 @@ import { ElasticController } from "./elastic/elastic.controller";
 import { ElasticModule } from "./elastic/elastic.module";
 import "dotenv/config";
 import { ElasticService } from "./elastic/elastic.service";
+import { ImageCropController } from './image-crop/image-crop.controller';
+import { ImageCropService } from './image-crop/image-crop.service';
+import { ImageCropModule } from './image-crop/image-crop.module';
 
 @Module({
   imports: [
@@ -24,8 +27,9 @@ import { ElasticService } from "./elastic/elastic.service";
     }),
     SkillModule,
     ElasticModule,
+    ImageCropModule,
   ],
-  controllers: [AppController, SkillController, ElasticController],
-  providers: [AppService, SkillService, ElasticService],
+  controllers: [AppController, SkillController, ElasticController, ImageCropController],
+  providers: [AppService, SkillService, ElasticService, ImageCropService],
 })
 export class AppModule {}

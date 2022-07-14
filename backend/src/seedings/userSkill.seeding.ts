@@ -34,7 +34,7 @@ async function seedUserSkills() {
       rating: Math.floor(Math.random() * 6) + 4,
     });
 
-    // Add English to the User with and 80% chance
+    // Add English to the User with an 80% chance
     if (Math.random() > 0.2) {
       userSkills.push({
         user: user.identifier,
