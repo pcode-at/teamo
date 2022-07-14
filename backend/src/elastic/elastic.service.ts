@@ -5,6 +5,7 @@ import * as fs from "fs";
 import { SearchEntity, SearchResponse } from "src/entities/search.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { SearchDto } from "src/user/dto/search.dto";
+import { SkillDto } from "src/user/dto/skill.dto";
 
 const prisma = new PrismaClient();
 
@@ -77,6 +78,19 @@ export class ElasticService {
             rating: skills.rating,
             skill: skills.skill.id,
           },
+        },
+      },
+    });
+  }
+
+  async addSkillToUser(skill: SkillDto) {
+    client.update({
+      index: "users",
+      id: skill.identifier,
+      doc: {
+        skills: {
+          rating: skill.rating,
+          skill: skill.skill,
         },
       },
     });
@@ -292,10 +306,16 @@ export class ElasticService {
 
     let skills = search.parameters.filter(paramter => paramter.attribute === "skill");
 
-    skills.forEach((paramter, index) => {
+    skills.forEach(paramter => {
       let weight = 1;
-      if (paramter.bucket === "required") weight = 10;
-      if (paramter.bucket === "should") weight = 5;
+      if (paramter.bucket === "required") {
+        weight = 10;
+        console.log("required");
+      }
+      if (paramter.bucket === "should") {
+        console.log("should");
+        weight = 5;
+      }
       searchQuery.body.query.function_score.query.bool.should.push({
         nested: {
           path: "skills",

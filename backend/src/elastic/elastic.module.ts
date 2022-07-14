@@ -9,5 +9,6 @@ import { jwtConstants } from "src/auth/constants";
 @Module({
   imports: [ConfigModule],
   providers: [ElasticService],
+  exports: [ElasticService],
 })
-export class ElasticModule { }
+export class ElasticModule {}
