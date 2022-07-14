@@ -265,7 +265,7 @@ export class ElasticService {
       },
     };
 
-    searchQuery.body.query.function_score.query.bool.should.push({
+    searchQuery.body.query.function_score.query.bool.must.push({
       match_all: {},
     });
 

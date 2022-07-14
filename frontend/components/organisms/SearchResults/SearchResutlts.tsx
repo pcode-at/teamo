@@ -57,7 +57,7 @@ export const SearchResults: React.FC<Props> = ({ items }) => {
   }
 
   const { data: results, status } = useQuery(["search", mappedItems], () => {
-    return searchElastic({ parameters: [items] });
+    return searchElastic({ parameters: [mappedItems] });
   });
 
   if (status === "loading") {

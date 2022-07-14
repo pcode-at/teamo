@@ -7,6 +7,9 @@ import { SearchListItem } from "../../molecules/SearchListItem/SearchListItem";
 import { Button } from "../../atoms/Button/Button";
 import { SearchAddSkill } from "../../molecules/SearchAddSkill/SearchAddSkill";
 import { DropDown } from "../../molecules/DropDown/DropDown";
+import SvgMapPin from "../../atoms/svg/SvgMapPin";
+import { useQuery } from "react-query";
+import { getLocations } from "../../../utils/requests/user";
 
 // a little function to help us with reordering the result
 const reorder = (list, source, destination) => {
@@ -134,13 +137,27 @@ export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
       optional: items.optional.filter((item) => item.id !== id),
     });
   }
+  
+  const [checkedItems, setCheckedItems] = React.useState<string[]>([]);
+  const { data: locations, status } = useQuery(["locations"], getLocations);
 
-  console.log(items);
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (status === "error") {
+    return <div>Error</div>;
+  }
 
   return (
     <>
       <SearchBarLayout>
-        <DropDown></DropDown>
+        <DropDown icon={SvgMapPin} title={"Location"} items={locations.map(({location}) => {
+          return {
+            value: location,
+            label: location
+          }
+        })} setCheckedItems={setCheckedItems} ></DropDown>
         <DragDropContext onDragEnd={onDragEnd}>
           <StyledList>
             <StyledDroppableLabel>Required</StyledDroppableLabel>
