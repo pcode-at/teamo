@@ -11,5 +11,5 @@ class SearchAttribute {
   attribute: "skill" | "department" | "location";
   value: string | string[];
   rating?: number;
-  bucket: "required" | "should" | "optional";
+  bucket?: "required" | "should" | "optional";
 }

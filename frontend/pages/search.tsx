@@ -28,12 +28,13 @@ export default function Home() {
     should: [],
     optional: [],
   });
+  const [locations, setLocations] = React.useState([]);
   return (
     <>
       <Navbar></Navbar>
       <SearchLayout>
-        <SearchBar items={items} setItems={setItems}></SearchBar>
-        <SearchResults items={items}></SearchResults>
+        <SearchBar items={items} setItems={setItems} setLocations={setLocations}></SearchBar>
+        <SearchResults items={items} locations={locations}></SearchResults>
       </SearchLayout>
     </>
   );

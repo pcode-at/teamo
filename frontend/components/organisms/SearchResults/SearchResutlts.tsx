@@ -28,11 +28,12 @@ type Props = {
     should: Item[];
     optional: Item[];
   };
+  locations: string[];
 };
 
 const SearchResultsLayout = styled("div", {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+  gridTemplateColumns: "1fr",
   gridGap: "$2x",
   padding: "$2x",
   width: "100%",
@@ -41,7 +42,7 @@ const SearchResultsLayout = styled("div", {
   overflowY: "scroll",
 });
 
-export const SearchResults: React.FC<Props> = ({ items }) => {
+export const SearchResults: React.FC<Props> = ({ items, locations }) => {
   let mappedItems = [];
 
   console.log(items);
@@ -55,10 +56,26 @@ export const SearchResults: React.FC<Props> = ({ items }) => {
       });
     });
   }
-
-  const { data: results, status } = useQuery(["search", mappedItems], () => {
-    return searchElastic({ parameters: [mappedItems] });
+  locations.forEach((location) => {
+    mappedItems.push({
+      attribute: "location",
+      value: location,
+      rating: 0,
+      bucket: "should",
+    });
   });
+
+  const { data: results, status } = useQuery(
+    [
+      "search",
+      items,
+      locations,
+    ],
+    () => {
+      console.log("asdf");
+      return searchElastic({ parameters: mappedItems });
+    }
+  );
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -68,7 +85,7 @@ export const SearchResults: React.FC<Props> = ({ items }) => {
     return <div>Error</div>;
   }
 
-  console.log(mappedItems);
+  console.log(results);
 
   return (
     <>

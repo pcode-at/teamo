@@ -213,14 +213,13 @@ export class ElasticService {
   async search(search: SearchDto): Promise<SearchResponse> {
     const results = await this.prepareSearch(search);
 
-    const requiredSkillIds = search.parameters.map((paramter) => {
-      return paramter.value
+    const requiredSkillIds = search.parameters.map(paramter => {
+      return paramter.value;
     });
 
-    const requiredSkills = search.parameters.map((paramter) => {
-      return { id: paramter.value, rating: paramter.rating }
+    const requiredSkills = search.parameters.map(paramter => {
+      return { id: paramter.value, rating: paramter.rating };
     });
-
 
     const mappedUsers = [] as UserEntity[];
     for (const user of results.users) {
@@ -237,25 +236,50 @@ export class ElasticService {
         return 0;
       });
 
-      userData.skills.map((currentSkill) => {
+      userData.skills.map(currentSkill => {
         if (requiredSkillIds.includes(currentSkill.skill.id) && requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating)) {
-          userSkills.push(new SkillEntity({
-            ...currentSkill,
-            opacity: 1,
-          }));
-        }
-        else if (requiredSkillIds.includes(currentSkill.skill.id) && ((requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 || requiredSkills.find
-          (skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 2))) {
-          userSkills.push(new SkillEntity({
-            ...currentSkill,
-            opacity: 0.5,
-          }));
-        }
-        else {
-          userSkills.push(new SkillEntity({
-            ...currentSkill,
-            opacity: 0,
-          }));
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 1,
+            }),
+          );
+        } else if (
+          requiredSkillIds.includes(currentSkill.skill.id) &&
+          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 2)
+        ) {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 1,
+            }),
+          );
+        } else if (
+          requiredSkillIds.includes(currentSkill.skill.id) &&
+          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 1 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 1)
+        ) {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 1,
+            }),
+          );
+        } else if (!requiredSkillIds.includes(currentSkill.skill.id)) {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 0,
+            }),
+          );
+        } else {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 0.5,
+            }),
+          );
         }
       });
 
@@ -379,7 +403,7 @@ export class ElasticService {
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 1,
+                      offset: 0,
                       origin: paramter.rating,
                       scale: 1,
                       decay: 0.5,
@@ -397,7 +421,7 @@ export class ElasticService {
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 1,
+                      offset: 0,
                       origin: paramter.rating,
                       scale: 1,
                       decay: 0.51,

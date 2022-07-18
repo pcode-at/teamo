@@ -4,7 +4,8 @@ import type * as Stitches from "@stitches/react";
 import { Separator } from "../../atoms/Separator/Separator";
 
 type Props = {
-  rating: number;
+  rating?: number;
+  opacity?: number;
   children: React.ReactNode;
 };
 
@@ -15,8 +16,24 @@ const SkillLayout = styled("div", {
   gap: "$2x",
   padding: "$1x $2x",
   backgroundColor: "$brand-300",
-  borderRadius: "$2x",
-  color: "$brand-100",
+  borderRadius: "$1x",
+  color: "$neutral-700",
+  height: "fit-content",
+
+  variants: {
+    type: {
+      none: {
+        backgroundColor: "$neutral-300",
+      },
+      half: {
+        backgroundColor: "$brand-100",
+      },
+      full: {
+        backgroundColor: "$brand-400",
+        color: "$brand-100",
+      },
+    },
+  },
 });
 
 const SkillName = styled("p", {
@@ -32,12 +49,22 @@ const SkillRating = styled("p", {
   fontSize: "1rem",
 });
 
-export const ProfilePageSkill: React.FC<Props> = ({ rating, children }) => {
+export const ProfilePageSkill: React.FC<Props> = ({
+  rating,
+  opacity = 1,
+  children,
+}) => {
+  let type: "none" | "half" | "full" = "half";
+  if (opacity === 0) {
+    type = "none";
+  } else if (opacity === 1) {
+    type = "full";
+  }
   return (
     <>
-      <SkillLayout>
+      <SkillLayout type={type}>
         <SkillName>{children}</SkillName>
-        <SkillRating>{rating}</SkillRating>
+        {rating && <SkillRating>{rating}</SkillRating>}
       </SkillLayout>
     </>
   );

@@ -10,6 +10,7 @@ import { DropDown } from "../../molecules/DropDown/DropDown";
 import SvgMapPin from "../../atoms/svg/SvgMapPin";
 import { useQuery } from "react-query";
 import { getLocations } from "../../../utils/requests/user";
+import { Separator } from "../../atoms/Separator/Separator";
 
 // a little function to help us with reordering the result
 const reorder = (list, source, destination) => {
@@ -41,6 +42,7 @@ type Props = {
     should: Item[];
     optional: Item[];
   }) => void;
+  setLocations: (locations: string[]) => void;
 };
 
 const SearchBarLayout = styled("div", {
@@ -97,7 +99,7 @@ const StyledDroppableLabel = styled("div", {
   color: "$brand-400",
 });
 
-export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
+export const SearchBar: React.FC<Props> = ({ items, setItems, setLocations }) => {
   const [itemCount, setItemCount] = React.useState(0);
 
   function onDragEnd(result) {
@@ -137,7 +139,7 @@ export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
       optional: items.optional.filter((item) => item.id !== id),
     });
   }
-  
+
   const [checkedItems, setCheckedItems] = React.useState<string[]>([]);
   const { data: locations, status } = useQuery(["locations"], getLocations);
 
@@ -152,12 +154,20 @@ export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
   return (
     <>
       <SearchBarLayout>
-        <DropDown icon={SvgMapPin} title={"Location"} items={locations.map(({location}) => {
-          return {
-            value: location,
-            label: location
-          }
-        })} setCheckedItems={setCheckedItems} ></DropDown>
+        <DropDown
+          icon={SvgMapPin}
+          title={"Location"}
+          items={locations.map(({ location }) => {
+            return {
+              value: location,
+              label: location,
+            };
+          })}
+          setCheckedItems={(value) => {
+            setCheckedItems(value);
+            setLocations(value);
+          }}
+        ></DropDown>
         <DragDropContext onDragEnd={onDragEnd}>
           <StyledList>
             <StyledDroppableLabel>Required</StyledDroppableLabel>
@@ -260,10 +270,7 @@ export const SearchBar: React.FC<Props> = ({ items, setItems }) => {
               )}
             </Droppable>
             <SearchAddSkill
-              addSearchSkill={(
-                skill: string,
-                id: string
-              ): void => {
+              addSearchSkill={(skill: string, id: string): void => {
                 setItems({
                   required: [
                     ...items.required,

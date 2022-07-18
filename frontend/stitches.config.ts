@@ -5,7 +5,7 @@ export const styles = {
     colors: {
       "neutral-100": "#ffffff",
       "neutral-200": "#f3f3f3",
-      "neutral-300": "#c2c2c2",
+      "neutral-300": "#dfdfdf",
       "neutral-400": "#a3a3a3",
       "neutral-500": "#858585",
       "neutral-600": "#666666",

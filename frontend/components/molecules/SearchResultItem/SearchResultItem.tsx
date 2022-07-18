@@ -1,8 +1,13 @@
 import React, { useEffect } from "react";
 import { styled } from "../../../stitches.config";
 import { InputField } from "../../atoms/InputField/InputField";
+import { Separator } from "../../atoms/Separator/Separator";
+import SvgBookmark from "../../atoms/svg/SvgBookmark";
+import SvgBriefcase from "../../atoms/svg/SvgBriefcase";
 import SvgCross from "../../atoms/svg/SvgCross";
+import SvgMapPin from "../../atoms/svg/SvgMapPin";
 import SvgMove2 from "../../atoms/svg/SvgMove2";
+import { IconInfoSection } from "../IconInfoSection/IconInfoSection";
 import { ProfilePageSkill } from "../ProfilePageSkill/ProfilePageSkill";
 
 type Props = {
@@ -23,6 +28,7 @@ type Props = {
     score?: number;
     skills: {
       rating: string;
+      opacity: number;
       skill: {
         name: string;
       };
@@ -31,20 +37,16 @@ type Props = {
 };
 
 const SearchResultItemLayout = styled("div", {
-  display: "flex",
-  flexDirection: "column",
+  display: "grid",
+  gridTemplateColumns: "3fr 1fr 9fr",
   width: "100%",
   gap: "$2x",
   borderRadius: "$2x",
-  backgroundColor: "$brand-100",
+  backgroundColor: "$neutral-200",
   padding: "$2x",
   boxShadow: "$shadow-1",
   border: "$border-1",
-  cursor: "pointer",
   transition: "all 0.2s",
-  "&:hover": {
-    backgroundColor: "$brand-200",
-  },
 });
 
 const SearchResultItemSkillsLayout = styled("div", {
@@ -55,16 +57,93 @@ const SearchResultItemSkillsLayout = styled("div", {
   gap: "$2x",
 });
 
+const SearchResultItemInfoLayout = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  gap: "$2x",
+  minWidth: "230px",
+});
+
+const Name = styled("span", {
+  fontSize: "1.5rem",
+  fontWeight: "bold",
+  color: "$brand-500",
+});
+
+const SeparatorLayout = styled("div", {
+  display: "flex",
+  flexDirection: "row",
+  justifyContent: "center",
+  width: "100%",
+});
+
+const InformationLayout = styled("div", {
+  display: "flex",
+  flexDirection: "row",
+  gap: "$3x",
+});
+
+const IconButtonLayout = styled("div", {});
+
+const IconButton = styled("button", {
+  display: "flex",
+  width: "36px",
+  height: "36px",
+  padding: "$1x",
+  border: "none",
+  backgroundColor: "$neutral-100",
+  borderRadius: "100%",
+  color: "$brand-500",
+  transition: "all 0.2s",
+  cursor: "pointer",
+
+  "&:hover": {
+    backgroundColor: "$brand-100",
+  },
+});
+
+const IconLayout = styled("div", {
+  display: "flex",
+  width: "20px",
+  height: "20px",
+});
+
 export const SearchResultItem: React.FC<Props> = ({ user }) => {
   return (
     <>
       <SearchResultItemLayout>
-        {user.name}
-        <br />
-
+        <SearchResultItemInfoLayout>
+          <Name>{user.name}</Name>
+          <InformationLayout>
+            <IconInfoSection
+              size="small"
+              icon={SvgBriefcase}
+              label="UI/UX"
+            ></IconInfoSection>
+            <IconInfoSection
+              size="small"
+              icon={SvgMapPin}
+              label={user.location}
+            ></IconInfoSection>
+          </InformationLayout>
+          <IconButtonLayout>
+            <IconButton>
+              <IconLayout>
+                <SvgBookmark></SvgBookmark>
+              </IconLayout>
+            </IconButton>
+          </IconButtonLayout>
+        </SearchResultItemInfoLayout>
+        <SeparatorLayout>
+          <Separator
+            width={"big"}
+            alignment={"center"}
+            orientation="vertical"
+          ></Separator>
+        </SeparatorLayout>
         <SearchResultItemSkillsLayout>
           {user.skills.map((skill, index) => (
-            <ProfilePageSkill key={index} rating={Number(skill.rating)}>
+            <ProfilePageSkill key={index} opacity={skill.opacity}>
               {skill.skill.name}
             </ProfilePageSkill>
           ))}

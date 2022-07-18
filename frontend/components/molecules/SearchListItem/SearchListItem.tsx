@@ -155,7 +155,10 @@ export const SearchListItem: React.FC<Props> = ({
               <StyledTrack>
                 <StyledRange />
               </StyledTrack>
-              <StyledThumb />
+              <StyledThumb 
+              onDragEnd={(value) => {
+                console.log(value);
+              }}/>
             </StyledSlider>
           </SliderInfoLayout>
 
