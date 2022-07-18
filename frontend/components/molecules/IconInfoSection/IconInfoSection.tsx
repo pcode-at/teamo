@@ -1,6 +1,10 @@
 import Link from "next/link";
 import React from "react";
 import { styled } from "../../../stitches.config";
+import {
+  BodyDefaultTabletAndUpStyle,
+  BodySmallTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
 
 type Props = {
   icon: any;
@@ -47,15 +51,13 @@ const IconLayout = styled("div", {
 });
 
 const InfoText = styled("p", {
-  fontSize: "1.3rem",
-
   variants: {
     size: {
       small: {
-        fontSize: "1.2rem",
+        ...BodySmallTabletAndUpStyle,
       },
       medium: {
-        fontSize: "1.3rem",
+        ...BodyDefaultTabletAndUpStyle,
       },
     },
   },
@@ -77,7 +79,7 @@ export const IconInfoSection: React.FC<Props> = ({
     <>
       <IconInfoLayout size={size}>
         <IconLayout size={size}>
-          <Icon></Icon>
+          <Icon strokeWidth={1}></Icon>
         </IconLayout>
         <InfoText>
           {href ? (

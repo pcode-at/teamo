@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "../../../stitches.config";
 import type * as Stitches from "@stitches/react";
 import { Separator } from "../../atoms/Separator/Separator";
+import { BodyDefaultTabletAndUpStyle } from "../../../utils/StyledParagraph";
 
 type Props = {
   rating?: number;
@@ -12,6 +13,7 @@ type Props = {
 const SkillLayout = styled("div", {
   display: "flex",
   flexDirection: "row",
+  alignItems: "center",
   width: "fit-content",
   gap: "$2x",
   padding: "$1x $2x",
@@ -26,7 +28,7 @@ const SkillLayout = styled("div", {
         backgroundColor: "$neutral-300",
       },
       half: {
-        backgroundColor: "$brand-100",
+        backgroundColor: "$brand-200",
       },
       full: {
         backgroundColor: "$brand-400",
@@ -37,7 +39,7 @@ const SkillLayout = styled("div", {
 });
 
 const SkillName = styled("p", {
-  fontSize: "1rem",
+  ...BodyDefaultTabletAndUpStyle
 });
 
 const SkillRating = styled("p", {
@@ -49,11 +51,7 @@ const SkillRating = styled("p", {
   fontSize: "1rem",
 });
 
-export const ProfilePageSkill: React.FC<Props> = ({
-  rating,
-  opacity = 1,
-  children,
-}) => {
+export const Skill: React.FC<Props> = ({ rating, opacity, children }) => {
   let type: "none" | "half" | "full" = "half";
   if (opacity === 0) {
     type = "none";

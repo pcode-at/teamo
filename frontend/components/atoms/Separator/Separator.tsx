@@ -52,7 +52,7 @@ const HrLayout = styled("div", {
 const StyledSeparator = styled(SeparatorPrimitive.Root, {
   borderRadius: "10px",
 
-  backgroundColor: "$neutral-800",
+  backgroundColor: "$neutral-200",
 
   "&[data-orientation=horizontal]": {
     height: 3,

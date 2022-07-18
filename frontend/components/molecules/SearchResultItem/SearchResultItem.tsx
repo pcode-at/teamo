@@ -8,7 +8,7 @@ import SvgCross from "../../atoms/svg/SvgCross";
 import SvgMapPin from "../../atoms/svg/SvgMapPin";
 import SvgMove2 from "../../atoms/svg/SvgMove2";
 import { IconInfoSection } from "../IconInfoSection/IconInfoSection";
-import { ProfilePageSkill } from "../ProfilePageSkill/ProfilePageSkill";
+import { Skill } from "../Skill/Skill";
 
 type Props = {
   user: {
@@ -143,9 +143,9 @@ export const SearchResultItem: React.FC<Props> = ({ user }) => {
         </SeparatorLayout>
         <SearchResultItemSkillsLayout>
           {user.skills.map((skill, index) => (
-            <ProfilePageSkill key={index} opacity={skill.opacity}>
+            <Skill key={index} opacity={skill.opacity}>
               {skill.skill.name}
-            </ProfilePageSkill>
+            </Skill>
           ))}
         </SearchResultItemSkillsLayout>
       </SearchResultItemLayout>
