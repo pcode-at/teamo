@@ -252,32 +252,14 @@ export class ElasticService {
           userSkills.push(
             new SkillEntity({
               ...currentSkill,
-              opacity: 1,
-            }),
-          );
-        } else if (
-          requiredSkillIds.includes(currentSkill.skill.id) &&
-          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 1 ||
-            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 1)
-        ) {
-          userSkills.push(
-            new SkillEntity({
-              ...currentSkill,
-              opacity: 1,
-            }),
-          );
-        } else if (!requiredSkillIds.includes(currentSkill.skill.id)) {
-          userSkills.push(
-            new SkillEntity({
-              ...currentSkill,
-              opacity: 0,
+              opacity: 0.5,
             }),
           );
         } else {
           userSkills.push(
             new SkillEntity({
               ...currentSkill,
-              opacity: 0.5,
+              opacity: 0,
             }),
           );
         }
@@ -333,6 +315,7 @@ export class ElasticService {
               bool: {
                 should: [],
                 must: [],
+                filter: [],
               },
             },
             score_mode: "sum",
@@ -359,16 +342,34 @@ export class ElasticService {
     // });
 
     if (attributes.includes("location")) {
-      searchQuery.body.query.function_score.query.bool.must.push({
+      let searchLocations = [];
+      let locations = search.parameters.find(search => search.attribute === "location").value;
+
+      if (locations instanceof Array) {
+        searchLocations = locations.map(location => location.toLowerCase());
+      } else {
+        searchLocations.push(locations.toLowerCase());
+      }
+
+      searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
-          location: search.parameters.find(search => search.attribute === "location").value,
+          location: searchLocations,
         },
       });
     }
     if (attributes.includes("department")) {
-      searchQuery.body.query.function_score.query.bool.must.push({
+      let searchDeparments = [];
+      let departments = search.parameters.find(search => search.attribute === "location").value;
+
+      if (departments instanceof Array) {
+        searchDeparments = departments.map(department => department.toLowerCase());
+      } else {
+        searchDeparments.push(departments.toLowerCase());
+      }
+
+      searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
-          departments: search.parameters.find(search => search.attribute === "department").value,
+          departments: searchDeparments,
         },
       });
     }
@@ -378,12 +379,10 @@ export class ElasticService {
     skills.forEach(paramter => {
       let weight = 1;
       if (paramter.bucket === "required") {
-        weight = 10;
-        console.log("required");
+        weight = 100;
       }
       if (paramter.bucket === "should") {
-        console.log("should");
-        weight = 5;
+        weight = 50;
       }
       searchQuery.body.query.function_score.query.bool.should.push({
         nested: {
@@ -403,7 +402,7 @@ export class ElasticService {
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
                       decay: 0.5,
@@ -421,7 +420,7 @@ export class ElasticService {
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
                       decay: 0.51,
@@ -447,7 +446,7 @@ export class ElasticService {
       });
     });
 
-    // console.log(JSON.stringify(searchQuery, null, 4));
+    console.log(JSON.stringify(searchQuery, null, 4));
 
     let modified: boolean = false;
 
