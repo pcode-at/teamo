@@ -1,16 +1,12 @@
 import React from "react";
 import { styled } from "../../../stitches.config";
-import { InputField } from "../../atoms/InputField/InputField";
-import SvgUser from "../../atoms/svg/SvgUser";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { SearchListItem } from "../../molecules/SearchListItem/SearchListItem";
-import { Button } from "../../atoms/Button/Button";
 import { SearchAddSkill } from "../../molecules/SearchAddSkill/SearchAddSkill";
 import { DropDown } from "../../molecules/DropDown/DropDown";
 import SvgMapPin from "../../atoms/svg/SvgMapPin";
 import { useQuery } from "react-query";
 import { getLocations } from "../../../utils/requests/user";
-import { Separator } from "../../atoms/Separator/Separator";
 
 // a little function to help us with reordering the result
 const reorder = (list, source, destination) => {
