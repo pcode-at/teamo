@@ -19,7 +19,7 @@ type UsersAuthorization {
 
 model userSkills {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
-  rating     String
+  rating     Int
   skill      skills @relation(fields: [skillsId], references: [id])
   skillsId   String @db.ObjectId
   user       users  @relation(fields: [identifier], references: [id])

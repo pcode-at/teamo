@@ -49,7 +49,7 @@ export class ElasticService {
 
     user.skills.forEach(skill => {
       skills.push({
-        rating: parseInt(skill.rating),
+        rating: skill.rating,
         skill: skill.skill.id,
       });
     });

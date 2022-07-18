@@ -133,7 +133,7 @@ export class UserService {
               id: skill.skill,
             },
           },
-          rating: skill.rating,
+          rating: parseInt(skill.rating),
         },
       });
       await this.elastic.addSkillToUser(skill);
