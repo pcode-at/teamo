@@ -73,7 +73,7 @@ function seedUserSkills() {
                             skill: skills.find(function (skill) { return skill.name == "German"; }).id,
                             rating: Math.floor(Math.random() * 6) + 4
                         });
-                        // Add English to the User with and 80% chance
+                        // Add English to the User with an 80% chance
                         if (Math.random() > 0.2) {
                             userSkills.push({
                                 user: user.identifier,
@@ -98,7 +98,7 @@ function seedUserSkills() {
                                         id: userSkills[i].skill
                                     }
                                 },
-                                rating: "" + userSkills[i].rating
+                                rating: userSkills[i].rating
                             }
                         })];
                 case 5:
@@ -112,4 +112,96 @@ function seedUserSkills() {
         });
     });
 }
-seedUserSkills();
+function seedUserSkillsWithGrouping(skillGroupings) {
+    return __awaiter(this, void 0, void 0, function () {
+        var users, userSkills, i;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, prisma.users.findMany()];
+                case 1:
+                    users = _a.sent();
+                    return [4 /*yield*/, prisma.userSkills.deleteMany()];
+                case 2:
+                    _a.sent();
+                    userSkills = [];
+                    users.forEach(function (user) {
+                        var skillsToAdd = [];
+                        var chance = 1;
+                        while (Math.random() <= chance) {
+                            var randomSkills = skillGroupings[Math.floor(Math.random() * skillGroupings.length)];
+                            skillsToAdd.push(randomSkills.filter(function (skill) { return !skillsToAdd.includes(skill); }));
+                            chance -= 0.15;
+                        }
+                        skillsToAdd.forEach(function (skills) {
+                            var base = Math.floor(Math.random() * 7) + 1;
+                            skills.forEach(function (skill) {
+                                userSkills.push({
+                                    user: user.identifier,
+                                    skill: skill,
+                                    rating: Math.floor(Math.random() * 2) + base
+                                });
+                            });
+                        });
+                        // Add German to the User
+                        userSkills.push({
+                            user: user.identifier,
+                            skill: "62ce7763f6b3d5251eb5ab76",
+                            rating: Math.floor(Math.random() * 6) + 4
+                        });
+                        // Add English to the User with an 80% chance
+                        if (Math.random() > 0.2) {
+                            userSkills.push({
+                                user: user.identifier,
+                                skill: "62ce7760f6b3d5251eb5ab75",
+                                rating: Math.floor(Math.random() * 8) + 2
+                            });
+                        }
+                    });
+                    i = 0;
+                    _a.label = 3;
+                case 3:
+                    if (!(i < userSkills.length)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, prisma.userSkills.create({
+                            data: {
+                                user: {
+                                    connect: {
+                                        identifier: userSkills[i].user
+                                    }
+                                },
+                                skill: {
+                                    connect: {
+                                        id: userSkills[i].skill
+                                    }
+                                },
+                                rating: userSkills[i].rating
+                            }
+                        })];
+                case 4:
+                    _a.sent();
+                    _a.label = 5;
+                case 5:
+                    i++;
+                    return [3 /*break*/, 3];
+                case 6: return [2 /*return*/];
+            }
+        });
+    });
+}
+var Skillgroupings = [
+    ["62ce771df6b3d5251eb5ab6b", "62ce773df6b3d5251eb5ab6c", "62ce79cbf6b3d5251eb5ab7e", "62ce7754f6b3d5251eb5ab72", "62ce775df6b3d5251eb5ab74"],
+    [
+        "62ce7741f6b3d5251eb5ab6d",
+        "62ce7746f6b3d5251eb5ab6e",
+        "62ce774af6b3d5251eb5ab6f",
+        "62ce774df6b3d5251eb5ab70",
+        "62ce7751f6b3d5251eb5ab71",
+        "62ce79adf6b3d5251eb5ab7b",
+        "62ce79aff6b3d5251eb5ab7c",
+    ],
+    ["62ce7741f6b3d5251eb5ab6d", "62ce7746f6b3d5251eb5ab6e", "62ce774af6b3d5251eb5ab6f", "62ce79bcf6b3d5251eb5ab7d"],
+    ["62ce775af6b3d5251eb5ab73", "62ce7775f6b3d5251eb5ab77", "62ce7779f6b3d5251eb5ab78", "62ce777bf6b3d5251eb5ab79", "62ce7a1df6b3d5251eb5ab85", "62ce7a23f6b3d5251eb5ab86"],
+    ["62ce79d9f6b3d5251eb5ab7f", "62ce79dcf6b3d5251eb5ab80", "62ce79e6f6b3d5251eb5ab81"],
+    ["62ce79ebf6b3d5251eb5ab82"],
+    ["62ce7796f6b3d5251eb5ab7a", "62ce79f6f6b3d5251eb5ab83", "62ce7a1df6b3d5251eb5ab85", "62ce7a32f6b3d5251eb5ab87", "62ce775af6b3d5251eb5ab73"],
+];
+seedUserSkillsWithGrouping(Skillgroupings);

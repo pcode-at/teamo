@@ -44,13 +44,13 @@ export async function recommendUsers(projectId: string, stage: number, numberOfR
           // or if the rating of all memebers together in this skill is greater or equals than 150% of the rating needed then remove the skill
           if (
             skill.rating == skillsNeeded.get(skill.skill.id).ratingNeeded ||
-            parseInt(skill.rating) + skillsNeeded.get(skill.skill.id).ratingNeeded >= skillsNeeded.get(skill.skill.id).ratingNeeded * 1.5
+            skill.rating + skillsNeeded.get(skill.skill.id).ratingNeeded >= skillsNeeded.get(skill.skill.id).ratingNeeded * 1.5
           ) {
             skillsNeeded.delete(skill.skill.id);
           }
           // If the skill rating is less than the Needed Rating then set the Rating to the Rating of the member
           else {
-            skillsNeeded.get(skill.skill.id).rating += parseInt(skill.rating);
+            skillsNeeded.get(skill.skill.id).rating += skill.rating;
           }
         }
       });

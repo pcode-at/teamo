@@ -40,7 +40,7 @@ export function searchForUsers(skills: (userSkills & { skill: skills; user: user
         paramterRating.sort((a, b) => parseInt(a) - parseInt(b));
         rating = (parseInt(paramterRating[0]) - parseInt(paramterRating[1])) / 2;
       } else {
-        rating = parseInt(paramterRating);
+        rating = paramterRating;
       }
     }
 
@@ -53,9 +53,7 @@ export function searchForUsers(skills: (userSkills & { skill: skills; user: user
         score: perfectScore - factor * rating,
         birthDate: user.user.birthDate,
         email: user.user.email,
-      }
-      );
-
+      });
 
       let skillAndRating = new SkillAndRating();
 
