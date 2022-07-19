@@ -4,8 +4,8 @@ export const styles = {
   theme: {
     colors: {
       "neutral-100": "#ffffff",
-      "neutral-200": "#dfdfdf",
-      "neutral-300": "#c2c2c2",
+      "neutral-200": "#f3f3f3",
+      "neutral-300": "#dfdfdf",
       "neutral-400": "#a3a3a3",
       "neutral-500": "#858585",
       "neutral-600": "#666666",
@@ -26,6 +26,7 @@ export const styles = {
     },
     shadows: {},
     space: {
+      "none": 0,
       "1x": "8px",
       "2x": "16px",
       "3x": "24px",
@@ -34,6 +35,7 @@ export const styles = {
       "6x": "48px",
       "7x": "56px",
       "8x": "64px",
+      "9x": "72px",
     },
     borderWidths: {
       regular: "1px",
@@ -45,20 +47,27 @@ export const styles = {
       medium: "500",
       bold: "700",
       "extra-bold": "800",
+      "ultra-bold": "900",
     },
-    lineHeights: {},
+    lineHeights: {
+      xs: "1.375rem",
+      s: "1.625rem",
+      m: "2rem",
+      l: "2.75rem",
+      xl: "4rem",
+      xxl: "5.625rem",
+    },
     letterSpacings: {
-      
+      wide: "0.015em",
     },
     sizes: {},
     fontSizes: {
       xs: "0.875rem",
       s: "1rem",
-      m: "1.125rem",
-      l: "1.5rem",
-      xl: "2rem",
-      xxl: "2.5rem",
-      xxxl: "3.5rem",
+      m: "1.25rem",
+      l: "1.75rem",
+      xl: "2.5rem",
+      xxl: "3.5rem",
     },
     fonts: {
       default: "Poppins, sans-serif",

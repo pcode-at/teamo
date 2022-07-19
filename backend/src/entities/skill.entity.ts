@@ -17,6 +17,7 @@ export class SkillResponse implements HttpResponse {
 export class SkillEntity {
     id: string;
     name: string;
+    opacity?: number;
 
     @Exclude()
     skillMatrix: SkillRating[]

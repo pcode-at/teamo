@@ -4,21 +4,19 @@ import { Cache } from "cache-manager";
 import { Model } from "mongoose";
 import { User, UserDocument } from "src/schemas/user.schema";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { SearchDto } from "./dto/search.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { UserResponse } from "src/entities/user-response.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { PrismaClient } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
-import { searchForUsers } from "src/algorithms/search.algorithm";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
 import { Authorization } from "src/auth/entities/authorization.entity";
 import { JwtService } from "@nestjs/jwt";
 import { LocationEntity, LocationResponse } from "src/entities/location.entity";
+import { ElasticService } from "src/elastic/elastic.service";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const bcrypt = require('bcrypt');
-
+const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();
 
@@ -28,10 +26,11 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
-  ) { }
+    private readonly elastic: ElasticService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
-    let password = createUserDto.password
+    let password = createUserDto.password;
     let hashed = await bcrypt.hash(password, 10);
 
     const user = await prisma.users.create({
@@ -64,6 +63,7 @@ export class UserService {
     }
     return new UserResponse({ statusCode: 404, message: "User not found" });
   }
+
   async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
     const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
     return null;
@@ -110,7 +110,7 @@ export class UserService {
   }
 
   async updateAuthorization(identifier: string, authorization: Authorization) {
-    const user = await (await this.findOne(identifier)).data as UserEntity;
+    const user = (await (await this.findOne(identifier)).data) as UserEntity;
 
     if (authorization.accessToken) user.authorization.accessTokens.push(authorization.accessToken);
     if (authorization.refreshToken) user.authorization.refreshTokens.push(authorization.refreshToken);
@@ -121,7 +121,6 @@ export class UserService {
   async addSkill(skill: SkillDto): Promise<UserResponse> {
     let user;
     try {
-
       await prisma.userSkills.create({
         data: {
           user: {
@@ -134,9 +133,10 @@ export class UserService {
               id: skill.skill,
             },
           },
-          rating: skill.rating,
+          rating: parseInt(skill.rating),
         },
       });
+      await this.elastic.addSkillToUser(skill);
     } catch {
       throw new BadRequestException("Something went wrong while adding a skill");
     }
@@ -179,7 +179,7 @@ export class UserService {
           ...updateUserDto,
           birthDate: new Date(updateUserDto.birthDate.toString()),
         },
-      })
+      });
     } catch {
       throw new BadRequestException("Something went wrong while updating the user");
     }
@@ -201,11 +201,11 @@ export class UserService {
 
   async getLocations(): Promise<LocationResponse> {
     const locations = await prisma.users.findMany({
-      distinct: ['location'],
+      distinct: ["location"],
       select: {
         location: true,
-      }
-    })
+      },
+    });
     return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
   }
 }

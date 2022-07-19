@@ -9,6 +9,7 @@ import { SearchAddSkill } from "../../molecules/SearchAddSkill/SearchAddSkill";
 import { searchElastic } from "../../../utils/requests/search";
 import { useQuery } from "react-query";
 import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
+import { Item } from "../SearchBar/SearchBar";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -23,39 +24,58 @@ const grid = 8;
 
 type Props = {
   items: {
-    id: string;
-    content: {
-      title: string;
-      skillId: string;
-      rating: string;
-    };
-  }[];
+    required: Item[];
+    should: Item[];
+    optional: Item[];
+  };
+  locations: string[];
 };
 
 const SearchResultsLayout = styled("div", {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
-    gridGap: "$2x",
-    padding: "$2x",
-    width: "100%",
-    height: "fit-content",
-    maxHeight: "100%",
-    overflowY: "scroll",
+  display: "grid",
+  gridTemplateColumns: "1fr",
+  gridGap: "$2x",
+  padding: "$2x",
+  width: "100%",
+  height: "fit-content",
+  maxHeight: "100%",
+  overflowY: "scroll",
 });
 
-export const SearchResults: React.FC<Props> = ({ items }) => {
-  let mappedItems = items.map((item, index) => {
-    return {
-      attribute: "skill",
-      value: item.content.skillId,
-      rating: item.content.rating,
-      required: false,
-    };
+export const SearchResults: React.FC<Props> = ({ items, locations }) => {
+  let mappedItems = [];
+
+  console.log(items);
+  for (let key in items) {
+    items[key].forEach((item, index) => {
+      mappedItems.push({
+        attribute: "skill",
+        value: item.content.skillId,
+        rating: item.content.rating,
+        bucket: key,
+      });
+    });
+  }
+  locations.forEach((location) => {
+    mappedItems.push({
+      attribute: "location",
+      value: location,
+      rating: 0,
+      bucket: "should",
+    });
   });
 
-  const { data: results, status } = useQuery(["search", mappedItems], () => {
-    return searchElastic({ parameters: mappedItems });
-  });
+  const { data: results, status } = useQuery(
+    [
+      "search",
+      items,
+      locations,
+    ],
+    () => {
+      console.log("asdf");
+      return searchElastic({ parameters: mappedItems });
+    }
+  );
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -71,9 +91,11 @@ export const SearchResults: React.FC<Props> = ({ items }) => {
     <>
       <SearchResultsLayout>
         {results.users.map((user, index) => {
-          return (<>
-            <SearchResultItem user={user} />
-          </>)
+          return (
+            <>
+              <SearchResultItem user={user} />
+            </>
+          );
         })}
       </SearchResultsLayout>
     </>

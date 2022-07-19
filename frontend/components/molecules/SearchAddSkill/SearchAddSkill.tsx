@@ -1,19 +1,17 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useQuery } from "react-query";
 import { styled } from "../../../stitches.config";
 import { getSkills } from "../../../utils/requests/skills";
 import { InputField } from "../../atoms/InputField/InputField";
+import { Item } from "../../organisms/SearchBar/SearchBar";
 
 type Props = {
-  addSearchSkill: (skill: string, rating: string, id: string) => void;
+  addSearchSkill: (skill: string, id: string) => void;
   items: {
-    id: string;
-    content: {
-      title: string;
-      skillId: string;
-      rating: string;
-    };
-  }[];
+    required: Item[];
+    should: Item[];
+    optional: Item[];
+  };
 };
 
 const SearchAddSkillLayout = styled("div", {
@@ -33,22 +31,6 @@ const AddSkillInfoLayout = styled("div", {
   flexDirection: "row",
   alignItems: "center",
   width: "100%",
-});
-
-const AddIconLayout = styled("button", {
-  display: "block",
-  width: "22px",
-  height: "22px",
-  border: "none",
-  padding: "0",
-
-  backgroundColor: "transparent",
-  color: "$brand-500",
-  cursor: "pointer",
-});
-
-const InputLayout = styled("div", {
-  width: "fit-content",
 });
 
 const SkillListLayout = styled("div", {
@@ -86,7 +68,6 @@ const SkillListItemLayout = styled("button", {
 });
 
 export const SearchAddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
-  const [rating, setRating] = React.useState("");
   const [skill, setSkill] = React.useState("");
   const { data: skills, status } = useQuery("skills", getSkills);
 
@@ -120,18 +101,25 @@ export const SearchAddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
             (element) =>
               (element.name.includes(skill) ||
                 element.name.toLowerCase().includes(skill.toLowerCase())) &&
-              !items.find((item) => item.content.title === element.name)
+              !items.required.find(
+                (item) => item.content.title === element.name
+              ) &&
+              !items.should.find(
+                (item) => item.content.title === element.name
+              ) &&
+              !items.optional.find(
+                (item) => item.content.title === element.name
+              )
           )
-          .map((skill) => (
+          .map((currentSkill) => (
             <SkillListItemLayout
-              key={skill.id}
+              key={currentSkill.id}
               onClick={() => {
-                addSearchSkill(skill.name, rating, skill.id);
+                addSearchSkill(currentSkill.name, currentSkill.id);
                 setSkill("");
-                setRating("");
               }}
             >
-              {skill.name}
+              {currentSkill.name}
             </SkillListItemLayout>
           ))}
       </SkillListLayout>

@@ -23,6 +23,7 @@ export class UserEntity {
   bookmarkedInIds: string[];
   projectsIds: string[];
   score?: number;
+  skills?: SkillEntity | SkillEntity[] | any;
 
   @Exclude()
   password: string;

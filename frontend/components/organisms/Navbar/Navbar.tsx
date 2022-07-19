@@ -57,8 +57,8 @@ export const Navbar: React.FC<Props> = ({}) => {
           <Link href="/" passHref>
             <StyledLink>HOME</StyledLink>
           </Link>
-          <Link href="/login" passHref>
-            <StyledLink>LOGIN</StyledLink>
+          <Link href="/project" passHref>
+            <StyledLink>PROJECTS</StyledLink>
           </Link>
           <Link href="/search" passHref>
             <StyledLink>SEARCH</StyledLink>

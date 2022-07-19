@@ -8,8 +8,8 @@ export class SearchDto {
 }
 
 class SearchAttribute {
-  attribute: "skill" | "department" | "location";	
+  attribute: "skill" | "department" | "location";
   value: string | string[];
   rating?: number;
-  required: boolean;
+  bucket?: "required" | "should" | "optional";
 }

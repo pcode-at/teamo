@@ -4,7 +4,15 @@ import { ChevronDownIcon } from "@radix-ui/react-icons";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import SvgMapPin from "../../atoms/svg/SvgMapPin";
 
-type Props = {};
+type Props = {
+  icon: any;
+  title: string;
+  items: {
+    value: string;
+    label: string;
+  }[];
+  setCheckedItems: (items: string[]) => void;
+};
 
 const slideDown = keyframes({
   from: { height: 0 },
@@ -64,7 +72,7 @@ const StyledTrigger = styled(AccordionPrimitive.Trigger, {
   lineHeight: 1,
   color: "$brand-400",
   boxShadow: `0 1px 0 $neutral-200`,
-  borderRadius: "$2x",
+  borderRadius: "$1x",
   marginBottom: "$1x",
   cursor: "pointer",
   '&[data-state="closed"]': { backgroundColor: "white" },
@@ -77,7 +85,7 @@ const StyledContent = styled(AccordionPrimitive.Content, {
   fontSize: 15,
   color: "$brand-400",
   backgroundColor: "$neutral-100",
-  borderRadius: "$2x",
+  borderRadius: "$1x",
 
   '&[data-state="open"]': {
     animation: `${slideDown} 300ms cubic-bezier(0.47, 0, 0.013, 1) forwards`,
@@ -144,46 +152,59 @@ export const AccordionContent = React.forwardRef(function accordionContent(
 const CheckBoxInput = styled("input", {});
 const CheckBoxLabel = styled("label", {});
 
-export const DropDown: React.FC<Props> = ({}) => {
+export const DropDown: React.FC<Props> = ({
+  icon,
+  title,
+  items,
+  setCheckedItems,
+}) => {
+  const [checkedItems, setCheckedItemsState] = React.useState<string[]>([]);
+  const Icon = icon;
+
   return (
     <>
-      <Accordion type="single" defaultValue="item-1" collapsible>
-        <AccordionItem value="item-1">
+      <Accordion type="single" defaultValue={"item-" + title} collapsible>
+        <AccordionItem value={"item-" + title}>
           {/*@ts-ignore */}
           <AccordionTrigger>
             <AccordionTriggerLayout>
               <MapPinLayout>
-                <SvgMapPin></SvgMapPin>
+                {/*@ts-ignore */}
+                <Icon></Icon>
               </MapPinLayout>
-              Location
+              {title}
             </AccordionTriggerLayout>
           </AccordionTrigger>
           {/*@ts-ignore */}
           <AccordionContent>
-            <CheckBoxInput
-              type="checkbox"
-              id="vehicle1"
-              name="vehicle1"
-              value="Bike"
-            />
-            <CheckBoxLabel htmlFor="vehicle1"> I have a bike</CheckBoxLabel>
-            <br />
-            <CheckBoxInput
-              type="checkbox"
-              id="vehicle2"
-              name="vehicle2"
-              value="Car"
-            />
-            <CheckBoxLabel htmlFor="vehicle2"> I have a car</CheckBoxLabel>
-            <br />
-            <CheckBoxInput
-              type="checkbox"
-              id="vehicle3"
-              name="vehicle3"
-              value="Bike"
-            />
-            <CheckBoxLabel htmlFor="vehicle3"> I have a bike</CheckBoxLabel>
-            <br />
+            {items.map((item) => {
+              return (
+                <>
+                  <CheckBoxInput
+                    type="checkbox"
+                    id={item.value}
+                    name={item.value}
+                    value={item.value}
+                    checked={checkedItems.includes(item.value)}
+                    onChange={(e) => {
+                      let newItems = [...checkedItems];
+                      if (e.target.checked) {
+                        newItems.push(item.value);
+                      } else {
+                        newItems = checkedItems.filter((i) => i !== item.value);
+                      }
+                      setCheckedItems(newItems);
+                      setCheckedItemsState(newItems);
+                    }}
+                  />
+                  <CheckBoxLabel htmlFor={item.value}>
+                    {"  "}
+                    {item.label}
+                  </CheckBoxLabel>
+                  <br />
+                </>
+              );
+            })}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

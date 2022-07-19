@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 @Controller("api/elastic")
 @UseInterceptors(ClassSerializerInterceptor)
 export class ElasticController {
-  constructor(private readonly elastic: ElasticService) { }
+  constructor(private readonly elastic: ElasticService) {}
 
   @Post("insertUser/:id")
   async insertUser(@Param("id") identifier: string) {
@@ -32,5 +32,10 @@ export class ElasticController {
   @Post("search")
   async search(@Body() search: SearchDto): Promise<SearchResponse> {
     return await this.elastic.search(search);
+  }
+
+  @Get("reimport")
+  async reimport() {
+    await this.elastic.reimportData();
   }
 }

@@ -8,6 +8,8 @@ import { jwtConstants } from "./constants";
 import { JwtStrategy } from "./jwt.strategy";
 import { LocalStrategy } from "./local.strategy";
 import { RefreshModule } from "./refresh/refresh.module";
+import { ElasticModule } from "src/elastic/elastic.module";
+import { ElasticService } from "src/elastic/elastic.service";
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { RefreshModule } from "./refresh/refresh.module";
       signOptions: { expiresIn: "900s" },
     }),
     RefreshModule,
+    ElasticModule,
   ],
-  providers: [AuthService, UserService, JwtStrategy, LocalStrategy],
+  providers: [ElasticService, AuthService, UserService, JwtStrategy, LocalStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}

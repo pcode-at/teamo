@@ -3,8 +3,10 @@ import { ElasticsearchService } from "@nestjs/elasticsearch";
 import { PrismaClient, skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
 import { SearchEntity, SearchResponse } from "src/entities/search.entity";
+import { SkillEntity } from "src/entities/skill.entity";
 import { UserEntity } from "src/entities/user.entity";
 import { SearchDto } from "src/user/dto/search.dto";
+import { SkillDto } from "src/user/dto/skill.dto";
 
 const prisma = new PrismaClient();
 
@@ -40,14 +42,14 @@ const client = new ElasticsearchService({
 // }
 @Injectable()
 export class ElasticService {
-  constructor() { }
+  constructor() {}
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
 
     user.skills.forEach(skill => {
       skills.push({
-        rating: parseInt(skill.rating),
+        rating: skill.rating,
         skill: skill.skill.id,
       });
     });
@@ -76,6 +78,45 @@ export class ElasticService {
           skills: {
             rating: skills.rating,
             skill: skills.skill.id,
+          },
+        },
+      },
+    });
+  }
+
+  async addSkillToUser(skill: SkillDto) {
+    client.update({
+      index: "users",
+      id: skill.identifier,
+      doc: {
+        skills: {
+          rating: skill.rating,
+          skill: skill.skill,
+        },
+      },
+    });
+  }
+
+  async reimportData() {
+    client.deleteByQuery({
+      index: "users",
+      body: {
+        query: {
+          match_all: {},
+        },
+      },
+    });
+
+    client.indices.putMapping({
+      index: "users",
+      properties: {
+        location: { type: "text" },
+        departments: { type: "text" },
+        skills: {
+          type: "nested",
+          properties: {
+            rating: { type: "integer" },
+            skill: { type: "text" },
           },
         },
       },
@@ -129,7 +170,7 @@ export class ElasticService {
                 {
                   exp: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
                     },
@@ -171,11 +212,60 @@ export class ElasticService {
 
   async search(search: SearchDto): Promise<SearchResponse> {
     const results = await this.prepareSearch(search);
-    console.log(results);
+
+    const requiredSkillIds = search.parameters.map(paramter => {
+      return paramter.value;
+    });
+
+    const requiredSkills = search.parameters.map(paramter => {
+      return { id: paramter.value, rating: paramter.rating };
+    });
+
     const mappedUsers = [] as UserEntity[];
     for (const user of results.users) {
+      let userSkills = [] as SkillEntity[];
       let userData = await this.getUserData(user.identifier);
-      mappedUsers.push(new UserEntity({ ...userData, score: user.score }));
+
+      userData.skills = userData.skills.sort((a, b) => {
+        if (requiredSkillIds.includes(a.skill.id)) {
+          return -1;
+        }
+        if (requiredSkillIds.includes(b.skill.id)) {
+          return 1;
+        }
+        return 0;
+      });
+
+      userData.skills.map(currentSkill => {
+        if (requiredSkillIds.includes(currentSkill.skill.id) && requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating)) {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 1,
+            }),
+          );
+        } else if (
+          requiredSkillIds.includes(currentSkill.skill.id) &&
+          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 2)
+        ) {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 0.5,
+            }),
+          );
+        } else {
+          userSkills.push(
+            new SkillEntity({
+              ...currentSkill,
+              opacity: 0,
+            }),
+          );
+        }
+      });
+
+      mappedUsers.push(new UserEntity({ ...userData, skills: userSkills, score: user.score }));
     }
 
     return new SearchResponse({
@@ -200,6 +290,7 @@ export class ElasticService {
             skill: {
               select: {
                 name: true,
+                id: true,
               },
             },
           },
@@ -209,15 +300,9 @@ export class ElasticService {
   }
 
   async prepareSearch(search: SearchDto) {
-    const attributes = search.parameters.filter(search => search.required).map(search => search.attribute);
+    const attributes = search.parameters.map(search => search.attribute);
 
-    const required = search.parameters
-      .filter(search => search.required)
-      .map(search => {
-        if (search.value) search.value;
-      });
-
-    if (!required) return;
+    if (!attributes) return;
 
     const searchQuery = {
       index: "users",
@@ -230,6 +315,7 @@ export class ElasticService {
               bool: {
                 should: [],
                 must: [],
+                filter: [],
               },
             },
             score_mode: "sum",
@@ -245,7 +331,7 @@ export class ElasticService {
       },
     };
 
-    searchQuery.body.query.function_score.query.bool.should.push({
+    searchQuery.body.query.function_score.query.bool.must.push({
       match_all: {},
     });
 
@@ -256,23 +342,48 @@ export class ElasticService {
     // });
 
     if (attributes.includes("location")) {
-      searchQuery.body.query.function_score.query.bool.must.push({
+      let searchLocations = [];
+      let locations = search.parameters.find(search => search.attribute === "location").value;
+
+      if (locations instanceof Array) {
+        searchLocations = locations.map(location => location.toLowerCase());
+      } else {
+        searchLocations.push(locations.toLowerCase());
+      }
+
+      searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
-          location: search.parameters.find(search => search.attribute === "location").value,
+          location: searchLocations,
         },
       });
     }
     if (attributes.includes("department")) {
-      searchQuery.body.query.function_score.query.bool.must.push({
+      let searchDeparments = [];
+      let departments = search.parameters.find(search => search.attribute === "location").value;
+
+      if (departments instanceof Array) {
+        searchDeparments = departments.map(department => department.toLowerCase());
+      } else {
+        searchDeparments.push(departments.toLowerCase());
+      }
+
+      searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
-          departments: search.parameters.find(search => search.attribute === "department").value,
+          departments: searchDeparments,
         },
       });
     }
 
     let skills = search.parameters.filter(paramter => paramter.attribute === "skill");
 
-    skills.forEach((paramter, index) => {
+    skills.forEach(paramter => {
+      let weight = 1;
+      if (paramter.bucket === "required") {
+        weight = 100;
+      }
+      if (paramter.bucket === "should") {
+        weight = 50;
+      }
       searchQuery.body.query.function_score.query.bool.should.push({
         nested: {
           path: "skills",
@@ -286,36 +397,36 @@ export class ElasticService {
                     range: {
                       "skills.rating": {
                         lte: paramter.rating,
-                      }
-                    }
+                      },
+                    },
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
                       decay: 0.5,
                     },
                   },
-                  weight: ((skills.length - index) / skills.length) * 100,
+                  weight: weight,
                 },
                 {
                   filter: {
                     range: {
                       "skills.rating": {
                         gt: paramter.rating,
-                      }
-                    }
+                      },
+                    },
                   },
                   gauss: {
                     "skills.rating": {
-                      offset: 0,
+                      offset: 1,
                       origin: paramter.rating,
                       scale: 1,
-                      decay: 0.51
+                      decay: 0.51,
                     },
                   },
-                  weight: ((skills.length - index) / skills.length) * 100,
+                  weight: weight,
                 },
               ],
               query: {
@@ -347,7 +458,7 @@ export class ElasticService {
       users: [],
     };
 
-    console.log(result.hits.hits.length);
+    // console.log(result.hits.hits.length);
 
     result.hits.hits.forEach(hit => {
       resultDTO.users.push({
