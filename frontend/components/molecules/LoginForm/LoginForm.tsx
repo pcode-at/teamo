@@ -45,7 +45,7 @@ export const LoginForm: React.FC<Props> = ({}) => {
         <Checkbox onChange={undefined}>Remember me</Checkbox>
         <Button
           onClick={async () => {
-            const isLoggedIn = login(identifier, password);
+            const isLoggedIn = await login(identifier, password);
             if (isLoggedIn) {
               router.push("/");
             }

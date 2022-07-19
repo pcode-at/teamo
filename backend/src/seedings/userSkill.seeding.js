@@ -127,10 +127,13 @@ function seedUserSkillsWithGrouping(skillGroupings) {
                     users.forEach(function (user) {
                         var skillsToAdd = [];
                         var chance = 1;
-                        while (Math.random() <= chance) {
+                        var i = 0;
+                        while (Math.random() <= chance && i < skillGroupings.length) {
                             var randomSkills = skillGroupings[Math.floor(Math.random() * skillGroupings.length)];
-                            skillsToAdd.push(randomSkills.filter(function (skill) { return !skillsToAdd.includes(skill); }));
+                            var filteredSkills = randomSkills.filter(function (skill) { return !skillsToAdd.flat().includes(skill); });
+                            skillsToAdd.push(filteredSkills);
                             chance -= 0.15;
+                            i++;
                         }
                         skillsToAdd.forEach(function (skills) {
                             var base = Math.floor(Math.random() * 7) + 1;
