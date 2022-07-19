@@ -10,9 +10,8 @@ import SvgMove2 from "../../atoms/svg/SvgMove2";
 import { IconInfoSection } from "../IconInfoSection/IconInfoSection";
 import { Skill } from "../Skill/Skill";
 
-type Props = {
-  user: {
-    birthDate: Date;
+export type User = {
+  birthDate: Date;
     departments: string[];
     email: string;
     gender: string;
@@ -33,7 +32,10 @@ type Props = {
         name: string;
       };
     }[];
-  };
+};
+
+type Props = {
+  user: User;
 };
 
 const SearchResultItemLayout = styled("div", {

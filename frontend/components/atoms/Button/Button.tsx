@@ -13,9 +13,10 @@ type Props = {
 
 const StyledButton = styled("button", {
   width: "fit-content",
+  height: "fit-content",
   padding: "$2x $3x",
   border: "transparent $borderWidths$medium solid",
-  borderRadius: "$2x",
+  borderRadius: "$1x",
 
   color: "$neutral-100",
   backgroundColor: "$brand-400",
