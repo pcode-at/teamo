@@ -44,7 +44,7 @@ export async function recommendUsers(projectId: string, stage: number, numberOfR
           // or if the rating of all memebers together in this skill is greater or equals than 150% of the rating needed then remove the skill
           if (
             skill.rating == skillsNeeded.get(skill.skill.id).ratingNeeded ||
-            skill.rating + skillsNeeded.get(skill.skill.id).ratingNeeded >= skillsNeeded.get(skill.skill.id).ratingNeeded * 1.5
+            Number(skill.rating + skillsNeeded.get(skill.skill.id).ratingNeeded) >= skillsNeeded.get(skill.skill.id).ratingNeeded * 1.5
           ) {
             skillsNeeded.delete(skill.skill.id);
           }

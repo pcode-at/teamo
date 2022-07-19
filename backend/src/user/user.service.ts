@@ -27,7 +27,7 @@ export class UserService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
     private readonly elastic: ElasticService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password;
@@ -133,7 +133,7 @@ export class UserService {
               id: skill.skill,
             },
           },
-          rating: parseInt(skill.rating),
+          rating: skill.rating.toString(),
         },
       });
       await this.elastic.addSkillToUser(skill);
