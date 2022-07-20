@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { PrismaClient, SkillGroup } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { ProjectEntity, ProjectResponse } from "src/entities/project.entity";
 import { AddSkillDTO } from "./dto/add-skill.dto";
 import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
 import { SkillGroupEntity, SkillGroupResponse } from "./dto/find-skillgroups.dto";
+import { connections } from "mongoose";
 
 
 const prisma = new PrismaClient();
@@ -15,16 +16,12 @@ export class ProjectService {
   async create(creatProject: CreateProjectDto): Promise<ProjectResponse> {
     let project;
     try {
-      let skillGroups: SkillGroup = {
-        nodes: [],
-        edges: []
-      };
       project = await prisma.projects.create({
         data: {
           ...creatProject,
           creationDate: new Date(creatProject.creationDate.toString()),
           lastEdited: new Date(Date.now().toString()),
-          skillGroups: skillGroups,
+          skillGroups: Object.create(null),
         },
       });
     } catch {
@@ -137,8 +134,6 @@ export class ProjectService {
   }
 
   async getSkillGroupings(projectId: string): Promise<SkillGroupResponse> {
-    let data = await getSkillGroupingsForProject(projectId);
-
 
     let skills = await prisma.projects.findUnique({
       where: {
@@ -155,8 +150,33 @@ export class ProjectService {
             },
           },
         },
+        skillGroups: {
+          select: {
+            nodes: true,
+            edges: true
+          }
+        }
       },
     });
+
+    let skillGroupIds = []
+    let skillIds = [];
+    skills.skillGroups.nodes.forEach(skillGroup => { skillGroupIds.push(skillGroup.id) });
+    skills.skills.forEach(skill => { skillIds.push(skill.skill.id) });
+
+    if (skillGroupIds.every(id => skillIds.includes(id))) {
+
+      console.log("stayed the same");
+
+      return {
+        statusCode: 200,
+        message: "Successfully computed skill groups",
+        data: new SkillGroupEntity(skills.skillGroups.nodes, skills.skillGroups.edges),
+      };
+    }
+
+    let data = await getSkillGroupingsForProject(projectId);
+
 
     let nodes = [];
 
@@ -181,15 +201,13 @@ export class ProjectService {
       });
     }
 
-    const dataBaseInsert: SkillGroup = {
-      nodes: nodes,
-      edges: edges
-    }
-
     await prisma.projects.update({
       where: { id: projectId },
       data: {
-        skillGroups: dataBaseInsert,
+        skillGroups: {
+          nodes: nodes,
+          edges: edges,
+        }
       }
     });
 

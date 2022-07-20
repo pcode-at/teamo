@@ -95,7 +95,6 @@ type Node {
 }
 
 type Edge {
-  id    String
   from  String
   to    String
   label String

@@ -84,7 +84,7 @@ const options = {
     maxVelocity: 146,
     solver: "forceAtlas2Based",
     timestep: 0.35,
-    stabilization: { iterations: 7 },
+    stabilization: { iterations: 8 },
   },
   height: "500px",
 };
@@ -96,7 +96,7 @@ const events = {
 };
 
 export async function getGroups() {
-  return fetchData("project/skill-groupings/62c7fbb4aba3578343a8f9a0", "GET");
+  return fetchData("project/skill/groupings/62c7fbb4aba3578343a8f9a0", "GET");
 }
 
 export default function Visualization() {
