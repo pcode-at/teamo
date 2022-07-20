@@ -15,8 +15,8 @@ export class ProjectController {
   @Post()
   @ApiOperation({ summary: "Create project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
-  create(@Body() createProjectDto: CreateProjectDto): Promise<ProjectResponse> {
-    return this.projectService.create(createProjectDto);
+  create(@Body() body: CreateProjectDto): Promise<ProjectResponse> {
+    return this.projectService.create(body);
   }
 
   @Get()
@@ -36,8 +36,8 @@ export class ProjectController {
   @Patch(":id")
   @ApiOperation({ summary: "Update project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
-  update(@Param("id") id: string, @Body() updateProjectDto: UpdateProjectDto): Promise<ProjectResponse> {
-    return this.projectService.update(id, updateProjectDto);
+  update(@Param("id") id: string, @Body() updateProject: UpdateProjectDto): Promise<ProjectResponse> {
+    return this.projectService.update(id, updateProject);
   }
 
   @Delete(":id")

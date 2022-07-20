@@ -17,7 +17,7 @@ const client = new ElasticsearchService({
     password: "elastic",
   },
   tls: {
-    ca: fs.readFileSync("./src/elastic/ca.crt"),
+    ca: fs.readFileSync("./src/elastic/cert/ca.crt"),
     rejectUnauthorized: false,
   },
   requestTimeout: 30000,

@@ -1,6 +1,4 @@
 import { CacheModule, Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserModule } from "./user/user.module";
 import { ProjectModule } from "./project/project.module";
@@ -28,7 +26,7 @@ import { ElasticService } from "./elastic/elastic.service";
     SkillModule,
     ElasticModule,
   ],
-  controllers: [AppController, SkillController, ElasticController],
-  providers: [AppService, SkillService, ElasticService],
+  controllers: [SkillController, ElasticController],
+  providers: [SkillService, ElasticService],
 })
 export class AppModule {}

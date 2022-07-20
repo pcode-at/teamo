@@ -1,4 +1,4 @@
-import { ApiProperty, ApiResponseProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger";
 import { HttpResponse } from "./http-response.entity";
 
 export class LocationResponse implements HttpResponse {

@@ -24,6 +24,10 @@ export class ProjectResponse implements HttpResponse {
     description: "Projects",
   })
   data?: ProjectEntity | ProjectEntity[];
+
+  constructor(partial: Partial<ProjectResponse>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class ProjectEntity {

@@ -34,35 +34,48 @@ export class UserService {
     let password = createUserDto.password;
     let hashed = await bcrypt.hash(password, 10);
 
-    const user = await prisma.users.create({
-      data: {
-        ...createUserDto,
-        password: hashed,
-        birthDate: new Date(createUserDto.birthDate.toString()),
-        authorization: {
-          accessTokens: [],
-          refreshTokens: [],
+    try {
+      const user = await prisma.users.create({
+        data: {
+          ...createUserDto,
+          password: hashed,
+          birthDate: new Date(createUserDto.birthDate.toString()),
+          authorization: {
+            accessTokens: [],
+            refreshTokens: [],
+          },
         },
-      },
-    });
-    return new UserResponse({ statusCode: 201, message: "User created successfully", data: new UserEntity(user) });
+      });
+
+      return new UserResponse({ statusCode: 201, message: "User created successfully", data: new UserEntity(user) });
+    } catch {
+      throw new BadRequestException("Something went wrong while creating a user");
+    }
   }
 
   async findAll(): Promise<UserResponse> {
-    const users = await prisma.users.findMany();
-    return new UserResponse({ statusCode: 200, message: "Users found successfully", data: users.map(user => new UserEntity(user)) });
+    try {
+      const users = await prisma.users.findMany();
+      return new UserResponse({ statusCode: 200, message: "Users found successfully", data: users.map(user => new UserEntity(user)) });
+    } catch {
+      throw new BadRequestException("Something went wrong while finding all users");
+    }
   }
 
   async findOne(identifier: string): Promise<UserResponse> {
-    const user = await prisma.users.findUnique({
-      where: {
-        identifier,
-      },
-    });
-    if (user) {
-      return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
+    try {
+      const user = await prisma.users.findUnique({
+        where: {
+          identifier,
+        },
+      });
+      if (user) {
+        return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
+      }
+      return new UserResponse({ statusCode: 404, message: "User not found" });
+    } catch {
+      throw new BadRequestException("Something went wrong while finding a user");
     }
-    return new UserResponse({ statusCode: 404, message: "User not found" });
   }
 
   async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
@@ -75,22 +88,27 @@ export class UserService {
     //@ts-ignore
     const identifier = decoded.identifier;
 
-    const user = await prisma.users.findUnique({
-      where: {
-        identifier,
-      },
-      include: {
-        skills: {
-          include: {
-            skill: true,
+    try {
+      const user = await prisma.users.findUnique({
+        where: {
+          identifier,
+        },
+        include: {
+          skills: {
+            include: {
+              skill: true,
+            },
           },
         },
-      },
-    });
-    if (user) {
-      return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
+      });
+
+      if (user) {
+        return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
+      }
+      return new UserResponse({ statusCode: 404, message: "User not found" });
+    } catch {
+      throw new BadRequestException("Something went wrong while finding a user");
     }
-    return new UserResponse({ statusCode: 404, message: "User not found" });
   }
 
   async updateOne(identifier: string, user: UserEntity): Promise<UserResponse> {
@@ -105,6 +123,7 @@ export class UserService {
           birthDate: new Date(user.birthDate.toString()),
         },
       });
+
       return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
     } catch {
       throw new BadRequestException("Something went wrong while updating a user");
@@ -121,9 +140,8 @@ export class UserService {
   }
 
   async addSkill(skill: SkillDto): Promise<SkillResponse> {
-    let user;
     try {
-      user = await prisma.userSkills.create({
+      let user = await prisma.userSkills.create({
         data: {
           user: {
             connect: {
@@ -139,10 +157,10 @@ export class UserService {
         },
       });
       await this.elastic.addSkillToUser(skill);
+      return new SkillResponse({ statusCode: 200, message: "Skill added successfully", data: new SkillEntity(user) });
     } catch {
       throw new BadRequestException("Something went wrong while adding a skill");
     }
-    return new SkillResponse({ statusCode: 200, message: "Skill added successfully", data: new SkillEntity(user) });
   }
 
   async getSkillsForUser(identifier: string) {
@@ -171,9 +189,8 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
-    let user;
     try {
-      user = await prisma.users.update({
+      let user = await prisma.users.update({
         where: {
           identifier: id,
         },
@@ -182,10 +199,10 @@ export class UserService {
           birthDate: new Date(updateUserDto.birthDate.toString()),
         },
       });
+      return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(user) });
     } catch {
       throw new BadRequestException("Something went wrong while updating the user");
     }
-    return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(user) });
   }
 
   async remove(id: string): Promise<UserResponse> {

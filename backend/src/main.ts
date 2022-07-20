@@ -19,7 +19,6 @@ async function bootstrap() {
     .setTitle('Teamo API Documentation')
     .setDescription('The Teamo API description')
     .setVersion('1.0')
-    .addTag('teamo')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

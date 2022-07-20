@@ -10,7 +10,6 @@ import { SkillService } from "./skill.service";
 export class SkillController {
   constructor(private readonly skillService: SkillService) {}
 
-  // @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: "Get all" })
   @ApiResponse({ status: 200, type: SkillResponse })

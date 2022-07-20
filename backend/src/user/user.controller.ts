@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Cla
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { SearchDto } from "./dto/search.dto";
 import { SkillDto } from "./dto/skill.dto";
 import { UserResponse } from "src/entities/user-response.entity";
 import { Request } from "express";
@@ -36,7 +35,7 @@ export class UserController {
   @Get()
   @ApiOperation({ summary: "Search for users" })
   @ApiResponse({ status: 200, type: UserResponse })
-  findOne(@Req() request: Request) {
+  findOne(@Req() request: Request): Promise<UserResponse> {
     const jwt = request.headers.authorization.split(" ")[1];
     return this.userService.findOneDetailed(jwt);
   }

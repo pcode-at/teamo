@@ -6,7 +6,6 @@ import { AuthorizationResponse } from "./entities/authorization.entity";
 import { LocalAuthGuard } from "./local-auth.guard";
 import { JwtRefreshTokenAuthGuard } from "./refresh/refresh-auth.guard";
 
-@ApiBearerAuth()
 @ApiTags("auth")
 @Controller("/api/auth")
 export class AuthController {

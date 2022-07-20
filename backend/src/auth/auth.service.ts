@@ -12,12 +12,12 @@ const bcrypt = require("bcrypt");
 export class AuthService {
   constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
 
-  async validateUser(identifier: string, pass: string): Promise<any> {
+  async validateUser(identifier: string, pass: string): Promise<UserEntity> {
     const user = (await this.userService.findOne(identifier)).data as UserEntity;
 
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
-      return result;
+      return new UserEntity(result);
     }
     return null;
   }
