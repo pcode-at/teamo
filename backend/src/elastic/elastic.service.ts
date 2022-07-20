@@ -40,6 +40,7 @@ const client = new ElasticsearchService({
 //     }
 //   }
 // }
+
 @Injectable()
 export class ElasticService {
   constructor() {}
