@@ -15,6 +15,7 @@ import { Authorization } from "src/auth/entities/authorization.entity";
 import { JwtService } from "@nestjs/jwt";
 import { LocationEntity, LocationResponse } from "src/entities/location.entity";
 import { ElasticService } from "src/elastic/elastic.service";
+import { SkillEntity, SkillResponse } from "src/entities/skill.entity";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require("bcrypt");
 
@@ -105,8 +106,6 @@ export class UserService {
       },
     });
     return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
-
-    //return this.userModel.findOne({ identifier }).populate("skill").exec();
   }
 
   async updateAuthorization(identifier: string, authorization: Authorization) {
@@ -118,10 +117,10 @@ export class UserService {
     await this.updateOne(identifier, user);
   }
 
-  async addSkill(skill: SkillDto): Promise<UserResponse> {
+  async addSkill(skill: SkillDto): Promise<SkillResponse> {
     let user;
     try {
-      await prisma.userSkills.create({
+      user = await prisma.userSkills.create({
         data: {
           user: {
             connect: {
@@ -140,7 +139,7 @@ export class UserService {
     } catch {
       throw new BadRequestException("Something went wrong while adding a skill");
     }
-    return new UserResponse({ statusCode: 200, message: "Skill added successfully", data: new UserEntity(user) });
+    return new SkillResponse({ statusCode: 200, message: "Skill added successfully", data: new SkillEntity(user) });
   }
 
   async getSkillsForUser(identifier: string) {

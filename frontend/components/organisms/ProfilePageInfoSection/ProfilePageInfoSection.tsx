@@ -9,6 +9,14 @@ import { getUser } from "../../../utils/requests/user";
 import { useQuery } from "react-query";
 import SvgMail from "../../atoms/svg/SvgMail";
 import SvgPhone from "../../atoms/svg/SvgPhone";
+import {
+  BodyDefaultTabletAndUpStyle,
+  H2BoldTabletAndUpStyle,
+  H3BoldTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
+import SvgMapPin from "../../atoms/svg/SvgMapPin";
+import SvgBriefcase from "../../atoms/svg/SvgBriefcase";
+import { Spacer } from "../../atoms/Spacer/Spacer";
 
 type Props = {
   profileId?: string;
@@ -19,12 +27,9 @@ const GeneralInfoLayout = styled("div", {
   gridTemplateColumns: "1fr 3fr",
   gap: "10px",
   padding: "10px",
-  lineHeight: "1",
-  fontWeight: "500",
   borderRadius: "10px",
 
   color: "$neutral-100",
-  fontSize: "15px",
 });
 
 const GeneralInfoText = styled("div", {
@@ -36,17 +41,25 @@ const GeneralInfoText = styled("div", {
   borderRadius: "10px",
 
   color: "$neutral-800",
-  fontSize: "15px",
-  lineHeight: "1",
-  fontWeight: "500",
 });
 
-const GeneralInfoTextTitle = styled("div", {
-  fontSize: "20px",
+const IconInfoLayout = styled("div", {
+  display: "flex",
+  flexDirection: "row",
+  width: "100%",
+  gap: "$9x",
+});
+
+const GeneralInfoTextTitle = styled("h2", {
+  ...H2BoldTabletAndUpStyle,
+});
+
+const PersonalInfoTextTitle = styled("h3", {
+  ...H3BoldTabletAndUpStyle,
 });
 
 const GeneralInfoTextSubtitle = styled("div", {
-  fontSize: "15px",
+  ...BodyDefaultTabletAndUpStyle,
 });
 
 const AvatarLayout = styled("div", {
@@ -75,17 +88,24 @@ export const ProfilePageInfoSection: React.FC<Props> = ({ profileId }) => {
         </AvatarLayout>
         <GeneralInfoText>
           <GeneralInfoTextTitle>{profile.name}</GeneralInfoTextTitle>
-          <GeneralInfoTextSubtitle>UI / UX</GeneralInfoTextSubtitle>
-          <GeneralInfoTextSubtitle>Design</GeneralInfoTextSubtitle>
-          <GeneralInfoTextSubtitle>{profile.location}</GeneralInfoTextSubtitle>
+          <IconInfoSection
+            icon={SvgBriefcase}
+            label={"UI / UX"}
+          ></IconInfoSection>
         </GeneralInfoText>
       </GeneralInfoLayout>
+      <Spacer size="3x"></Spacer>
       <Separator width={"big"} alignment={"center"}></Separator>
-      <GeneralInfoText>
-        <GeneralInfoTextTitle>Personal</GeneralInfoTextTitle>
+      <Spacer size="3x"></Spacer>
+      <PersonalInfoTextTitle>Personal Info</PersonalInfoTextTitle>
+      <IconInfoLayout>
         <IconInfoSection
           icon={SvgCalendar}
           label={"Employee since: 2018"}
+        ></IconInfoSection>
+        <IconInfoSection
+          icon={SvgMapPin}
+          label={profile.location}
         ></IconInfoSection>
         <IconInfoSection
           icon={SvgMail}
@@ -97,8 +117,11 @@ export const ProfilePageInfoSection: React.FC<Props> = ({ profileId }) => {
           label={profile.phoneNumber}
           href={`tel:${profile.phoneNumber}`}
         ></IconInfoSection>
-      </GeneralInfoText>
+      </IconInfoLayout>
+      <Spacer size="3x"></Spacer>
       <Separator width={"big"} alignment={"center"}></Separator>
+      <Spacer size="3x"></Spacer>
+      <PersonalInfoTextTitle>Skills</PersonalInfoTextTitle>
     </>
   );
 };

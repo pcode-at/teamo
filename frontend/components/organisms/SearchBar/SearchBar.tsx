@@ -50,7 +50,7 @@ const SearchBarLayout = styled("div", {
   gap: "$3x",
   minWidth: "450px",
 
-  backgroundColor: "$brand-100",
+  backgroundColor: "$neutral-200",
 });
 
 const StyledList = styled("div", {
