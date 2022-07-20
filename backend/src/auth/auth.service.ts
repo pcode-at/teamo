@@ -4,18 +4,18 @@ import { UserEntity } from "src/entities/user.entity";
 import { UserService } from "src/user/user.service";
 import { jwtConstants } from "./constants";
 import { LoginDto } from "./dto/login.dto";
-import { Authorization, AuthorizationResponse } from "./entities/authorization.entity";
+import { AuthorizationEntity, AuthorizationResponse } from "./entities/authorization.entity";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) { }
+  constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {}
 
   async validateUser(identifier: string, pass: string): Promise<any> {
     const user = (await this.userService.findOne(identifier)).data as UserEntity;
 
-    if (user && await bcrypt.compare(pass, user.password)) {
+    if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
     }
@@ -26,7 +26,7 @@ export class AuthService {
     const userIdentifier = { identifier: payload.identifier };
     const accessToken = this.jwtService.sign(userIdentifier);
     const refreshToken = this.jwtService.sign({ identifier: { userIdentifier } }, { expiresIn: jwtConstants.refreshTokenExpiryTime });
-    const authorization = new Authorization({
+    const authorization = new AuthorizationEntity({
       accessToken,
       refreshToken,
     });
@@ -36,7 +36,7 @@ export class AuthService {
     return new AuthorizationResponse({
       statusCode: 200,
       message: "Login successful",
-      data: authorization
+      data: authorization,
     });
   }
 
