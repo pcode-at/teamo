@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, SkillGroup } from "@prisma/client";
 import { ProjectEntity, ProjectResponse } from "src/entities/project.entity";
 import { AddSkillDTO } from "./dto/add-skill.dto";
 import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
 import { SkillGroupEntity, SkillGroupResponse } from "./dto/find-skillgroups.dto";
+
 
 const prisma = new PrismaClient();
 
@@ -14,11 +15,16 @@ export class ProjectService {
   async create(creatProject: CreateProjectDto): Promise<ProjectResponse> {
     let project;
     try {
+      let skillGroups: SkillGroup = {
+        nodes: [],
+        edges: []
+      };
       project = await prisma.projects.create({
         data: {
           ...creatProject,
           creationDate: new Date(creatProject.creationDate.toString()),
           lastEdited: new Date(Date.now().toString()),
+          skillGroups: skillGroups,
         },
       });
     } catch {
@@ -161,13 +167,12 @@ export class ProjectService {
       });
     }
 
-    console.log("Nodes");
 
     let edges = [];
 
     for (let edge of data.entries()) {
       edge[1].skillConnections.forEach(skillConnection => {
-        if (skillConnection.skillId2)
+        if (skillConnection.skillId2 && skillConnection.percentage > 0.25)
           edges.push({
             from: skillConnection.skillId1.skillId,
             to: skillConnection.skillId2.skillId,
@@ -176,11 +181,19 @@ export class ProjectService {
       });
     }
 
-    console.log("Edges");
+    const dataBaseInsert: SkillGroup = {
+      nodes: nodes,
+      edges: edges
+    }
 
-    const returnData = { nodes, edges };
+    await prisma.projects.update({
+      where: { id: projectId },
+      data: {
+        skillGroups: dataBaseInsert,
+      }
+    });
 
-    console.log(returnData);
+
 
     return {
       statusCode: 200,

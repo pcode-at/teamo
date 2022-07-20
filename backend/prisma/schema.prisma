@@ -72,6 +72,7 @@ model projects {
   skillIds     String[]      @db.ObjectId
   bookmarks    users[]       @relation(name: "projectMembers", fields: [bookmarkIds], references: [id])
   bookmarkIds  String[]      @db.ObjectId
+  skillGroups  SkillGroup
 }
 
 model skillRating {
@@ -81,4 +82,21 @@ model skillRating {
   rating        Int
   projects      projects @relation(fields: [projectsId], references: [id])
   projectsId    String   @db.ObjectId
+}
+
+type SkillGroup {
+  nodes Node[]
+  edges Edge[]
+}
+
+type Node {
+  id    String
+  label String
+}
+
+type Edge {
+  id    String
+  from  String
+  to    String
+  label String
 }
