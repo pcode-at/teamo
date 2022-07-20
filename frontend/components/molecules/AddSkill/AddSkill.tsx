@@ -103,8 +103,7 @@ export const AddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
         {skills
           .filter(
             (element) =>
-              (element.name.includes(skill) ||
-                element.name.toLowerCase().includes(skill.toLowerCase())) &&
+              element.name.toLowerCase().includes(skill.toLowerCase()) &&
               !items.find((item) => item.name === element.name)
           )
           .map((currentSkill) => (

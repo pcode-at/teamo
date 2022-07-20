@@ -1,9 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { styled } from "../../../stitches.config";
-import {
-  H2BoldTabletAndUpStyle,
-} from "../../../utils/StyledParagraph";
+import { H2BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
 import { Button } from "../../atoms/Button/Button";
 import { InputField } from "../../atoms/InputField/InputField";
 import { Separator } from "../../atoms/Separator/Separator";
@@ -66,12 +64,21 @@ export const CreateProject: React.FC<Props> = ({}) => {
         <SeparatorLayout>
           <Separator width={"big"} alignment={"left"}></Separator>
         </SeparatorLayout>
-          <AddSkill
-            addSearchSkill={(value) => {
-              setInputs({ ...inputs, skills: [...inputs.skills, value] });
-            }}
-            items={...inputs.skills}
-          ></AddSkill>
+        <AddSkill
+          addSearchSkill={(value, id) => {
+            setInputs({
+              ...inputs,
+              skills: [
+                ...inputs.skills,
+                {
+                  name: value,
+                  id,
+                },
+              ],
+            });
+          }}
+          items={...inputs.skills}
+        ></AddSkill>
         <SeparatorLayout></SeparatorLayout>
         <SeparatorLayout>
           <Separator width={"big"} alignment={"left"}></Separator>
