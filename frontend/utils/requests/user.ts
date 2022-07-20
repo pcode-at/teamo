@@ -7,3 +7,7 @@ export async function getUser() {
 export async function getLocations(){
   return fetchData("user/locations", "GET");
 }
+
+export async function getAllUsers() {
+  return fetchData("user/all", "GET");
+}
