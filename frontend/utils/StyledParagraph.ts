@@ -1,3 +1,5 @@
+import { styled } from "../stitches.config";
+
 export const H1BlackTabletAndUpStyle = {
   fontFamily: "$default",
   fontSize: "$xxl",
@@ -74,3 +76,32 @@ export const LinkSmallBoldTabletAndUpStyle = {
   fontSize: "$xs",
   lineHeight: "$xs",
 };
+
+const typographyComposers = {
+  color: "$grey-500",
+  variants: {
+    variant: {
+      "h1-black-tablet-and-up": H1BlackTabletAndUpStyle,
+      "h1-extra-bold-tablet-and-up": H1ExtraBoldTabletAndUpStyle,
+      "h1-bold-tablet-and-up": H1BoldTabletAndUpStyle,
+      "h2-bold-tablet-and-up": H2BoldTabletAndUpStyle,
+      "h3-bold-tablet-and-up": H3BoldTabletAndUpStyle,
+      "body-medium-tablet-and-up": BodyMediumTabletAndUpStyle,
+      "body-default-tablet-and-up": BodyDefaultTabletAndUpStyle,
+      "body-small-tablet-and-up": BodySmallTabletAndUpStyle,
+      "link-default-bold-tablet-and-up": LinkDefaultBoldTabletAndUpStyle,
+      "link-default-medium-tablet-and-up": LinkDefaultMediumTabletAndUpStyle,
+      "link-small-bold-tablet-and-up": LinkSmallBoldTabletAndUpStyle,
+    },
+    color: {
+      "neutral-700": { color: "$neutral-700" },
+    },
+  },
+  defaultVariants: {
+    color: "neutral-700",
+    variant: "body-regular",
+  },
+};
+
+export const Typography = styled("span", typographyComposers);
+export const StyledParagraph = styled("p", typographyComposers);

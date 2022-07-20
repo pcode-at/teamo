@@ -2,7 +2,12 @@ import React from "react";
 import { styled } from "../../../stitches.config";
 import { InputFieldCore } from "../InputFieldCore/InputFieldCore";
 import type * as Stitches from "@stitches/react";
-import { BodyDefaultTabletAndUpStyle, BodySmallTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import {
+  BodyDefaultTabletAndUpStyle,
+  BodySmallTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
+import SvgEye from "../svg/SvgEye";
+import SvgEyeOff from "../svg/SvgEyeOff";
 
 type Props = {
   inputType: "text" | "date" | "email" | "number" | "datetime-local" | "tel";
@@ -23,22 +28,17 @@ type Props = {
 const StyledInputField = styled("input", {
   ...BodyDefaultTabletAndUpStyle,
   display: "inline-block",
-  height: "50px",
   border: "none",
-  padding: "$1x $2x",
   borderRadius: "$1x",
   borderBottom: "solid 1px transparent",
+
   background: "$neutral-200",
   outline: "none",
   lineHeight: "1.5rem",
   color: "black",
 
-  ["&:focus"]: {
-    borderBottom: "solid 1px red",
-  },
-
   ["&::placeholder"]: {
-    ...BodyDefaultTabletAndUpStyle
+    ...BodyDefaultTabletAndUpStyle,
   },
 
   variants: {
