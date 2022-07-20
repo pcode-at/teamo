@@ -11,11 +11,11 @@ import { PrismaClient } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
-import { Authorization } from "src/auth/entities/authorization.entity";
 import { JwtService } from "@nestjs/jwt";
 import { LocationEntity, LocationResponse } from "src/entities/location.entity";
 import { ElasticService } from "src/elastic/elastic.service";
 import { SkillEntity, SkillResponse } from "src/entities/skill.entity";
+import { AuthorizationEntity } from "src/auth/entities/authorization.entity";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require("bcrypt");
 
@@ -95,20 +95,23 @@ export class UserService {
 
   async updateOne(identifier: string, user: UserEntity): Promise<UserResponse> {
     const { id, ...rest } = user;
-
-    const updatedUser = await prisma.users.update({
-      where: {
-        identifier,
-      },
-      data: {
-        ...rest,
-        birthDate: new Date(user.birthDate.toString()),
-      },
-    });
-    return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
+    try {
+      const updatedUser = await prisma.users.update({
+        where: {
+          identifier,
+        },
+        data: {
+          ...rest,
+          birthDate: new Date(user.birthDate.toString()),
+        },
+      });
+      return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
+    } catch {
+      throw new BadRequestException("Something went wrong while updating a user");
+    }
   }
 
-  async updateAuthorization(identifier: string, authorization: Authorization) {
+  async updateAuthorization(identifier: string, authorization: AuthorizationEntity) {
     const user = (await (await this.findOne(identifier)).data) as UserEntity;
 
     if (authorization.accessToken) user.authorization.accessTokens.push(authorization.accessToken);
@@ -132,7 +135,7 @@ export class UserService {
               id: skill.skill,
             },
           },
-          rating: parseInt(skill.rating),
+          rating: skill.rating,
         },
       });
       await this.elastic.addSkillToUser(skill);
@@ -199,12 +202,16 @@ export class UserService {
   }
 
   async getLocations(): Promise<LocationResponse> {
-    const locations = await prisma.users.findMany({
-      distinct: ["location"],
-      select: {
-        location: true,
-      },
-    });
-    return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
+    try {
+      const locations = await prisma.users.findMany({
+        distinct: ["location"],
+        select: {
+          location: true,
+        },
+      });
+      return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
+    } catch {
+      throw new BadRequestException("Something went wrong while getting the locations");
+    }
   }
 }

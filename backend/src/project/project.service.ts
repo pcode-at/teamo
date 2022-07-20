@@ -18,7 +18,7 @@ export class ProjectService {
         data: {
           ...creatProject,
           creationDate: new Date(creatProject.creationDate.toString()),
-          lastEdited: new Date(creatProject.lastEdited.toString()),
+          lastEdited: new Date(Date.now().toString()),
         },
       });
     } catch {
@@ -66,7 +66,7 @@ export class ProjectService {
         where: { id },
         data: {
           ...updateProjectDto,
-          lastEdited: new Date(updateProjectDto.lastEdited.toString()),
+          lastEdited: new Date(Date.now().toString()),
         },
       });
     } catch {
