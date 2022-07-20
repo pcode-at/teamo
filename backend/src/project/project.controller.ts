@@ -3,7 +3,7 @@ import { ProjectService } from "./project.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { ProjectResponse } from "src/entities/project.entity";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 @Controller("api/project")
 @ApiTags("project")
@@ -15,7 +15,8 @@ export class ProjectController {
   @Post()
   @ApiOperation({ summary: "Create project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
-  create(@Body() body: CreateProjectDto): Promise<ProjectResponse> {
+  @ApiBody({ type: CreateProjectDto })
+  async create(@Body() body: CreateProjectDto): Promise<ProjectResponse> {
     return this.projectService.create(body);
   }
 
