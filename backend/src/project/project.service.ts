@@ -130,10 +130,9 @@ export class ProjectService {
     };
   }
 
-  async getSkillGroupings(projectId: string): Promise<any> {
+  async getSkillGroupings(projectId: string): Promise<SkillGroupResponse> {
     let data = await getSkillGroupingsForProject(projectId);
 
-    console.log("Data");
 
     let skills = await prisma.projects.findUnique({
       where: {
@@ -153,8 +152,6 @@ export class ProjectService {
       },
     });
 
-    console.log("Skills");
-
     let nodes = [];
 
     for (let node of data.keys()) {
@@ -170,20 +167,25 @@ export class ProjectService {
 
     for (let edge of data.entries()) {
       edge[1].skillConnections.forEach(skillConnection => {
-        edges.push({
-          from: skillConnection.skillId1,
-          to: skillConnection.skillId2,
-          label: skillConnection.percentage,
-        });
+        if (skillConnection.skillId2)
+          edges.push({
+            from: skillConnection.skillId1.skillId,
+            to: skillConnection.skillId2.skillId,
+            label: skillConnection.percentage * 100 + "%",
+          });
       });
     }
 
     console.log("Edges");
 
+    const returnData = { nodes, edges };
+
+    console.log(returnData);
+
     return {
       statusCode: 200,
       message: "Successfully computed skill groups",
-      data: { nodes, edges },
+      data: new SkillGroupEntity(nodes, edges),
     };
   }
 }

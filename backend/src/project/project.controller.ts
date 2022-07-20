@@ -9,7 +9,7 @@ import { SkillGroupResponse } from "./dto/find-skillgroups.dto";
 @Controller("api/project")
 @UseInterceptors(ClassSerializerInterceptor)
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService) { }
 
   @Post()
   create(@Body() createProjectDto: CreateProjectDto): Promise<ProjectResponse> {

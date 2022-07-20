@@ -13,8 +13,6 @@ async function getMatchingPercentage(skillId1: string, skillId2: string) {
     _count: true,
   });
 
-  console.log("Got totalOccourences");
-
   const test2 = await prisma.userSkills.groupBy({
     by: ["identifier"],
     where: {
@@ -38,8 +36,6 @@ async function getMatchingPercentage(skillId1: string, skillId2: string) {
       },
     },
   });
-
-  console.log("Got test2");
 
   let combinedOccourences = test2.filter(skill => skill._count > 1);
 
@@ -68,8 +64,6 @@ async function getAllAggregationPercentagesOfSkills(projectId: string) {
     },
   });
 
-  console.log("Got Skills");
-
   const skillIds = skills.skills.map(skill => skill.skill.id);
   // const percentages = [];
   let mapping = new Map<String, SkillMap>();
@@ -91,7 +85,6 @@ async function getAllAggregationPercentagesOfSkills(projectId: string) {
     }
   }
 
-  console.log("Got percentages");
   return mapping;
 }
 
@@ -99,7 +92,6 @@ export async function getSkillGroupingsForProject(projectId: string): Promise<Ma
   const skillSystem = new Map<string, SkillNode>();
   const percentages = await getAllAggregationPercentagesOfSkills(projectId);
 
-  console.log("Percentages");
 
   for (const skillId of percentages.keys()) {
     skillSystem.set(skillId.toString(), new SkillNode(skillId.toString()));

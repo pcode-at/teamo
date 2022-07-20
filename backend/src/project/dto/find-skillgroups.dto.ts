@@ -5,6 +5,10 @@ export class SkillGroupResponse implements HttpResponse {
   message: string;
   error?: string;
   data?: SkillGroupEntity;
+
+  constructor(partial: Partial<SkillGroupResponse>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class SkillGroupEntity {
@@ -26,5 +30,5 @@ export class SkillNode {
 }
 
 export class SkillConnection {
-  constructor(public skillId1: SkillNode, public skillId2: SkillNode, public percentage: number) {}
+  constructor(public skillId1: SkillNode, public skillId2: SkillNode, public percentage: number) { }
 }

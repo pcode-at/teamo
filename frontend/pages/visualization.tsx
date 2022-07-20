@@ -1,6 +1,6 @@
 import { Navbar } from "../components/organisms/Navbar/Navbar";
 import React, { useEffect, useState } from "react";
-import { styled } from "../stitches.config";
+import { styled, theme } from "../stitches.config";
 import Graph from "react-graph-vis";
 import { useQuery } from "react-query";
 
@@ -25,7 +25,7 @@ const nodes = [
   },
 ];
 
-const graph = {
+let graph = {
   nodes: [
     { id: 1, label: "Node 1", title: "node 1 tootip text" },
     { id: 2, label: "Node 2", title: "node 2 tootip text" },
@@ -34,7 +34,7 @@ const graph = {
     { id: 5, label: "Node 5", title: "node 5 tootip text" },
   ],
   edges: [
-    { from: 1, to: 2 },
+    { from: 1, to: 2, label: "test" },
     { from: 1, to: 3 },
     { from: 1, to: 4 },
     { from: 2, to: 4 },
@@ -47,16 +47,24 @@ const options = {
     hierarchical: false,
   },
   nodes: {
-    borderWidth: 5,
-    borderWidthSelected: 10,
-    size: 10,
+    borderWidth: 0,
+    borderWidthSelected: 3,
+    size: 15,
     shape: "circle",
+    color: {
+      background: theme.colors["brand-400"],
+      border: theme.colors["brand-500"],
+      highlight: theme.colors["brand-300"],
+    },
+    font: {
+      color: "#ffffff",
+    },
   },
   edges: {
-    color: "#000000",
+    color: theme.colors["brand-200"],
     selfReferenceSize: 10,
     selfReference: {
-      angle: 0.7853981633974483,
+      angle: 0,
     },
     arrows: {
       to: false,
@@ -67,7 +75,16 @@ const options = {
     },
   },
   physics: {
-    minVelocity: 0.75,
+    forceAtlas2Based: {
+      gravitationalConstant: -26,
+      centralGravity: 0.005,
+      springLength: 230,
+      springConstant: 0.18,
+    },
+    maxVelocity: 146,
+    solver: "forceAtlas2Based",
+    timestep: 0.35,
+    stabilization: { iterations: 7 },
   },
   height: "500px",
 };
@@ -92,6 +109,8 @@ export default function Visualization() {
   if (status === "error") {
     return <div>Error</div>;
   }
+
+  let graph = data;
 
   console.log(data);
 
