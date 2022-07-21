@@ -24,7 +24,9 @@ export const styles = {
       "brand-400": "#245a91",
       "brand-500": "#153967",
     },
-    shadows: {},
+    shadows: {
+      "regular": "0px 5px 20px rgba(194, 194, 194, 0.25)"
+    },
     space: {
       "none": 0,
       "1x": "8px",

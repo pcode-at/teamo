@@ -93,7 +93,11 @@ export const Separator: React.FC<Props> = ({
 }) => {
   return (
     <>
-      <HrLayout orientation={orientation} alignment={alignment} visible={visible}>
+      <HrLayout
+        orientation={orientation}
+        alignment={alignment}
+        visible={visible}
+      >
         <StyledSeparator
           orientation={orientation}
           width={width}

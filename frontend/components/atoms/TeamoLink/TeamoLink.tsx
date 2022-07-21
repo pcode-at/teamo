@@ -14,7 +14,7 @@ type Props = {
 
 const StyledLink = styled("a", {
   width: "fit-content",
-
+  
   color: "$neutral-700",
   cursor: "pointer",
   transition: "all 0.2s ease-in-out",

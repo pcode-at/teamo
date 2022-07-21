@@ -2,7 +2,10 @@ import React from "react";
 import { styled } from "../../../stitches.config";
 import { InputFieldCore } from "../InputFieldCore/InputFieldCore";
 import type * as Stitches from "@stitches/react";
-import { BodyDefaultTabletAndUpStyle, BodySmallTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import {
+  BodyDefaultTabletAndUpStyle,
+  BodySmallTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
 
 type Props = {
   inputType: "text" | "date" | "email" | "number" | "datetime-local" | "tel";
@@ -31,14 +34,18 @@ const StyledInputField = styled("input", {
   background: "$neutral-200",
   outline: "none",
   lineHeight: "1.5rem",
-  color: "black",
+  color: "$neutral-700",
 
   ["&:focus"]: {
     borderBottom: "solid 1px red",
   },
 
   ["&::placeholder"]: {
-    ...BodyDefaultTabletAndUpStyle
+    ...BodyDefaultTabletAndUpStyle,
+  },
+
+  ["&::first-letter"]: {
+    textTransform: "uppercase",
   },
 
   variants: {
