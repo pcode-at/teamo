@@ -199,11 +199,12 @@ export class ElasticService {
                 score_mode: "multiply",
                 functions: [
                   {
-                    exp: {
+                    linear: {
                       "skills.rating": {
-                        offset: 1,
+                        offset: 0,
                         origin: paramter.rating,
-                        scale: 1,
+                        scale: 9,
+                        decay: 0.5,
                       },
                     },
                   },
