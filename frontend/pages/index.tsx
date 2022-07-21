@@ -8,36 +8,18 @@ import { useState } from "react";
 import { logout } from "../utils/authHelper";
 import { useRouter } from "next/router";
 import { Button } from "../components/atoms/Button/Button";
+import { ContentLayout } from "./project/[projectId]";
+import { SpecialSearchButton } from "../components/organisms/SpecialSearchButton/SpecialSearchButton";
 
 export default function Home() {
-    const Router = useRouter();
-
-    const [user, setUser] = useState(undefined);
-
-    if(!user) {
-  getUser()
-    .then((user) => {
-      console.log(user);
-        setUser(user);
-    })
-    .catch(() => {});
-    }
 
   return (
     <>
       <Navbar></Navbar>
 
-      {user && (
-        <>
-            <h1>Hello {user.name}</h1>
-            <p>You are logged in</p>
-            <Button onClick={() => {
-                logout();
-                Router.push("/login");
-            }
-            }>Logout</Button>
-        </>
-      )}
+      <ContentLayout>
+        <SpecialSearchButton></SpecialSearchButton>
+      </ContentLayout>
     </>
   );
 }
