@@ -12,7 +12,7 @@ type Props = {
 const InputLayout = styled("div", {
   display: "flex",
   flexDirection: "column",
-  gap: "$1x"
+  gap: "$1x",
 });
 
 const InputFieldLayout = styled("div", {
@@ -21,16 +21,18 @@ const InputFieldLayout = styled("div", {
   width: "100%",
   border: "none",
   gap: "20px",
+  borderRadius: "$1x",
+  padding: "$2x $3x",
 
-  background: "$backgroundTertiary",
+  background: "$neutral-200",
 });
 
 const ImageLayout = styled("div", {
   display: "flex",
-  width: "30px",
-  height: "30px",
+  width: "22px",
+  height: "22px",
 
-  color: "$fontPrimary",
+  color: "$neutral-800",
 });
 
 const InputFieldLabel = styled("div", {});
@@ -46,25 +48,23 @@ export const InputFieldCore: React.FC<Props> = ({
   label = "",
   showLabel = true,
 }) => {
-
   const Icon = icon;
 
   return (
-
-      <InputLayout>
-        {label && showLabel && (
-            <InputFieldLabel>
-              {label} {required && <Required>*</Required>}
-            </InputFieldLabel>
+    <InputLayout>
+      {label && showLabel && (
+        <InputFieldLabel>
+          {label} {required && <Required>*</Required>}
+        </InputFieldLabel>
+      )}
+      <InputFieldLayout>
+        {icon && (
+          <ImageLayout>
+            <Icon />
+          </ImageLayout>
         )}
-        <InputFieldLayout>
-          {icon && (
-            <ImageLayout>
-              <Icon />
-            </ImageLayout>
-          )}
-          {children}
-        </InputFieldLayout>
-      </InputLayout>
+        {children}
+      </InputFieldLayout>
+    </InputLayout>
   );
 };

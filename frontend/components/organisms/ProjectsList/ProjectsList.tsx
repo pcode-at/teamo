@@ -8,6 +8,7 @@ import { getProjects } from "../../../utils/requests/project";
 import { useQuery } from "react-query";
 import SvgPlus from "../../atoms/svg/SvgPlus";
 import { H1BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import { useRouter } from "next/router";
 
 type Props = {};
 
@@ -44,6 +45,7 @@ const StyledLink = styled("a", {
 });
 
 export const ProjectsList: React.FC<Props> = ({}) => {
+  const router = useRouter();
   const { data: projects, status } = useQuery(["projects"], getProjects);
 
   if (status === "loading") {
@@ -59,7 +61,9 @@ export const ProjectsList: React.FC<Props> = ({}) => {
       <ListLayout>
         <HeaderLayout>
           <ListTitle>All Projects</ListTitle>
-          <Button leftIcon={SvgPlus}>Create project</Button>
+          <Button leftIcon={SvgPlus} onClick={() => {
+            router.push("/project/create");
+          }}>Create project</Button>
         </HeaderLayout>
         <ListItems>
           {projects.map((item) => (

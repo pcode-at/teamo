@@ -2,11 +2,14 @@ import { useRouter } from "next/router";
 import React from "react";
 import { styled } from "../../../stitches.config";
 import { login } from "../../../utils/authHelper";
+import { Typography } from "../../../utils/StyledParagraph";
 import { Button } from "../../atoms/Button/Button";
 import { Checkbox } from "../../atoms/Checkbox/Checkbox";
 import { Heading } from "../../atoms/Heading/Heading";
 import { InputField } from "../../atoms/InputField/InputField";
 import { PasswordField } from "../../atoms/PasswordField/PasswordField";
+import { Spacer } from "../../atoms/Spacer/Spacer";
+import SvgLock from "../../atoms/svg/SvgLock";
 
 type Props = {};
 
@@ -15,37 +18,38 @@ const LoginFormLayout = styled("div", {
   flexDirection: "column",
   justifyContent: "center",
   width: "100%",
-  padding: "$4x",
-
-  backgroundColor: "$brand-300",
-  borderRadius: "$2x",
 });
 
 export const LoginForm: React.FC<Props> = ({}) => {
   const [identifier, setIdentifier] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [rememberMe, setRememberMe] = React.useState(false);
 
   const router = useRouter();
 
   return (
     <>
       <LoginFormLayout>
-        <Heading alignment={"left"}>Login</Heading>
+        <Typography variant="h1-bold-tablet-and-up">Hello there!</Typography>
+        <Spacer size="4x" axis="vertical" />
         <InputField
           inputType={"text"}
           value={identifier}
           onChange={setIdentifier}
+          label="Employee-ID"
+          required={true}
         />
+        <Spacer size="4x" axis="vertical" />
         <PasswordField
+          icon={SvgLock}
           value={password}
           onChange={setPassword}
-          regex={undefined}
+          label="Password"
+          required={true}
         />
-        <Checkbox onChange={undefined}>Remember me</Checkbox>
+        <Spacer size="4x" axis="vertical" />
         <Button
           onClick={async () => {
-            const isLoggedIn = login(identifier, password);
+            const isLoggedIn = await login(identifier, password);
             if (isLoggedIn) {
               router.push("/");
             }

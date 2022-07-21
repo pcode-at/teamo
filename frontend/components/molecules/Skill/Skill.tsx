@@ -3,10 +3,12 @@ import { styled } from "../../../stitches.config";
 import type * as Stitches from "@stitches/react";
 import { Separator } from "../../atoms/Separator/Separator";
 import { BodyDefaultTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import SvgCross from "../../atoms/svg/SvgCross";
 
 type Props = {
   rating?: number;
   opacity?: number;
+  deleteSkill?: Function;
   children: React.ReactNode;
 };
 
@@ -39,7 +41,7 @@ const SkillLayout = styled("div", {
 });
 
 const SkillName = styled("p", {
-  ...BodyDefaultTabletAndUpStyle
+  ...BodyDefaultTabletAndUpStyle,
 });
 
 const SkillRating = styled("p", {
@@ -51,7 +53,21 @@ const SkillRating = styled("p", {
   fontSize: "1rem",
 });
 
-export const Skill: React.FC<Props> = ({ rating, opacity, children }) => {
+const DeleteSkillLayout = styled("button", {
+  display: "flex",
+  width: "22px",
+  height: "22px",
+  border: "none",
+  backgroundColor: "transparent",
+  cursor: "pointer",
+});
+
+export const Skill: React.FC<Props> = ({
+  rating,
+  opacity,
+  deleteSkill,
+  children,
+}) => {
   let type: "none" | "half" | "full" = "half";
   if (opacity === 0) {
     type = "none";
@@ -63,6 +79,15 @@ export const Skill: React.FC<Props> = ({ rating, opacity, children }) => {
       <SkillLayout type={type}>
         <SkillName>{children}</SkillName>
         {rating && <SkillRating>{rating}</SkillRating>}
+        {deleteSkill && (
+          <DeleteSkillLayout
+            onClick={(e) => {
+              deleteSkill();
+            }}
+          >
+            <SvgCross></SvgCross>
+          </DeleteSkillLayout>
+        )}
       </SkillLayout>
     </>
   );
