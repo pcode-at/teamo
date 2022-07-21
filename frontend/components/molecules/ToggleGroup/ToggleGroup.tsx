@@ -33,11 +33,10 @@ const StyledItem = styled(ToggleGroupPrimitive.Item, {
   backgroundColor: "$neutral-200",
   outline: "1.5px solid $neutral-300",
   color: "$neutral-700",
-  height: 50,
-  width: 100,
+  height: "fit-content",
+  width: "fit-content",
+  padding: "$2x $4x $2x $4x",
   display: "flex",
-  fontSize: 15,
-  lineHeight: 1,
   alignItems: "center",
   justifyContent: "center",
   marginLeft: 1,
@@ -67,7 +66,12 @@ export const ToggleGroup: React.FC<Props> = ({
   elements,
 }) => {
   return (
-    <InputFieldCore required={required} label={label} showLabel={showLabel}>
+    <InputFieldCore
+      size={"small"}
+      required={required}
+      label={label}
+      showLabel={showLabel}
+    >
       <StyledToggleGroup
         type="single"
         defaultValue="center"

@@ -2,6 +2,10 @@ import React from "react";
 import { useQuery } from "react-query";
 import { styled } from "../../../stitches.config";
 import { getSkills } from "../../../utils/requests/skills";
+import {
+  H2BoldTabletAndUpStyle,
+  H3BoldTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
 import { InputField } from "../../atoms/InputField/InputField";
 
 type Props = {
@@ -11,6 +15,15 @@ type Props = {
     id: string;
   }[];
 };
+
+const HeaderLayout = styled("div", {
+  width: "100%",
+});
+
+const Headline = styled("h1", {
+  ...H3BoldTabletAndUpStyle,
+  padding: "0 0 $2x 0",
+});
 
 const SearchAddSkillLayout = styled("div", {
   display: "flex",
@@ -26,8 +39,7 @@ const SearchAddSkillLayout = styled("div", {
 
 const AddSkillInfoLayout = styled("div", {
   display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "column",
   width: "100%",
 });
 
@@ -48,7 +60,6 @@ const SkillListLayout = styled("div", {
 const SkillListItemLayout = styled("button", {
   display: "flex",
   width: "fit-content",
-
   borderRadius: "$1x",
   backgroundColor: "$brand-100",
   cursor: "pointer",
@@ -83,42 +94,48 @@ export const AddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
   if (status === "error") {
     return <p>Error</p>;
   }
-  console.log(skills);
+
   return (
-    <SearchLayout>
-      <SearchAddSkillLayout>
-        <AddSkillInfoLayout>
-          <InputField
-            inputType={"text"}
-            value={skill}
-            onChange={(value) => {
-              setSkill(value);
-            }}
-            label={"Search skill"}
-            showLabel={false}
-            size="fitParent"
-          ></InputField>
-        </AddSkillInfoLayout>
-      </SearchAddSkillLayout>
-      <SkillListLayout>
-        {skills
-          .filter(
-            (element) =>
-              element.name.toLowerCase().includes(skill.toLowerCase()) &&
-              !items.find((item) => item.name === element.name)
-          )
-          .map((currentSkill) => (
-            <SkillListItemLayout
-              key={currentSkill.id}
-              onClick={() => {
-                addSearchSkill(currentSkill.name, currentSkill.id);
-                setSkill("");
+    <>
+      <SearchLayout>
+        <SearchAddSkillLayout>
+          <AddSkillInfoLayout>
+            <HeaderLayout>
+              <Headline>Search for a skill</Headline>
+            </HeaderLayout>
+
+            <InputField
+              inputType={"text"}
+              value={skill}
+              onChange={(value) => {
+                setSkill(value);
               }}
-            >
-              {currentSkill.name}
-            </SkillListItemLayout>
-          ))}
-      </SkillListLayout>
-    </SearchLayout>
+              label={"Name of skill"}
+              showLabel={true}
+              size="fitParent"
+            ></InputField>
+          </AddSkillInfoLayout>
+        </SearchAddSkillLayout>
+        <SkillListLayout>
+          {skills
+            .filter(
+              (element) =>
+                element.name.toLowerCase().includes(skill.toLowerCase()) &&
+                !items.find((item) => item.name === element.name)
+            )
+            .map((currentSkill) => (
+              <SkillListItemLayout
+                key={currentSkill.id}
+                onClick={() => {
+                  addSearchSkill(currentSkill.name, currentSkill.id);
+                  setSkill("");
+                }}
+              >
+                {currentSkill.name}
+              </SkillListItemLayout>
+            ))}
+        </SkillListLayout>
+      </SearchLayout>
+    </>
   );
 };

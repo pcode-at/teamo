@@ -12,6 +12,9 @@ import SvgCalendar from "../../atoms/svg/SvgCalendar";
 import SvgMail from "../../atoms/svg/SvgMail";
 import SvgPhone from "../../atoms/svg/SvgPhone";
 import SvgUser from "../../atoms/svg/SvgUser";
+import { AddSkill } from "../../molecules/AddSkill/AddSkill";
+import { BackLink } from "../../molecules/BackLink/BackLink";
+import { EditableSkill } from "../../molecules/EditableSkill/EditableSkill";
 import { LocationInput } from "../../molecules/LocationInput/LocationInput";
 import { ToggleGroup } from "../../molecules/ToggleGroup/ToggleGroup";
 
@@ -37,6 +40,20 @@ const RightColumnLayout = styled("div", {
   gridColumn: "span 2",
 });
 
+const SeparatorLayout = styled("div", {
+  gridColumn: "span 3",
+});
+
+const SkillListLayout = styled("div", {
+  display: "flex",
+  flexDirection: "row",
+  alignItems: "left",
+  width: "100%",
+  flexWrap: "wrap",
+  gap: "$2x",
+  height: "fit-content",
+});
+
 export const CreateUser: React.FC<Props> = ({}) => {
   const router = useRouter();
   const [inputs, setInputs] = useState({
@@ -47,10 +64,15 @@ export const CreateUser: React.FC<Props> = ({}) => {
     identifier: "",
     email: "",
     phoneNumber: "",
+    skills: [],
   });
+
+  console.log(inputs);
 
   return (
     <>
+      <BackLink href="/admin/user" label="Back to users"></BackLink>
+
       <HeaderLayout>
         <Headline>Create a user</Headline>
       </HeaderLayout>
@@ -81,7 +103,12 @@ export const CreateUser: React.FC<Props> = ({}) => {
         </RightColumnLayout>
 
         {/* Location */}
-        <LocationInput></LocationInput>
+        <LocationInput
+          value={inputs.location}
+          onChange={(value) => {
+            setInputs({ ...inputs, location: value });
+          }}
+        ></LocationInput>
 
         {/* Gender */}
         <ToggleGroup
@@ -137,12 +164,69 @@ export const CreateUser: React.FC<Props> = ({}) => {
 
         {/*  <LocationInput></LocationInput> */}
 
-        {/* <Separator width={"big"} alignment={"left"}></Separator> */}
+        <SeparatorLayout>
+          <Separator width={"big"} alignment={"left"}></Separator>
+        </SeparatorLayout>
+
+        <AddSkill
+          addSearchSkill={(skill, id) => {
+            setInputs({
+              ...inputs,
+              skills: [
+                ...inputs.skills,
+                {
+                  name: skill,
+                  rating: 5,
+                  id,
+                },
+              ],
+            });
+          }}
+          items={inputs.skills}
+        ></AddSkill>
+
+        <RightColumnLayout>
+          <SkillListLayout>
+            {inputs.skills.map((skill) => (
+              <EditableSkill
+                key={skill.id}
+                rating={skill.rating}
+                editRating={(rating) => {
+                  if (rating == "" || (rating >= 1 && rating <= 9)) {
+                    setInputs({
+                      ...inputs,
+                      skills: inputs.skills.map((s) => {
+                        if (s.id === skill.id) {
+                          return {
+                            ...s,
+                            rating,
+                          };
+                        }
+                        return s;
+                      }),
+                    });
+                  }
+                }}
+                deleteSkill={() => {
+                  setInputs({
+                    ...inputs,
+                    skills: inputs.skills.filter(
+                      (item) => item.id !== skill.id
+                    ),
+                  });
+                }}
+              >
+                {skill.name}
+              </EditableSkill>
+            ))}
+          </SkillListLayout>
+        </RightColumnLayout>
 
         <Button
           onClick={() => {
             router.push("/admin/user");
           }}
+          disabled={isDisabled(inputs)}
         >
           Create User
         </Button>
@@ -150,3 +234,32 @@ export const CreateUser: React.FC<Props> = ({}) => {
     </>
   );
 };
+
+function isDisabled(input): boolean {
+  // return true if any of the inputs is empty or the rating of the skill is empty except for gender, birthdate, phonenumber
+  /* const [inputs, setInputs] = useState({
+    name: "",
+    birthdate: "",
+    location: "",
+    gender: "",
+    identifier: "",
+    email: "",
+    phoneNumber: "",
+    skills: [],
+  }); */
+
+  let skillDisabled = false;
+  input.skills.forEach((skill) => {
+    if (skill.rating == "") {
+      skillDisabled = true;
+    }
+  });
+
+  return (
+    input.name == "" ||
+    input.location == "" ||
+    input.identifier == "" ||
+    input.email == "" ||
+    skillDisabled
+  );
+}

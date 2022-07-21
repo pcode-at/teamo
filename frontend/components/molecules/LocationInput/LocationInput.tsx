@@ -9,7 +9,10 @@ import SvgMapPin from "../../atoms/svg/SvgMapPin";
 import { InputField } from "../../atoms/InputField/InputField";
 import { Checkbox } from "../../atoms/Checkbox/Checkbox";
 
-type Props = {};
+type Props = {
+  value: string;
+  onChange: Function;
+};
 
 const LocationLayout = styled("div", {
   display: "flex",
@@ -26,8 +29,7 @@ const LocationInputLayout = styled("div", {
   borderRadius: "$2x",
 });
 
-export const LocationInput: React.FC<Props> = ({}) => {
-  const [input, setInput] = React.useState("");
+export const LocationInput: React.FC<Props> = ({ value, onChange }) => {
   const { data: locations, status } = useQuery("locations", getLocations);
 
   if (status === "loading") {
@@ -38,8 +40,6 @@ export const LocationInput: React.FC<Props> = ({}) => {
     return <div>Error</div>;
   }
 
-  console.log(locations);
-
   return (
     <>
       <LocationInputLayout>
@@ -48,24 +48,23 @@ export const LocationInput: React.FC<Props> = ({}) => {
           required={true}
           inputType={"text"}
           onChange={(value) => {
-            setInput(value);
+            onChange(value);
           }}
           label="Location"
-          value={input}
+          value={value}
         ></InputField>
 
         <LocationLayout>
           {locations
             .filter(
               (location) =>
-                location.location !== input &&
-                location.location.toLowerCase().includes(input.toLowerCase())
+                location.location !== value &&
+                location.location.toLowerCase().includes(value.toLowerCase())
             )
             .map((location) => (
               <Checkbox
                 onChange={() => {
-                  console.log(location.location);
-                  return setInput(location.location);
+                  return onChange(location.location);
                 }}
               >
                 {location.location}
