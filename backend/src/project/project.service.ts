@@ -8,7 +8,6 @@ import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
 import { SkillGroupEntity, SkillGroupResponse } from "./dto/find-skillgroups.dto";
 import { connections } from "mongoose";
 
-
 const prisma = new PrismaClient();
 
 @Injectable()
@@ -134,7 +133,6 @@ export class ProjectService {
   }
 
   async getSkillGroupings(projectId: string): Promise<SkillGroupResponse> {
-
     let skills = await prisma.projects.findUnique({
       where: {
         id: projectId,
@@ -153,19 +151,22 @@ export class ProjectService {
         skillGroups: {
           select: {
             nodes: true,
-            edges: true
-          }
-        }
+            edges: true,
+          },
+        },
       },
     });
 
-    let skillGroupIds = []
+    let skillGroupIds = [];
     let skillIds = [];
-    skills.skillGroups.nodes.forEach(skillGroup => { skillGroupIds.push(skillGroup.id) });
-    skills.skills.forEach(skill => { skillIds.push(skill.skill.id) });
+    skills.skillGroups.nodes.forEach(skillGroup => {
+      skillGroupIds.push(skillGroup.id);
+    });
+    skills.skills.forEach(skill => {
+      skillIds.push(skill.skill.id);
+    });
 
     if (skillGroupIds.every(id => skillIds.includes(id))) {
-
       console.log("stayed the same");
 
       return {
@@ -177,7 +178,6 @@ export class ProjectService {
 
     let data = await getSkillGroupingsForProject(projectId);
 
-
     let nodes = [];
 
     for (let node of data.keys()) {
@@ -186,7 +186,6 @@ export class ProjectService {
         label: skills.skills.find(skill => skill.skill.id === node).skill.name,
       });
     }
-
 
     let edges = [];
 
@@ -207,11 +206,9 @@ export class ProjectService {
         skillGroups: {
           nodes: nodes,
           edges: edges,
-        }
-      }
+        },
+      },
     });
-
-
 
     return {
       statusCode: 200,

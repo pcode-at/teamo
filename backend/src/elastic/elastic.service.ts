@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ElasticsearchService } from "@nestjs/elasticsearch";
 import { PrismaClient, skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
+import { RecommendEntity, RecommendResponse } from "src/entities/recommend.entity";
 import { SearchEntity, SearchResponse } from "src/entities/search.entity";
 import { SkillEntity } from "src/entities/skill.entity";
 import { UserEntity } from "src/entities/user.entity";
@@ -43,7 +44,7 @@ const client = new ElasticsearchService({
 
 @Injectable()
 export class ElasticService {
-  constructor() { }
+  constructor() {}
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
@@ -124,17 +125,40 @@ export class ElasticService {
     });
   }
 
-  async recommend(skillGroups: SkillElastic[][], accurate: boolean) {
+  async recommend(skillGroups: SkillElastic[][], accurate: boolean): Promise<RecommendResponse> {
+    const results = await this.prepareRecommend(skillGroups, accurate);
 
+    let mappedUsers = [] as UserEntity[][];
+    let i = 0;
+    for (const userGroup of results.users) {
+      mappedUsers[i] = [];
+      for (const user of userGroup) {
+        let userData = await this.getUserData(user.identifier);
+
+        mappedUsers[i].push(new UserEntity({ ...userData, skills: userData.skills, score: user.score }));
+      }
+      i++;
+    }
+
+    mappedUsers = mappedUsers.filter(userGroup => userGroup.length > 0);
+
+    return new RecommendResponse({
+      statusCode: 201,
+      message: "Successfully found users",
+      data: new RecommendEntity({
+        users: mappedUsers,
+      }),
+    });
+  }
+
+  async prepareRecommend(skillGroups: SkillElastic[][], accurate: boolean) {
     const resultDTO = {
-      users: [],
+      users: [[]],
     };
 
-
-    skillGroups.forEach(group => group.forEach(async (paramter) => {
-
+    for (const group of skillGroups) {
       const searchQuery = {
-        limit: 5,
+        size: 5,
         index: "users",
         body: {
           query: {
@@ -165,53 +189,55 @@ export class ElasticService {
         match_all: {},
       });
 
-
-      field.push({
-        nested: {
-          path: "skills",
-          query: {
-            function_score: {
-              boost_mode: "sum",
-              score_mode: "multiply",
-              functions: [
-                {
-                  exp: {
-                    "skills.rating": {
-                      offset: 1,
-                      origin: paramter.rating,
-                      scale: 1,
-                    },
-                  },
-                },
-              ],
-              query: {
-                bool: {
-                  should: [
-                    {
-                      match: {
-                        "skills.skill": paramter.skill as string,
+      group.forEach(paramter => {
+        field.push({
+          nested: {
+            path: "skills",
+            query: {
+              function_score: {
+                boost_mode: "sum",
+                score_mode: "multiply",
+                functions: [
+                  {
+                    exp: {
+                      "skills.rating": {
+                        offset: 1,
+                        origin: paramter.rating,
+                        scale: 1,
                       },
                     },
-                  ],
+                  },
+                ],
+                query: {
+                  bool: {
+                    should: [
+                      {
+                        match: {
+                          "skills.skill": paramter.skill as string,
+                        },
+                      },
+                    ],
+                  },
                 },
               },
             },
           },
-        },
+        });
       });
 
       const result = await client.search(searchQuery);
 
+      const resultToPush = [];
 
       result.hits.hits.forEach(hit => {
-        resultDTO.users.push({
+        resultToPush.push({
           identifier: hit._id,
           score: hit._score,
         });
       });
-    }));
 
-
+      resultDTO.users.push(resultToPush);
+    }
 
     return resultDTO;
   }
