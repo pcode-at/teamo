@@ -15,7 +15,7 @@ const NavbarLayout = styled("div", {
   padding: "$4x",
   backgroundColor: "$neutral-100",
   height: "12vh",
-  boxShadow: "0px 5px 20px rgba(194, 194, 194, 0.25)"
+  boxShadow: "$regular",
 });
 
 const LogoLayout = styled("div", {

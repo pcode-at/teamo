@@ -1,33 +1,47 @@
-import { Exclude, Transform } from "class-transformer";
+import { ApiProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 import { HttpResponse } from "./http-response.entity";
 
 export class SkillResponse implements HttpResponse {
-    statusCode: number;
-    message: string;
-    error?: string;
-    data?: SkillEntity | SkillEntity[];
-    id: string;
-    name: string;
+  @ApiProperty({ example: "200", description: "HTTP status code" })
+  statusCode: number;
 
-    constructor(partial: Partial<SkillResponse>) {
-        Object.assign(this, partial);
-    }
+  @ApiProperty({ example: "Locations found", description: "Message" })
+  message: string;
+
+  error?: string;
+  @ApiProperty({
+    examples: [
+      { id: "62ce572313abfde432", name: "CIA" },
+      {
+        id: "62ce572313abfde432",
+        name: "FBI",
+        opacity: 0.5,
+      },
+    ],
+    description: "Skills",
+  })
+  data?: SkillEntity | SkillEntity[];
+
+  constructor(partial: Partial<SkillResponse>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class SkillEntity {
-    id: string;
-    name: string;
-    opacity?: number;
+  id: string;
+  name: string;
+  opacity?: number;
 
-    @Exclude()
-    skillMatrix: SkillRating[]
+  @Exclude()
+  skillMatrix: SkillRating[];
 
-    constructor(partial: Partial<SkillEntity>) {
-        Object.assign(this, partial);
-    }
+  constructor(partial: Partial<SkillEntity>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class SkillRating {
-    rating: number;
-    aggregation: string;
-} 
+  rating: number;
+  aggregation: string;
+}

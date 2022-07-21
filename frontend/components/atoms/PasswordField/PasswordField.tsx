@@ -1,6 +1,9 @@
 import React from "react";
 import { styled } from "../../../stitches.config";
+import { BodyDefaultTabletAndUpStyle } from "../../../utils/StyledParagraph";
 import { InputFieldCore } from "../InputFieldCore/InputFieldCore";
+import SvgEye from "../svg/SvgEye";
+import SvgEyeOff from "../svg/SvgEyeOff";
 
 type Props = {
   value?: string;
@@ -11,22 +14,24 @@ type Props = {
   showLabel?: boolean;
   setValidInput?: Function;
   errorMessage?: string;
-  regex: RegExp;
+  regex?: RegExp;
 };
 
 const StyledInputField = styled("input", {
+  ...BodyDefaultTabletAndUpStyle,
+
   display: "inline-block",
   width: "100%",
   border: "none",
-  padding: "0.5rem 0",
   borderBottom: "solid 1px transparent",
 
-  fontWeight: "bold",
-  background: "$brand-100",
+  background: "$neutral-200",
   outline: "none",
-  fontSize: "1.2rem",
-  lineHeight: "1.5rem",
   color: "$neutral-800",
+
+  ["&::placeholder"]: {
+    ...BodyDefaultTabletAndUpStyle,
+  },
 });
 
 const StyledLabel = styled("label", {
@@ -38,6 +43,15 @@ const ErrorMessage = styled("span", {
   paddingLeft: "10px",
 
   color: "red",
+});
+
+const ImageLayout = styled("div", {
+  display: "flex",
+  width: "22px",
+  height: "22px",
+
+  color: "$neutral-800",
+  cursor: "pointer",
 });
 
 export const PasswordField: React.FC<Props> = ({
@@ -52,6 +66,24 @@ export const PasswordField: React.FC<Props> = ({
   regex,
 }) => {
   const [isInputValid, setIsInputValid] = React.useState(null);
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  function onChangeInput(inputValue: string) {
+    onChange(inputValue);
+    if (regex) {
+      const isValid = regex.test(inputValue);
+      if (setValidInput) {
+        setValidInput(isValid);
+      }
+      if (isInputValid == null && !isValid) {
+        if (regex.test(inputValue)) {
+          setIsInputValid(false);
+        }
+      } else {
+        setIsInputValid(isValid);
+      }
+    }
+  }
 
   return (
     <>
@@ -63,45 +95,38 @@ export const PasswordField: React.FC<Props> = ({
       >
         <StyledLabel>
           <StyledInputField
-            type={"password"}
+            type={showPassword ? "text" : "password"}
             value={value}
             name={label}
             placeholder={label}
             onChange={(e) => {
-              onChange(e.target.value);
-              if (regex) {
-                const isValid = regex.test(e.target.value);
-                if (setValidInput) {
-                  setValidInput(isValid);
-                }
-                if (isInputValid == null && !isValid) {
-                  if (regex.test(e.target.value)) {
-                    setIsInputValid(false);
-                  }
-                } else {
-                  setIsInputValid(isValid);
-                }
-              }
+              onChangeInput(e.target.value);
             }}
             onBlur={(e) => {
-              onChange(e.target.value);
-              if (regex) {
-                const isValid = regex.test(e.target.value);
-                if (setValidInput) {
-                  setValidInput(isValid);
-                }
-                if (isInputValid == null && !isValid) {
-                  if (regex.test(e.target.value)) {
-                    setIsInputValid(false);
-                  }
-                } else {
-                  setIsInputValid(isValid);
-                }
-              }
+              onChangeInput(e.target.value);
             }}
             {...(required && { required: true })}
           />
         </StyledLabel>
+
+        {!showPassword && (
+          <ImageLayout
+            onClick={() => {
+              setShowPassword(true);
+            }}
+          >
+            <SvgEyeOff />
+          </ImageLayout>
+        )}
+        {showPassword && (
+          <ImageLayout
+            onClick={() => {
+              setShowPassword(!showPassword);
+            }}
+          >
+            <SvgEye />
+          </ImageLayout>
+        )}
       </InputFieldCore>
       {errorMessage && isInputValid === false && (
         <ErrorMessage>{errorMessage}</ErrorMessage>

@@ -1,6 +1,6 @@
 import { getAccessToken } from "../authHelper";
 
-export async function fetchData(url: string, method: string, body?: any) {
+export async function fetchData(url: string, method: string, statusCode: number, body?: any) {
   const accessToken = await getAccessToken();
 
   const response = await fetch(
@@ -15,7 +15,7 @@ export async function fetchData(url: string, method: string, body?: any) {
     }
   );
 
-  if (response.status !== 200) {
+  if (response.status !== statusCode) {
     throw new Error(getErrorMessage(response));
   }
 

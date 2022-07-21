@@ -5,7 +5,7 @@ import { Request } from "express";
 import { jwtConstants } from "../constants";
 import { PassportStrategy } from "@nestjs/passport";
 import { UserService } from "src/user/user.service";
-import { Authorization, AuthorizationResponse } from "../entities/authorization.entity";
+import { AuthorizationEntity } from "../entities/authorization.entity";
 
 @Injectable()
 export class RefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh-token") {
@@ -31,7 +31,7 @@ export class RefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh-tok
       throw new UnauthorizedException();
     }
     const newToken = await this.refreshService.getNewJwtToken(identifier);
-    await this.userService.updateAuthorization(identifier, new Authorization({ accessToken: newToken }));
+    await this.userService.updateAuthorization(identifier, new AuthorizationEntity({ accessToken: newToken }));
     return newToken;
   }
 }
