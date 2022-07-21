@@ -9,12 +9,6 @@ type Props = {
   showLabel?: boolean;
 };
 
-const InputLayout = styled("div", {
-  display: "flex",
-  flexDirection: "column",
-  gap: "$1x"
-});
-
 const InputFieldLayout = styled("div", {
   display: "flex",
   alignItems: "center",
@@ -51,20 +45,22 @@ export const InputFieldCore: React.FC<Props> = ({
 
   return (
 
-      <InputLayout>
-        {label && showLabel && (
-            <InputFieldLabel>
-              {label} {required && <Required>*</Required>}
-            </InputFieldLabel>
+    <>
+      {label && showLabel && (
+        <>
+          <InputFieldLabel>
+            {label} {required && <Required>*</Required>}
+          </InputFieldLabel>
+        </>
+      )}
+      <InputFieldLayout>
+        {icon && (
+          <ImageLayout>
+            <Icon />
+          </ImageLayout>
         )}
-        <InputFieldLayout>
-          {icon && (
-            <ImageLayout>
-              <Icon />
-            </ImageLayout>
-          )}
-          {children}
-        </InputFieldLayout>
-      </InputLayout>
+        {children}
+      </InputFieldLayout>
+    </>
   );
 };
