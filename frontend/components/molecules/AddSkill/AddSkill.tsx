@@ -33,9 +33,10 @@ const AddSkillInfoLayout = styled("div", {
 
 const SkillListLayout = styled("div", {
   display: "flex",
-  flexDirection: "column",
+  flexDirection: "row",
   alignItems: "left",
   width: "100%",
+  flexWrap: "wrap",
   gap: "$2x",
   padding: "$1x 0",
   borderRadius: "$2x",
@@ -46,7 +47,7 @@ const SkillListLayout = styled("div", {
 
 const SkillListItemLayout = styled("button", {
   display: "flex",
-  width: "100%",
+  width: "fit-content",
 
   borderRadius: "$1x",
   backgroundColor: "$brand-100",
