@@ -1,20 +1,27 @@
+import { ApiProperty, ApiResponseProperty } from "@nestjs/swagger";
 import { HttpResponse } from "./http-response.entity";
 
 export class LocationResponse implements HttpResponse {
-    statusCode: number;
-    message: string;
-    error?: string;
-    data?: LocationEntity | LocationEntity[];
+  @ApiProperty({ example: "200", description: "HTTP status code" })
+  statusCode: number;
 
-    constructor(partial: Partial<LocationResponse>) {
-        Object.assign(this, partial);
-    }
+  @ApiProperty({ example: "Locations found", description: "Message" })
+  message: string;
+
+  error?: string;
+
+  @ApiProperty({ example: [{ location: "USA" }], description: "Locations" })
+  data?: LocationEntity | LocationEntity[];
+
+  constructor(partial: Partial<LocationResponse>) {
+    Object.assign(this, partial);
+  }
 }
 
 export class LocationEntity {
-    location: String;
+  location: String;
 
-    constructor(partial: Partial<LocationEntity>) {
-        Object.assign(this, partial);
-    }
+  constructor(partial: Partial<LocationEntity>) {
+    Object.assign(this, partial);
+  }
 }

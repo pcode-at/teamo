@@ -8,7 +8,7 @@ export class SkillDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    rating: string;
+    rating: number;
 
     @ApiProperty()
     @IsNotEmpty()
