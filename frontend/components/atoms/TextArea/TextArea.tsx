@@ -10,7 +10,6 @@ import SvgEye from "../svg/SvgEye";
 import SvgEyeOff from "../svg/SvgEyeOff";
 
 type Props = {
-  inputType: "text" | "date" | "email" | "number" | "datetime-local" | "tel";
   value?: string;
   onChange: Function;
   icon?: any;
@@ -22,20 +21,21 @@ type Props = {
   errorMessage?: string;
   min?: string;
   max?: string;
-  size?: Stitches.VariantProps<typeof StyledInputField>["size"];
+  size?: Stitches.VariantProps<typeof StyledTextarea>["size"];
 };
 
-const StyledInputField = styled("input", {
+const StyledTextarea = styled("textarea", {
   ...BodyDefaultTabletAndUpStyle,
   display: "inline-block",
   border: "none",
-  borderRadius: "$1x",
   borderBottom: "solid 1px transparent",
+  minHeight: "100px",
 
   background: "$neutral-200",
   outline: "none",
   lineHeight: "1.5rem",
   color: "black",
+  resize: "vertical",
 
   ["&::placeholder"]: {
     ...BodyDefaultTabletAndUpStyle,
@@ -80,8 +80,7 @@ const ErrorMessage = styled("span", {
   color: "red",
 });
 
-export const InputField: React.FC<Props> = ({
-  inputType,
+export const TextArea: React.FC<Props> = ({
   value,
   onChange,
   icon,
@@ -123,8 +122,7 @@ export const InputField: React.FC<Props> = ({
         showLabel={showLabel}
       >
         <StyledLabel>
-          <StyledInputField
-            type={inputType}
+          <StyledTextarea
             value={value}
             name={label}
             placeholder={label}
