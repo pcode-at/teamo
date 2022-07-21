@@ -4,13 +4,15 @@ import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { ProjectResponse } from "src/entities/project.entity";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { AddSkillDTO } from "./dto/add-skill.dto";
+import { SkillGroupResponse } from "./dto/find-skillgroups.dto";
 
 @Controller("api/project")
 @ApiTags("project")
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService) { }
 
   @Post()
   @ApiOperation({ summary: "Create project" })
@@ -45,5 +47,16 @@ export class ProjectController {
   @ApiResponse({ status: 200, type: ProjectResponse })
   remove(@Param("id") id: string): Promise<ProjectResponse> {
     return this.projectService.remove(id);
+  }
+
+  @Post("skill/add")
+  addSkill(@Body() skillRating: AddSkillDTO): Promise<ProjectResponse> {
+    return this.projectService.addSkill(skillRating);
+  }
+
+  @Get("skill/groupings/:id")
+  getSkillGroupings(@Param("id") projectId: string): Promise<SkillGroupResponse> {
+    let test = this.projectService.getSkillGroupings(projectId);
+    return test;
   }
 }

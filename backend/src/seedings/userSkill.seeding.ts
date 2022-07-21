@@ -71,14 +71,17 @@ async function seedUserSkillsWithGrouping(skillGroupings) {
   let userSkills = [];
 
   users.forEach(user => {
-    const skillsToAdd = [];
+    let skillsToAdd = [];
 
     let chance = 1;
 
-    while (Math.random() <= chance) {
+    let i = 0;
+    while (Math.random() <= chance && i < skillGroupings.length) {
       const randomSkills = skillGroupings[Math.floor(Math.random() * skillGroupings.length)];
-      skillsToAdd.push(randomSkills.filter(skill => !skillsToAdd.includes(skill)));
+      let filteredSkills = randomSkills.filter(skill => !skillsToAdd.flat().includes(skill));
+      skillsToAdd.push(filteredSkills);
       chance -= 0.15;
+      i++;
     }
 
     skillsToAdd.forEach(skills => {
