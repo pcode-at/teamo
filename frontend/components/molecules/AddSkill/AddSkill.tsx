@@ -3,6 +3,7 @@ import { useQuery } from "react-query";
 import { styled } from "../../../stitches.config";
 import { getSkills } from "../../../utils/requests/skills";
 import {
+  BodyDefaultTabletAndUpStyle,
   H2BoldTabletAndUpStyle,
   H3BoldTabletAndUpStyle,
 } from "../../../utils/StyledParagraph";
@@ -58,6 +59,7 @@ const SkillListLayout = styled("div", {
 });
 
 const SkillListItemLayout = styled("button", {
+  ...BodyDefaultTabletAndUpStyle,
   display: "flex",
   width: "fit-content",
   borderRadius: "$1x",
@@ -67,7 +69,6 @@ const SkillListItemLayout = styled("button", {
   border: "none",
   color: "$brand-500",
   fontSize: "1rem",
-  fontWeight: "bold",
   textAlign: "left",
   textDecoration: "none",
   transition: "all 0.2s",

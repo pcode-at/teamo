@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { styled } from "../../../stitches.config";
+import { createUser } from "../../../utils/requests/user";
 import {
   H1BoldTabletAndUpStyle,
   H2BoldTabletAndUpStyle,
@@ -71,9 +72,8 @@ export const CreateUser: React.FC<Props> = ({}) => {
 
   return (
     <>
-      <BackLink href="/admin/user" label="Back to users"></BackLink>
-
       <HeaderLayout>
+        <BackLink href="/admin/user" label="Back to users"></BackLink>
         <Headline>Create a user</Headline>
       </HeaderLayout>
 
@@ -224,7 +224,25 @@ export const CreateUser: React.FC<Props> = ({}) => {
 
         <Button
           onClick={() => {
-            router.push("/admin/user");
+            try {
+              createUser({
+                identifier: inputs.identifier,
+                password: "",
+                name: inputs.name,
+                email: inputs.email,
+                phoneNumber: inputs.phoneNumber,
+                birthdate: inputs.birthdate,
+                gender: inputs.gender,
+                photo: "",
+                roles: [""],
+                departments: [""],
+                loation: inputs.location,
+              });
+
+              router.push("/admin/user");
+            } catch (exception) {
+              alert("Error creating user");
+            }
           }}
           disabled={isDisabled(inputs)}
         >
