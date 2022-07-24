@@ -145,7 +145,7 @@ export const SearchResultItem: React.FC<Props> = ({ user }) => {
         </SeparatorLayout>
         <SearchResultItemSkillsLayout>
           {user.skills.map((skill, index) => (
-            <Skill key={index} opacity={skill.opacity}>
+            <Skill key={index} opacity={skill.opacity} rating={skill.rating}>
               {skill.skill.name}
             </Skill>
           ))}

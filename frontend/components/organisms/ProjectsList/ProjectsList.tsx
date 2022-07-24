@@ -61,7 +61,7 @@ export const ProjectsList: React.FC<Props> = ({}) => {
       <ListLayout>
         <HeaderLayout>
           <ListTitle>All Projects</ListTitle>
-          <Button leftIcon={SvgPlus} onClick={() => {
+          <Button leftIcon={SvgPlus} size={"small"} onClick={() => {
             router.push("/project/create");
           }}>Create project</Button>
         </HeaderLayout>

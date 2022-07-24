@@ -8,16 +8,30 @@ import { SubHeading } from "../../atoms/SubHeading/SubHeading";
 import { useQuery } from "react-query";
 import { getProject } from "../../../utils/requests/project";
 import { useRouter } from "next/router";
+import { getRecommendation } from "../../../utils/requests/search";
 
 type Props = {};
 
 export const ProjectDetails: React.FC<Props> = ({}) => {
   const router = useRouter();
+  const projectId = router.query.projectId as string;
 
-  const { data: project, status } = useQuery(["project"], () => {
-    return getProject(router.query.projectId as string);
+  const { data: project, status } = useQuery(["project", projectId], () => {
+    return getProject(projectId);
+  });
+  const { data: recommendation, status: recommendationStatus } = useQuery(["recommend", projectId], () => {
+    return getRecommendation(projectId);
   });
 
+  if (recommendationStatus === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (recommendationStatus === "error") {
+    return <div>Error</div>;
+  }
+
+  console.log(recommendation);
   if (status === "loading") {
     return <div>Loading...</div>;
   }
@@ -26,7 +40,6 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     return <div>Error</div>;
   }
 
-  console.log(project);
   
   return (
     <>
