@@ -12,7 +12,6 @@ const globalStyles = globalCss({
     padding: 0,
   },
   body: {
-    fontFamily: "comic-sans, sans-serif",
     fontWeight: "$regular",
     overflowX: "hidden",
     backgroundColor: "$background",

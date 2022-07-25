@@ -12,18 +12,19 @@ const NavbarLayout = styled("div", {
   justifyContent: "space-between",
   alignItems: "center",
   width: "100%",
-  padding: "$2x",
-  backgroundColor: "$brand-300",
-  height: "7vh",
+  padding: "$4x",
+  backgroundColor: "$neutral-100",
+  height: "11vh",
+  boxShadow: "0px 5px 20px rgba(194, 194, 194, 0.25)"
 });
 
 const LogoLayout = styled("div", {
   display: "flex",
-  height: "4vh",
+  height: "5vh",
 });
 
 const StyledLink = styled("a", {
-  color: "$neutral-100",
+  color: "$brand-500",
   textDecoration: "none",
 });
 
@@ -39,7 +40,7 @@ const UserIconLayout = styled("div", {
   width: "3vh",
   height: "3vh",
 
-  color: "$neutral-100",
+  color: "$brand-500",
 });
 
 export const Navbar: React.FC<Props> = ({}) => {

@@ -5,17 +5,21 @@ import type * as Stitches from "@stitches/react";
 type Props = {
   size?: Stitches.VariantProps<typeof StyledButton>["size"];
   disabled?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
+  leftIcon?: any;
+  rightIcon?: any;
   onClick?: () => void;
   children: React.ReactNode;
 };
 
 const StyledButton = styled("button", {
   width: "fit-content",
+  height: "fit-content",
   padding: "$2x $3x",
   border: "transparent $borderWidths$medium solid",
-  borderRadius: "$2x",
+  display: "flex",
+  gap: "$1x",
+  alignItems: "center",
+  borderRadius: "$1x",
 
   color: "$neutral-100",
   backgroundColor: "$brand-400",
@@ -48,6 +52,12 @@ const StyledButton = styled("button", {
   },
 });
 
+const IconLayout = styled("div", {
+  display: "flex",
+  width: "18px",
+  height: "18px",
+});
+
 export const Button: React.FC<Props> = ({
   size = "medium",
   disabled = false,
@@ -56,10 +66,23 @@ export const Button: React.FC<Props> = ({
   onClick,
   children,
 }) => {
+  const LeftIcon = leftIcon;
+  const RightIcon = rightIcon;
+
   return (
     <>
       <StyledButton size={size} disabled={disabled} onClick={onClick}>
+        {leftIcon && (
+          <IconLayout>
+            <LeftIcon />
+          </IconLayout>
+        )}
         {children}
+        {rightIcon && (
+          <IconLayout>
+            <RightIcon />
+          </IconLayout>
+        )}
       </StyledButton>
     </>
   );

@@ -18,7 +18,7 @@ const SearchLayout = styled("div", {
   display: "grid",
   gridTemplateColumns: "1fr 3fr",
   width: "100%",
-  height: "93vh",
+  height: "89vh",
   overflow: "hidden",
 });
 

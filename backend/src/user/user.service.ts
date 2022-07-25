@@ -11,10 +11,11 @@ import { PrismaClient } from "@prisma/client";
 import { SkillDto } from "./dto/skill.dto";
 import { UserAndSkills } from "src/types/userAndSkills.type";
 import { recommendUsers } from "src/algorithms/recommend.algorithm";
-import { Authorization } from "src/auth/entities/authorization.entity";
 import { JwtService } from "@nestjs/jwt";
 import { LocationEntity, LocationResponse } from "src/entities/location.entity";
 import { ElasticService } from "src/elastic/elastic.service";
+import { SkillEntity, SkillResponse } from "src/entities/skill.entity";
+import { AuthorizationEntity } from "src/auth/entities/authorization.entity";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require("bcrypt");
 
@@ -94,22 +95,23 @@ export class UserService {
 
   async updateOne(identifier: string, user: UserEntity): Promise<UserResponse> {
     const { id, ...rest } = user;
-
-    const updatedUser = await prisma.users.update({
-      where: {
-        identifier,
-      },
-      data: {
-        ...rest,
-        birthDate: new Date(user.birthDate.toString()),
-      },
-    });
-    return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
-
-    //return this.userModel.findOne({ identifier }).populate("skill").exec();
+    try {
+      const updatedUser = await prisma.users.update({
+        where: {
+          identifier,
+        },
+        data: {
+          ...rest,
+          birthDate: new Date(user.birthDate.toString()),
+        },
+      });
+      return new UserResponse({ statusCode: 200, message: "User updated successfully", data: new UserEntity(updatedUser) });
+    } catch {
+      throw new BadRequestException("Something went wrong while updating a user");
+    }
   }
 
-  async updateAuthorization(identifier: string, authorization: Authorization) {
+  async updateAuthorization(identifier: string, authorization: AuthorizationEntity) {
     const user = (await (await this.findOne(identifier)).data) as UserEntity;
 
     if (authorization.accessToken) user.authorization.accessTokens.push(authorization.accessToken);
@@ -118,10 +120,10 @@ export class UserService {
     await this.updateOne(identifier, user);
   }
 
-  async addSkill(skill: SkillDto): Promise<UserResponse> {
+  async addSkill(skill: SkillDto): Promise<SkillResponse> {
     let user;
     try {
-      await prisma.userSkills.create({
+      user = await prisma.userSkills.create({
         data: {
           user: {
             connect: {
@@ -133,14 +135,14 @@ export class UserService {
               id: skill.skill,
             },
           },
-          rating: skill.rating.toString(),
+          rating: skill.rating,
         },
       });
       await this.elastic.addSkillToUser(skill);
     } catch {
       throw new BadRequestException("Something went wrong while adding a skill");
     }
-    return new UserResponse({ statusCode: 200, message: "Skill added successfully", data: new UserEntity(user) });
+    return new SkillResponse({ statusCode: 200, message: "Skill added successfully", data: new SkillEntity(user) });
   }
 
   async getSkillsForUser(identifier: string) {
@@ -200,12 +202,16 @@ export class UserService {
   }
 
   async getLocations(): Promise<LocationResponse> {
-    const locations = await prisma.users.findMany({
-      distinct: ["location"],
-      select: {
-        location: true,
-      },
-    });
-    return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
+    try {
+      const locations = await prisma.users.findMany({
+        distinct: ["location"],
+        select: {
+          location: true,
+        },
+      });
+      return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
+    } catch {
+      throw new BadRequestException("Something went wrong while getting the locations");
+    }
   }
 }

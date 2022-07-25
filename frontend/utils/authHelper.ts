@@ -14,7 +14,7 @@ export async function login(identifier, password) {
       }),
     }
   );
-
+    console.log(response);
   if (response.status !== 201) {
     throw new Error("Invalid credentials");
   }
@@ -44,7 +44,7 @@ export async function getAccessToken(): Promise<string> {
   if (cookie.get("accessToken")) {
     return cookie.get("accessToken");
   } else if (cookie.get("refreshToken")) {
-    return refreshAccessToken(cookie.get("refreshToken"));
+    return await refreshAccessToken(cookie.get("refreshToken"));
   } else {
     return "";
   }
