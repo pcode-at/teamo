@@ -44,14 +44,14 @@ const client = new ElasticsearchService({
 
 @Injectable()
 export class ElasticService {
-  constructor() {}
+  constructor() { }
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
 
     user.skills.forEach(skill => {
       skills.push({
-        rating: skill.rating,
+        rating: Number(skill.rating),
         skill: skill.skill.id,
       });
     });

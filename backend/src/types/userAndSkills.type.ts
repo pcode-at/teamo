@@ -22,6 +22,6 @@ export class UserAndSkills {
 
 export class SkillAndRating {
   skillMatrix: SkillMatrix[];
-  rating: string;
+  rating: number;
   name: string;
 }
