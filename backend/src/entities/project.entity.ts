@@ -32,7 +32,6 @@ export class ProjectEntity {
   description: string;
   creationDate: Date;
   lastEdited: Date;
-  status: string;
 
   @Exclude()
   creatorId: string;

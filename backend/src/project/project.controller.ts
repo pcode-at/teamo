@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor, Req, UseGuards } from "@nestjs/common";
 import { ProjectService } from "./project.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
@@ -6,6 +6,7 @@ import { ProjectResponse } from "src/entities/project.entity";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { AddSkillDTO } from "./dto/add-skill.dto";
 import { SkillGroupResponse } from "./dto/find-skillgroups.dto";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
 @Controller("api/project")
 @ApiTags("project")
@@ -17,8 +18,9 @@ export class ProjectController {
   @Post()
   @ApiOperation({ summary: "Create project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
-  create(@Body() createProjectDto: CreateProjectDto): Promise<ProjectResponse> {
-    return this.projectService.create(createProjectDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Body() createProjectDto: CreateProjectDto, @Req() request): Promise<ProjectResponse> {
+    return this.projectService.create(createProjectDto, request);
   }
 
   @Get()

@@ -1,29 +1,66 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { CreateProjectDto } from "./dto/create-project.dto";
-import { UpdateProjectDto } from "./dto/update-project.dto";
-import { PrismaClient, Prisma } from "@prisma/client";
 import { ProjectEntity, ProjectResponse } from "src/entities/project.entity";
-import { AddSkillDTO } from "./dto/add-skill.dto";
-import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
 import { SkillGroupEntity, SkillGroupResponse } from "./dto/find-skillgroups.dto";
-import { connections } from "mongoose";
+
+import { AddSkillDTO } from "./dto/add-skill.dto";
+import { CreateProjectDto } from "./dto/create-project.dto";
+import { JwtService } from "@nestjs/jwt";
+import { PrismaClient } from "@prisma/client";
+import { UpdateProjectDto } from "./dto/update-project.dto";
+import { UserService } from "src/user/user.service";
+import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
+import { use } from "passport";
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class ProjectService {
-  async create(creatProject: CreateProjectDto): Promise<ProjectResponse> {
+  constructor(private readonly jwtService: JwtService) { }
+
+  async create(createProject: CreateProjectDto, request): Promise<ProjectResponse> {
     let project;
+    //get bearer authorization from request
+    let bearer = request.headers.authorization.split(" ")[1];
+    const decoded = await this.jwtService.decode(bearer);
+    //@ts-ignore
+    const identifier = decoded.identifier;
+
+    const user = await prisma.users.findUnique({ where: { identifier } });
+
+    const { skills, ...rest } = createProject;
+
     try {
       project = await prisma.projects.create({
         data: {
-          ...creatProject,
-          creationDate: new Date(creatProject.creationDate.toString()),
-          lastEdited: new Date(Date.now().toString()),
+          ...rest,
+          creationDate: new Date(Date.now()),
+          lastEdited: new Date(Date.now()),
+          creatorId: user.id,
+          status: "active",
           skillGroups: Object.create(null),
         },
       });
-    } catch {
+
+      skills.forEach(async (skill) => {
+        await prisma.skillRating.create({
+          data: {
+            rating: 9,
+            skill: {
+              connect: {
+                id: skill,
+              },
+            },
+            projects: {
+              connect: {
+                id: project.id,
+              },
+            },
+          },
+        });
+      });
+    } catch (err) {
+      console.log(err);
+
       throw new BadRequestException("Something went wrong trying to create the project");
     }
     return {
@@ -50,7 +87,17 @@ export class ProjectService {
   async findOne(id: string): Promise<ProjectResponse> {
     let project;
     try {
-      project = await prisma.projects.findUnique({ where: { id } });
+      project = await prisma.projects.findUnique({
+        where: { id }, include: { skills: true },
+      });
+
+      for await (const skill of project.skills) {
+        skill.name = await (await prisma.skills.findUnique({ where: { id: skill.skillId }, select: { name: true } })).name;
+
+        delete skill.skillRatingId;
+        delete skill.projectsId;
+      }
+
     } catch {
       throw new BadRequestException("Something went wrong trying to fetch the project");
     }
@@ -63,14 +110,52 @@ export class ProjectService {
 
   async update(id: string, updateProjectDto: UpdateProjectDto): Promise<ProjectResponse> {
     let project;
+
+    const { skills, ...rest } = updateProjectDto;
+
     try {
       project = prisma.projects.update({
         where: { id },
         data: {
-          ...updateProjectDto,
-          lastEdited: new Date(Date.now().toString()),
+          ...rest,
+          lastEdited: new Date(Date.now()),
         },
       });
+
+      const currentProject = await prisma.projects.findUnique({ where: { id }, include: { skills: true } });
+
+      const currentSkills = currentProject.skills.map(skill => skill.skillId);
+      const givenSkills = skills.map(skill => skill);
+
+      const skillsToDelete = currentSkills.filter(skill => !givenSkills.includes(skill));
+      const skillsToAdd = givenSkills.filter(skill => !currentSkills.includes(skill));
+
+      await prisma.skillRating.deleteMany({
+        where: {
+          skillRatingId: { in: skillsToDelete }, AND: [
+            { projectsId: { equals: id } },
+          ]
+        }
+      });
+
+      skillsToAdd.forEach(async (skill) => {
+        await prisma.skillRating.create({
+          data: {
+            rating: 9,
+            skill: {
+              connect: {
+                id: skill,
+              },
+            },
+            projects: {
+              connect: {
+                id,
+              },
+            },
+          },
+        });
+      });
+
     } catch {
       throw new BadRequestException("Something went wrong trying to update the project");
     }
