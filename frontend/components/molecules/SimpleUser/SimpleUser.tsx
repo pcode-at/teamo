@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
 import { styled } from "../../../stitches.config";
-import { BodyMediumBoldTabletAndUpStyle, BodyMediumTabletAndUpStyle, H3BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import {
+  BodyMediumBoldTabletAndUpStyle,
+  BodyMediumTabletAndUpStyle,
+  H3BoldTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
 import SvgBriefcase from "../../atoms/svg/SvgBriefcase";
 import SvgMapPin from "../../atoms/svg/SvgMapPin";
 import { IconInfoSection } from "../IconInfoSection/IconInfoSection";

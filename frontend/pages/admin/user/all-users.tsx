@@ -9,10 +9,7 @@ export default function Home() {
   return (
     <>
       <Navbar></Navbar>
-
-      <UserList>
-        
-      </UserList>
+      <UserList></UserList>
     </>
   );
 }
