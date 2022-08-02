@@ -18,7 +18,7 @@ const ProfilePageSkillsLayout = styled("div", {
 });
 
 export const ProfilePageSkills: React.FC<Props> = ({ profileId }) => {
-  const { data: profile, status } = useQuery("profile", getUser);
+  const { data: profile, status } = useQuery(["profile", profileId], () => getUser(profileId));
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -37,6 +37,7 @@ export const ProfilePageSkills: React.FC<Props> = ({ profileId }) => {
         "name": "Java",
     }
 }*/
+
   return (
     <>
       <ProfilePageSkillsLayout>

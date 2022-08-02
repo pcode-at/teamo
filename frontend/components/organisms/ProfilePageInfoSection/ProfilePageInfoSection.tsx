@@ -68,7 +68,7 @@ const AvatarLayout = styled("div", {
 });
 
 export const ProfilePageInfoSection: React.FC<Props> = ({ profileId }) => {
-  const { data: profile, status } = useQuery("profile", getUser);
+  const { data: profile, status } = useQuery(["profile", profileId], () => getUser(profileId));
 
   if (status === "loading") {
     return <div>Loading...</div>;

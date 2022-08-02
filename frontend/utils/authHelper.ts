@@ -35,7 +35,7 @@ export async function login(identifier, password) {
   return false;
 }
 
-export async function logout() {
+export function logout() {
   cookie.remove("accessToken");
   cookie.remove("refreshToken");
 }

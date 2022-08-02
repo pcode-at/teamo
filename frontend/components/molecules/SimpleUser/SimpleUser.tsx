@@ -15,7 +15,7 @@ const SimpleUserLayout = styled("div", {
     flexDirection: "column",
     gap: "$2x",
     padding: "$3x",
-    borderRadius: "$1x",
+    borderRadius: "$3x",
     backgroundColor: "$neutral-200"
 });
 

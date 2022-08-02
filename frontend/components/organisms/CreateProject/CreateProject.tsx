@@ -2,7 +2,10 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { styled } from "../../../stitches.config";
 import { createProject } from "../../../utils/requests/project";
-import { H2BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import {
+  H2BoldTabletAndUpStyle,
+  Typography,
+} from "../../../utils/StyledParagraph";
 import { Button } from "../../atoms/Button/Button";
 import { InputField } from "../../atoms/InputField/InputField";
 import { Separator } from "../../atoms/Separator/Separator";
@@ -42,6 +45,12 @@ const SkillListLayout = styled("div", {
   height: "fit-content",
 });
 
+const GridItemLayout = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  gap: "$2x",
+});
+
 export const CreateProject: React.FC<Props> = ({}) => {
   const router = useRouter();
   const [inputs, setInputs] = useState({
@@ -76,36 +85,44 @@ export const CreateProject: React.FC<Props> = ({}) => {
         <SeparatorLayout>
           <Separator width={"big"} alignment={"left"}></Separator>
         </SeparatorLayout>
-        <AddSkill
-          addSearchSkill={(skill, id) => {
-            setInputs({
-              ...inputs,
-              skills: [
-                ...inputs.skills,
-                {
-                  name: skill,
-                  id,
-                },
-              ],
-            });
-          }}
-          items={inputs.skills}
-        ></AddSkill>
-        <SkillListLayout>
-          {inputs.skills.map((skill) => (
-            <Skill
-              key={skill.id}
-              deleteSkill={() => {
-                setInputs({
-                  ...inputs,
-                  skills: inputs.skills.filter((item) => item.id !== skill.id),
-                });
-              }}
-            >
-              {skill.name}
-            </Skill>
-          ))}
-        </SkillListLayout>
+        <GridItemLayout>
+          <Typography variant="h3-bold-tablet-and-up">Available skills</Typography>
+          <AddSkill
+            addSearchSkill={(skill, id) => {
+              setInputs({
+                ...inputs,
+                skills: [
+                  ...inputs.skills,
+                  {
+                    name: skill,
+                    id,
+                  },
+                ],
+              });
+            }}
+            items={inputs.skills}
+          ></AddSkill>
+        </GridItemLayout>
+        <GridItemLayout>
+          <Typography variant="h3-bold-tablet-and-up">Added skills</Typography>
+          <SkillListLayout>
+            {inputs.skills.map((skill) => (
+              <Skill
+                key={skill.id}
+                deleteSkill={() => {
+                  setInputs({
+                    ...inputs,
+                    skills: inputs.skills.filter(
+                      (item) => item.id !== skill.id
+                    ),
+                  });
+                }}
+              >
+                {skill.name}
+              </Skill>
+            ))}
+          </SkillListLayout>
+        </GridItemLayout>
         <SeparatorLayout>
           <Separator width={"big"} alignment={"left"}></Separator>
         </SeparatorLayout>
@@ -122,6 +139,7 @@ export const CreateProject: React.FC<Props> = ({}) => {
             }
           }}
           size="small"
+          disabled={!inputs.name}
         >
           Create project
         </Button>

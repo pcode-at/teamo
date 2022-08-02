@@ -1,7 +1,7 @@
 import { fetchData } from "./default";
 
-export async function getUser() {
-  return fetchData("user", "GET", 200);
+export async function getUser(profileId: string = "") {
+  return fetchData("user/" + profileId, "GET", 200);
 }
 
 export async function getLocations(){

@@ -23,16 +23,11 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     return getRecommendation(projectId);
   });
 
-  if (recommendationStatus === "loading") {
+  if (status === "loading") {
     return <div>Loading...</div>;
   }
 
-  if (recommendationStatus === "error") {
-    return <div>Error</div>;
-  }
-
-  console.log(recommendation);
-  if (status === "loading") {
+  if (recommendationStatus === "loading") {
     return <div>Loading...</div>;
   }
 
@@ -40,6 +35,9 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     return <div>Error</div>;
   }
 
+  if (recommendationStatus === "error") {
+    return <div>Error</div>;
+  }
   
   return (
     <>

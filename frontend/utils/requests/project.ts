@@ -4,6 +4,10 @@ export async function getProjects() {
   return fetchData("project", "GET", 200);
 }
 
+export async function getRecentProjects() {
+  return fetchData("recentProjects", "GET", 200);
+}
+
 export async function getProject(id: string){
   return fetchData("project/" + id, "GET", 200);
 }

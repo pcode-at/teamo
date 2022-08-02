@@ -41,7 +41,7 @@ export class UserController {
     return this.userService.findOneDetailed(jwt);
   }
 
-  @Get()
+  @Get(":identifier")
   @ApiOperation({ summary: "Search for users" })
   @ApiResponse({ status: 200, type: UserResponse })
   async getUserByIdentifier(@Param("identifier") identifier: string) {
