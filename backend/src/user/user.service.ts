@@ -65,6 +65,18 @@ export class UserService {
     return new UserResponse({ statusCode: 404, message: "User not found" });
   }
 
+  async getUserByIdentifier(identifier: string): Promise<UserResponse> {
+    const user = await prisma.users.findUnique({
+      where: {
+        identifier,
+      },
+    });
+    if (user) {
+      return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
+    }
+    throw new BadRequestException("User not found");
+  }
+
   async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
     const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
     return null;

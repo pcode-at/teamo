@@ -16,7 +16,7 @@ import { SkillResponse } from "src/entities/skill.entity";
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   @ApiOperation({ summary: "Create user" })
@@ -39,6 +39,13 @@ export class UserController {
   findOne(@Req() request: Request) {
     const jwt = request.headers.authorization.split(" ")[1];
     return this.userService.findOneDetailed(jwt);
+  }
+
+  @Get()
+  @ApiOperation({ summary: "Search for users" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getUserByIdentifier(@Param("identifier") identifier: string) {
+    return await this.userService.getUserByIdentifier(identifier);
   }
 
   @Patch(":id")

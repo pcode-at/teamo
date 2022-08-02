@@ -1,13 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { ElasticsearchService } from "@nestjs/elasticsearch";
-import { PrismaClient, skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
+
+import { PrismaClient, skills, userSkills, users } from "@prisma/client";
 import { RecommendEntity, RecommendResponse } from "src/entities/recommend.entity";
 import { SearchEntity, SearchResponse } from "src/entities/search.entity";
-import { SkillEntity } from "src/entities/skill.entity";
-import { UserEntity } from "src/entities/user.entity";
+
+import { ElasticsearchService } from "@nestjs/elasticsearch";
+import { Injectable } from "@nestjs/common";
 import { SearchDto } from "src/user/dto/search.dto";
 import { SkillDto } from "src/user/dto/skill.dto";
+import { SkillEntity } from "src/entities/skill.entity";
+import { UserEntity } from "src/entities/user.entity";
 
 const prisma = new PrismaClient();
 
@@ -507,41 +509,3 @@ export class SkillElastic {
   rating: number;
   skill: string;
 }
-
-// client.diagnostic.on("request", (err, result) => {
-//   const { id } = result.meta.request;
-//   const { context } = result.meta;
-//   if (err) {
-//     console.log({ error: err, reqId: id, context });
-//   }
-// });
-
-// client.diagnostic.on("request", (err, result) => {
-//   if (err) {
-//     console.log("Error:");
-//     console.error(err);
-//   } else {
-//     console.log("Info:");
-//     console.info(result);
-//   }
-// });
-
-// client.diagnostic.on("serialization", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("deserialization", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("response", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("sniff", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("resurrect", (err, result) => {
-//   console.log(err, result);
-// });

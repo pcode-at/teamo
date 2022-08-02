@@ -59,8 +59,6 @@ export class ProjectService {
         });
       });
     } catch (err) {
-      console.log(err);
-
       throw new BadRequestException("Something went wrong trying to create the project");
     }
     return {
