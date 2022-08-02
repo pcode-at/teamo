@@ -70,6 +70,13 @@ export class UserService {
       where: {
         identifier,
       },
+      include: {
+        skills: {
+          include: {
+            skill: true,
+          },
+        },
+      },
     });
     if (user) {
       return new UserResponse({ statusCode: 200, message: "User found successfully", data: new UserEntity(user) });
