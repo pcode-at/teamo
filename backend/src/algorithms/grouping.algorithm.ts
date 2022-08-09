@@ -92,7 +92,6 @@ export async function getSkillGroupingsForProject(projectId: string): Promise<Ma
   const skillSystem = new Map<string, SkillNode>();
   const percentages = await getAllAggregationPercentagesOfSkills(projectId);
 
-
   for (const skillId of percentages.keys()) {
     skillSystem.set(skillId.toString(), new SkillNode(skillId.toString()));
   }
@@ -105,6 +104,28 @@ export async function getSkillGroupingsForProject(projectId: string): Promise<Ma
       skillNode.skillConnections.push(skillConnection);
     });
   });
+
+  const skillGroups = [];
+
+  let skillSystemCopy = new Map(skillSystem);
+
+  skillSystemCopy.forEach((skillNode, skillId) => {
+    if (skillNode.skillConnections.length === 0) {
+      skillNode.skillConnections = skillNode.skillConnections.filter(skillConnection => skillConnection.percentage > 0.375);
+    }
+  });
+
+  skillSystemCopy.forEach((skillNode, skillId) => {
+    if (!skillGroups.flat().includes(skillNode)) {
+      skillGroups.push([skillNode]);
+      skillNode.skillConnections.forEach(skillConnection => {
+        let skillAdd = skillConnection.skillId1.skillId === skillId ? skillConnection.skillId2 : skillConnection.skillId1;
+        skillGroups[skillGroups.length - 1].push(skillAdd);
+      });
+    }
+  });
+
+  console.log(skillGroups);
 
   return skillSystem;
 }
