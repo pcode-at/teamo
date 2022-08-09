@@ -10,6 +10,7 @@ import { InputField } from "../../atoms/InputField/InputField";
 import { PasswordField } from "../../atoms/PasswordField/PasswordField";
 import { Spacer } from "../../atoms/Spacer/Spacer";
 import SvgLock from "../../atoms/svg/SvgLock";
+import SvgUser from "../../atoms/svg/SvgUser";
 
 type Props = {};
 
@@ -35,6 +36,7 @@ export const LoginForm: React.FC<Props> = ({}) => {
           inputType={"text"}
           value={identifier}
           onChange={setIdentifier}
+          icon={SvgUser}
           label="Employee-ID"
           required={true}
         />

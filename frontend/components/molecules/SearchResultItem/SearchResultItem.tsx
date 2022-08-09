@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { styled } from "../../../stitches.config";
+import { BookMarkDropDown } from "../../atoms/BookMarkDropDown/BookMarkDropDown";
 import { InputField } from "../../atoms/InputField/InputField";
 import { Separator } from "../../atoms/Separator/Separator";
 import SvgBookmark from "../../atoms/svg/SvgBookmark";
@@ -12,26 +13,26 @@ import { Skill } from "../Skill/Skill";
 
 export type User = {
   birthDate: Date;
-    departments: string[];
-    email: string;
-    gender: string;
-    identifier: string;
-    location: string;
-    phoneNumber: string;
-    name: string;
-    photo: string;
-    roles: string[];
-    projectIds: string[];
-    bookmarkedInIds: string[];
-    projectsIds: string[];
-    score?: number;
-    skills: {
-      rating: string;
-      opacity: number;
-      skill: {
-        name: string;
-      };
-    }[];
+  departments: string[];
+  email: string;
+  gender: string;
+  identifier: string;
+  location: string;
+  phoneNumber: string;
+  name: string;
+  photo: string;
+  roles: string[];
+  projectIds: string[];
+  bookmarkedInIds: string[];
+  projectsIds: string[];
+  score?: number;
+  skills: {
+    rating: string;
+    opacity: number;
+    skill: {
+      name: string;
+    };
+  }[];
 };
 
 type Props = {
@@ -128,13 +129,7 @@ export const SearchResultItem: React.FC<Props> = ({ user }) => {
               label={user.location}
             ></IconInfoSection>
           </InformationLayout>
-          <IconButtonLayout>
-            <IconButton>
-              <IconLayout>
-                <SvgBookmark></SvgBookmark>
-              </IconLayout>
-            </IconButton>
-          </IconButtonLayout>
+          <BookMarkDropDown></BookMarkDropDown>
         </SearchResultItemInfoLayout>
         <SeparatorLayout>
           <Separator
