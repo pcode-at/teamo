@@ -340,11 +340,11 @@ export class ProjectService {
     // //@ts-ignore
     // const identifier = decoded.identifier;
 
-    const userId = await (await prisma.users.findUnique({ where: { identifier: identifier }, select: { id: true } })).id;
+    const userId = await (await prisma.users.findUnique({ where: { identifier }, select: { id: true } })).id;
 
     const projects = await prisma.projects.findMany();
 
-    let bookmarks = [{}];
+    let bookmarks = [];
 
     projects.forEach((project) => {
       if (project.bookmarkIds.includes(userId)) {
