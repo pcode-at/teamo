@@ -330,8 +330,36 @@ export class ProjectService {
         });
       }
     });
-
     return null;
+  }
+
+  async getBookmarks(identifier, request): Promise<any> {
+
+    // let bearer = request.headers.authorization.split(" ")[1];
+    // const decoded = await this.jwtService.decode(bearer);
+    // //@ts-ignore
+    // const identifier = decoded.identifier;
+
+    const userId = await (await prisma.users.findUnique({ where: { identifier: identifier }, select: { id: true } })).id;
+
+    const projects = await prisma.projects.findMany();
+
+    let bookmarks = [{}];
+
+    projects.forEach((project) => {
+      if (project.bookmarkIds.includes(userId)) {
+        bookmarks.push({
+          projectId: project.id,
+          projectName: project.name,
+        });
+      }
+    });
+
+    return {
+      statusCode: 200,
+      message: "Successfully fetched bookmarks",
+      data: bookmarks,
+    };
   }
 }
 
