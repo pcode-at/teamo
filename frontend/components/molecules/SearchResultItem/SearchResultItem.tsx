@@ -129,7 +129,7 @@ export const SearchResultItem: React.FC<Props> = ({ user }) => {
               label={user.location}
             ></IconInfoSection>
           </InformationLayout>
-          <BookMarkDropDown></BookMarkDropDown>
+          <BookMarkDropDown userId={user.identifier}></BookMarkDropDown>
         </SearchResultItemInfoLayout>
         <SeparatorLayout>
           <Separator

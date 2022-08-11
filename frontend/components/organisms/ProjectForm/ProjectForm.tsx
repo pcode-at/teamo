@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { styled } from "../../../stitches.config";
-import { createProject } from "../../../utils/requests/project";
 import {
   H2BoldTabletAndUpStyle,
   Typography,
@@ -14,7 +13,18 @@ import { AddSkill } from "../../molecules/AddSkill/AddSkill";
 import { BackLink } from "../../molecules/BackLink/BackLink";
 import { Skill } from "../../molecules/Skill/Skill";
 
-type Props = {};
+type Props = {
+  saveFunction: (project: any) => void;
+  defaultInput: {
+    name: string;
+    description: string;
+    skills: {
+      name: string;
+      id: string;
+    }[];
+  };
+  siteName: string;
+};
 
 const HeaderLayout = styled("div", {
   width: "100%",
@@ -51,19 +61,19 @@ const GridItemLayout = styled("div", {
   gap: "$2x",
 });
 
-export const CreateProject: React.FC<Props> = ({}) => {
+export const ProjectForm: React.FC<Props> = ({
+  saveFunction,
+  defaultInput = { name: "", description: "", skills: [] },
+  siteName,
+}) => {
   const router = useRouter();
-  const [inputs, setInputs] = useState({
-    name: "",
-    description: "",
-    skills: [],
-  });
-
+  const [inputs, setInputs] = useState(defaultInput);
+  console.log(inputs);
   return (
     <>
       <BackLink href="/project" label="Back to projects"></BackLink>
       <HeaderLayout>
-        <Headline>Create a project</Headline>
+        <Headline>{siteName}</Headline>
       </HeaderLayout>
       <InputFieldLayout>
         <InputField
@@ -81,12 +91,15 @@ export const CreateProject: React.FC<Props> = ({}) => {
             setInputs({ ...inputs, description: value });
           }}
           label="Description"
+          value={inputs.description}
         ></TextArea>
         <SeparatorLayout>
           <Separator width={"big"} alignment={"left"}></Separator>
         </SeparatorLayout>
         <GridItemLayout>
-          <Typography variant="h3-bold-tablet-and-up">Available skills</Typography>
+          <Typography variant="h3-bold-tablet-and-up">
+            Available skills
+          </Typography>
           <AddSkill
             addSearchSkill={(skill, id) => {
               setInputs({
@@ -128,20 +141,17 @@ export const CreateProject: React.FC<Props> = ({}) => {
         </SeparatorLayout>
         <Button
           onClick={() => {
-            try {
-              createProject({
-                name: inputs.name,
-                description: inputs.description,
-                skills: inputs.skills.map((skill) => skill.id),
-              });
-            } catch (e) {
-              alert("something went wrong");
-            }
+            saveFunction({
+              name: inputs.name,
+              description: inputs.description,
+              skills: inputs.skills.map((skill) => skill.id),
+            });
+            router.push("/project");
           }}
           size="small"
           disabled={!inputs.name}
         >
-          Create project
+          {siteName}
         </Button>
       </InputFieldLayout>
     </>

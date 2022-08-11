@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { styled } from "../../../stitches.config";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { keyframes } from "@stitches/react";
@@ -10,6 +10,9 @@ import Link from "next/link";
 import { logout } from "../../../utils/authHelper";
 import { useRouter } from "next/router";
 import SvgBookmark from "../svg/SvgBookmark";
+import { useQuery } from "react-query";
+import { getProjects } from "../../../utils/requests/project";
+import { getBookmarks, updateBookmarks } from "../../../utils/requests/project";
 
 const slideUpAndFade = keyframes({
   "0%": { opacity: 0, transform: "translateY(2px)" },
@@ -118,8 +121,8 @@ const IconButton = styled("button", {
   border: "none",
   borderRadius: "100%",
   boxSizing: "border-box",
-  height: 40,
-  width: 40,
+  height: 30,
+  width: 30,
   padding: "$1x",
   display: "inline-flex",
   alignItems: "center",
@@ -133,16 +136,39 @@ const IconButton = styled("button", {
   "&:hover": { backgroundColor: "$brand-500", color: "$neutral-100" },
 });
 
-type Props = {};
+type Props = {
+  userId: string;
+};
 
-const IconLayout = styled("div", {
-  display: "flex",
-  width: 20,
-  height: 20,
-});
+const CheckBoxInput = styled("input", {});
 
-export const BookMarkDropDown: React.FC<Props> = ({}) => {
-  const router = useRouter();
+const CheckBoxLabel = styled("label", {});
+
+const StyledCheckboxItem = styled("div", {});
+
+export const BookMarkDropDown: React.FC<Props> = ({ userId }) => {
+  const [checkedItems, setCheckedItems] = React.useState<string[]>([]);
+  const { data: bookmarks, status: bookmarksStatus } = useQuery(
+    ["bookmarks", userId],
+    () => getBookmarks(userId)
+  );
+  const { data: projects, status: projectsStatus } = useQuery(
+    ["projects"],
+    getProjects
+  );
+  useEffect(() => {
+    if (bookmarksStatus === "success" && projectsStatus === "success") {
+      setCheckedItems(bookmarks.map((bookmark) => bookmark.projectId));
+    }
+  }, [bookmarks]);
+
+  if (bookmarksStatus === "loading" || projectsStatus === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (bookmarksStatus === "error" || projectsStatus === "error") {
+    return <div>Error</div>;
+  }
 
   return (
     <>
@@ -155,39 +181,54 @@ export const BookMarkDropDown: React.FC<Props> = ({}) => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent sideOffset={5}>
-            <DropdownMenuItem>
-              <Link href="/profile" passHref>
-                <StyledItemLink>
-                  <IconLayout>
-                    <SvgUser></SvgUser>
-                  </IconLayout>
-                  PROFILE
-                </StyledItemLink>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href="/admin/user" passHref>
-                <StyledItemLink>
-                  <IconLayout>
-                    <SvgSettings></SvgSettings>
-                  </IconLayout>
-                  ADMIN
-                </StyledItemLink>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                logout();
-                router.push("/login");
-              }}
-            >
-              <StyledItemLink>
-                <IconLayout>
-                  <SvgArrowLeft></SvgArrowLeft>
-                </IconLayout>
-                LOGOUT
-              </StyledItemLink>
-            </DropdownMenuItem>
+            <StyledCheckboxItem key={"self"}>
+              <CheckBoxInput
+                type="checkbox"
+                id={"self"}
+                name={"self"}
+                value={"self"}
+                checked={checkedItems.includes("self")}
+                onChange={(e) => {
+                  let newItems = [...checkedItems];
+                  if (e.target.checked) {
+                    newItems.push("self");
+                  } else {
+                    newItems = checkedItems.filter((i) => i !== "self");
+                  }
+                  setCheckedItems(newItems);
+                  updateBookmarks(userId, newItems);
+                }}
+              />
+              <CheckBoxLabel htmlFor={"self"}>
+                {"  "}
+                {"Own list"}
+              </CheckBoxLabel>
+            </StyledCheckboxItem>
+            {projects.map((project) => (
+              <StyledCheckboxItem key={project.id}>
+                <CheckBoxInput
+                  type="checkbox"
+                  id={project.id}
+                  name={project.id}
+                  value={projects.id}
+                  checked={checkedItems.includes(project.id)}
+                  onChange={(e) => {
+                    let newItems = [...checkedItems];
+                    if (e.target.checked) {
+                      newItems.push(project.id);
+                    } else {
+                      newItems = checkedItems.filter((i) => i !== project.id);
+                    }
+                    setCheckedItems(newItems);
+                    updateBookmarks(userId, newItems);
+                  }}
+                />
+                <CheckBoxLabel htmlFor={project.id}>
+                  {"  "}
+                  {project.name}
+                </CheckBoxLabel>
+              </StyledCheckboxItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </Box>

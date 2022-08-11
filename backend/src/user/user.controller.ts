@@ -41,13 +41,6 @@ export class UserController {
     return this.userService.findOneDetailed(jwt);
   }
 
-  @Get(":identifier")
-  @ApiOperation({ summary: "Search for users" })
-  @ApiResponse({ status: 200, type: UserResponse })
-  async getUserByIdentifier(@Param("identifier") identifier: string) {
-    return await this.userService.getUserByIdentifier(identifier);
-  }
-
   @Patch(":id")
   @ApiOperation({ summary: "Update user" })
   @ApiResponse({ status: 200, type: UserResponse })
@@ -88,5 +81,12 @@ export class UserController {
   @ApiResponse({ status: 200, type: LocationResponse })
   async getLocations(): Promise<LocationResponse> {
     return await this.userService.getLocations();
+  }
+
+  @Get(":identifier")
+  @ApiOperation({ summary: "Search for users" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getUserByIdentifier(@Param("identifier") identifier: string) {
+    return await this.userService.getUserByIdentifier(identifier);
   }
 }

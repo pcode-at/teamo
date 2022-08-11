@@ -1,16 +1,28 @@
-import { ProjectsList } from "../../components/organisms/ProjectsList/ProjectsList";
 import { Navbar } from "../../components/organisms/Navbar/Navbar";
-import { styled } from "../../stitches.config";
-import { ProjectDetails } from "../../components/organisms/ProjectDetails/ProjectDetails";
 import { ContentLayout } from "./[projectId]";
-import { CreateProject } from "../../components/organisms/CreateProject/CreateProject";
+import { ProjectForm } from "../../components/organisms/ProjectForm/ProjectForm";
+import { createProject } from "../../utils/requests/project";
 
 export default function Home() {
   return (
     <>
       <Navbar></Navbar>
       <ContentLayout>
-        <CreateProject></CreateProject>
+        <ProjectForm
+          saveFunction={(project) => {
+            try {
+              createProject(project);
+            } catch (e) {
+              alert("something went wrong");
+            }
+          }}
+          defaultInput={{
+            name: "",
+            description: "",
+            skills: [],
+          }}
+          siteName={"Create project"}
+        ></ProjectForm>
       </ContentLayout>
     </>
   );
