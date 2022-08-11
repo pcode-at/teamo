@@ -304,12 +304,12 @@ export class ProjectService {
     //@ts-ignore
     const identifier = decoded.identifier;
 
-    const userId = await (await prisma.users.findUnique({ where: { identifier: identifier }, select: { id: true } })).id;
+    const userId = await (await prisma.users.findUnique({ where: { identifier: userIdentifier }, select: { id: true } })).id;
 
     const projects = await prisma.projects.findMany();
 
     projects.forEach(async (project) => {
-      if (project.bookmarkIds.includes(userId) && !bookmarks.includes(userId)) {
+      if (project.bookmarkIds.includes(userId) && !bookmarks.includes(project.id)) {
         await prisma.projects.update({
           where: { id: project.id },
           data: {
@@ -319,7 +319,7 @@ export class ProjectService {
           },
         });
       }
-      if (!project.bookmarkIds.includes(userId) && bookmarks.includes(userId)) {
+      if (!project.bookmarkIds.includes(userId) && bookmarks.includes(project.id)) {
         await prisma.projects.update({
           where: { id: project.id },
           data: {

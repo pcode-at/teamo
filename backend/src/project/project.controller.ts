@@ -23,9 +23,9 @@ export class ProjectController {
     return this.projectService.create(createProjectDto, request);
   }
 
-  @Post('bookmark/:id')
+  @Patch('bookmark/:id')
   @ApiOperation({ summary: "Bookmark a user to a project" })
-  @ApiResponse({ status: 200, type: ProjectResponse })
+  @ApiResponse({ status: 201, type: ProjectResponse })
   @UseGuards(JwtAuthGuard)
   async bookmark(@Body() bookmarks: string[], @Param('id') id: string, @Req() request): Promise<ProjectResponse> {
     return this.projectService.bookmark(id, bookmarks, request);
