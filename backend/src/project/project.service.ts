@@ -7,9 +7,7 @@ import { CreateProjectDto } from "./dto/create-project.dto";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaClient } from "@prisma/client";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { UserService } from "src/user/user.service";
 import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
-import { use } from "passport";
 
 const prisma = new PrismaClient();
 
@@ -26,7 +24,6 @@ export class ProjectService {
     const identifier = decoded.identifier;
 
     const user = await prisma.users.findUnique({ where: { identifier } });
-
     const { skills, ...rest } = createProject;
 
     try {
