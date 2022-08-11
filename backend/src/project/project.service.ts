@@ -6,6 +6,7 @@ import { AddSkillDTO } from "./dto/add-skill.dto";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaClient } from "@prisma/client";
+import { PrismaClientValidationError } from "@prisma/client/runtime";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
 
@@ -17,7 +18,6 @@ export class ProjectService {
 
   async create(createProject: CreateProjectDto, request): Promise<ProjectResponse> {
     let project;
-    //get bearer authorization from request
     let bearer = request.headers.authorization.split(" ")[1];
     const decoded = await this.jwtService.decode(bearer);
     //@ts-ignore
@@ -296,4 +296,42 @@ export class ProjectService {
       data: new SkillGroupEntity(nodes, edges),
     };
   }
+
+  async bookmark(userIdentifier, bookmarks, request): Promise<ProjectResponse> {
+
+    let bearer = request.headers.authorization.split(" ")[1];
+    const decoded = await this.jwtService.decode(bearer);
+    //@ts-ignore
+    const identifier = decoded.identifier;
+
+    const userId = await (await prisma.users.findUnique({ where: { identifier: identifier }, select: { id: true } })).id;
+
+    const projects = await prisma.projects.findMany();
+
+    projects.forEach(async (project) => {
+      if (project.bookmarkIds.includes(userId) && !bookmarks.includes(userId)) {
+        await prisma.projects.update({
+          where: { id: project.id },
+          data: {
+            bookmarkIds: {
+              set: project.bookmarkIds.filter(id => id != userId)
+            },
+          },
+        });
+      }
+      if (!project.bookmarkIds.includes(userId) && bookmarks.includes(userId)) {
+        await prisma.projects.update({
+          where: { id: project.id },
+          data: {
+            bookmarkIds: {
+              push: userId
+            },
+          },
+        });
+      }
+    });
+
+    return null;
+  }
 }
+
