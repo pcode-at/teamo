@@ -15,19 +15,18 @@ type Props = {
 };
 
 const slideDown = keyframes({
-  from: { height: 0 },
-  to: { height: "150px" },
+  from: { height: 0, overflow: "hidden" },
+  to: { height: "150px", overflow: "hidden" },
 });
 
 const slideUp = keyframes({
-  from: { height: "150px" },
-  to: { height: 0 },
+  from: { height: "150px", overflow: "hidden" },
+  to: { height: 0, overflow: "hidden" },
 });
 
 const StyledAccordion = styled(AccordionPrimitive.Root, {
   borderRadius: "$3x",
   width: "100%",
-  backgroundColor: "$brand-100",
   boxShadow: `0 2px 10px $neutral-100`,
 });
 
@@ -104,6 +103,8 @@ const MapPinLayout = styled("div", {
 
 const StyledContentText = styled("div", {
   padding: "15px 20px",
+  overflowY: "auto",
+  height: "150px",
 });
 
 const AccordionTriggerLayout = styled("div", {

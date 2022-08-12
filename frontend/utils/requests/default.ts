@@ -14,7 +14,7 @@ export async function fetchData(url: string, method: string, statusCode: number,
       body: JSON.stringify(body),
     }
   );
-  console.log(body);
+  console.log(response);
 
   if (response.status !== statusCode) {
     throw new Error(getErrorMessage(response));

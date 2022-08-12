@@ -3,23 +3,24 @@ import { Navbar } from "../../components/organisms/Navbar/Navbar";
 import { ProfilePageInfoSection } from "../../components/organisms/ProfilePageInfoSection/ProfilePageInfoSection";
 import { ProfilePageSkills } from "../../components/organisms/ProfilePageSkills/ProfilePageSkills";
 import { Spacer } from "../../components/atoms/Spacer/Spacer";
+import { ContentLayout } from "../project/[projectId]";
 
-const ContentLayout = styled("div", {
+const ProfileLayout = styled("div", {
   display: "flex",
-  maxWidth: "1200px",
   flexDirection: "column",
   gap: "$3x",
-  margin: "0 auto",
 });
 
-export default function Home() {
+export default function Profile() {
   return (
     <>
       <Navbar></Navbar>
 
       <ContentLayout>
-        <ProfilePageInfoSection></ProfilePageInfoSection>
-        <ProfilePageSkills></ProfilePageSkills>
+        <ProfileLayout>
+          <ProfilePageInfoSection></ProfilePageInfoSection>
+          <ProfilePageSkills></ProfilePageSkills>
+        </ProfileLayout>
       </ContentLayout>
       <Spacer size="9x" axis="vertical"></Spacer>
     </>

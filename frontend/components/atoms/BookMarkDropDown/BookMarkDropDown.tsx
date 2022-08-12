@@ -1,14 +1,7 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import { styled } from "../../../stitches.config";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { keyframes } from "@stitches/react";
-import SvgUser from "../svg/SvgUser";
-import { BodyDefaultTabletAndUpStyle } from "../../../utils/StyledParagraph";
-import SvgArrowLeft from "../svg/SvgArrowLeft";
-import SvgSettings from "../svg/SvgSettings";
-import Link from "next/link";
-import { logout } from "../../../utils/authHelper";
-import { useRouter } from "next/router";
 import SvgBookmark from "../svg/SvgBookmark";
 import { useQuery } from "react-query";
 import { getProjects } from "../../../utils/requests/project";
@@ -58,6 +51,9 @@ const contentStyles = {
 const StyledContent = styled(DropdownMenuPrimitive.Content, {
   ...contentStyles,
   padding: "$2x",
+  maxHeight: "45vh",
+
+  overflowY: "auto",
 });
 
 const StyledArrow = styled(DropdownMenuPrimitive.Arrow, {
@@ -75,36 +71,8 @@ function Content({ children, ...props }) {
   );
 }
 
-const StyledSubContent = styled(DropdownMenuPrimitive.SubContent, {
-  ...contentStyles,
-});
-
 const StyledItem = styled(DropdownMenuPrimitive.Item, {
   outline: "none",
-});
-
-const StyledItemLink = styled("a", {
-  ...BodyDefaultTabletAndUpStyle,
-
-  color: "$neutral-800",
-  borderRadius: "$1x",
-  display: "flex",
-  alignItems: "center",
-  padding: "$1x",
-  position: "relative",
-  border: "none",
-  gap: "$1x",
-  cursor: "pointer",
-  transition: "all 0.2s",
-
-  "&:hover": {
-    backgroundColor: "$brand-100",
-  },
-
-  "&[data-disabled]": {
-    color: "$neutral-400",
-    pointerEvents: "none",
-  },
 });
 
 // Exports
@@ -146,24 +114,48 @@ const CheckBoxLabel = styled("label", {});
 
 const StyledCheckboxItem = styled("div", {});
 
-export const BookMarkDropDown: React.FC<Props> = ({ userId }) => {
+const BookMarkDropDownPureComponent: React.FC<Props> = ({ userId }) => {
   const [checkedItems, setCheckedItems] = React.useState<string[]>([]);
+  const [isOpen, setIsOpen] = React.useState(false);
   const { data: bookmarks, status: bookmarksStatus } = useQuery(
     ["bookmarks", userId],
-    () => getBookmarks(userId)
+    () => getBookmarks(userId),
+    {
+      enabled: isOpen,
+    }
   );
   const { data: projects, status: projectsStatus } = useQuery(
     ["projects"],
-    getProjects
+    getProjects,
+    {
+      enabled: isOpen,
+    }
   );
   useEffect(() => {
     if (bookmarksStatus === "success" && projectsStatus === "success") {
       setCheckedItems(bookmarks.map((bookmark) => bookmark.projectId));
     }
-  }, [bookmarks]);
+  }, [bookmarks, bookmarksStatus, projectsStatus]);
 
-  if (bookmarksStatus === "loading" || projectsStatus === "loading") {
-    return <div>Loading...</div>;
+  console.log(isOpen);
+  if (bookmarksStatus === "loading" || projectsStatus === "loading" || !isOpen) {
+    return (
+      <>
+        <Box>
+          <DropdownMenu onOpenChange={setIsOpen}>
+            <DropdownMenuTrigger asChild>
+              <IconButton aria-label="Customise options">
+                <SvgBookmark></SvgBookmark>
+              </IconButton>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent sideOffset={5}>
+              Loading...
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </Box>
+      </>
+    );
   }
 
   if (bookmarksStatus === "error" || projectsStatus === "error") {
@@ -173,7 +165,7 @@ export const BookMarkDropDown: React.FC<Props> = ({ userId }) => {
   return (
     <>
       <Box>
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild>
             <IconButton aria-label="Customise options">
               <SvgBookmark></SvgBookmark>
@@ -235,3 +227,5 @@ export const BookMarkDropDown: React.FC<Props> = ({ userId }) => {
     </>
   );
 };
+
+export default memo(BookMarkDropDownPureComponent);

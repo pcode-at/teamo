@@ -17,7 +17,8 @@ export async function createProject(project: {
   description: string;
   skills: string[];
 }){
-  return fetchData("project", "POST", 200, project);
+  console.log(project);
+  return fetchData("project", "POST", 201, project);
 }
 
 export async function updateProject(project: {
@@ -33,5 +34,5 @@ export async function getBookmarks(userId: string) {
 }
 
 export async function updateBookmarks(userId: string, bookmarks: string[]) {
-  return fetchData("project/bookmark/" + userId, "PATCH", 201, bookmarks);
+  return fetchData("project/bookmark/" + userId, "PATCH", 200, bookmarks);
 }

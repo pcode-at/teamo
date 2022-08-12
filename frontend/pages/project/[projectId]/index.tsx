@@ -9,7 +9,7 @@ export const ContentLayout = styled("div", {
   flexDirection: "column",
   gap: "0",
   margin: "0 auto",
-  padding: "$8x 0",
+  padding: "$8x $4x",
 });
 
 export default function Home() {

@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { getRecommendation } from "../../../utils/requests/search";
 import { Skill } from "../../molecules/Skill/Skill";
 import { styled } from "../../../stitches.config";
+import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
 
 type Props = {};
 
@@ -20,6 +21,15 @@ const ProfilePageSkillsLayout = styled("div", {
   width: "100%",
   flexWrap: "wrap",
   gap: "$3x",
+});
+
+const RecommendationsLayout = styled("div", {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  gridGap: "$2x",
+  width: "100%",
+  height: "fit-content",
+  maxHeight: "100%",
 });
 
 export const ProjectDetails: React.FC<Props> = ({}) => {
@@ -36,23 +46,15 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     }
   );
 
-  if (status === "loading") {
+  if (status === "loading" || recommendationStatus === "loading") {
     return <div>Loading...</div>;
   }
 
-  if (recommendationStatus === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "error") {
+  if (status === "error" || recommendationStatus === "error") {
     return <div>Error</div>;
   }
 
-  if (recommendationStatus === "error") {
-    return <div>Error</div>;
-  }
-
-  console.log(project);
+  console.log(recommendation);
 
   return (
     <>
@@ -70,6 +72,7 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
       <Separator width={"big"} alignment={"left"}></Separator>
       <Spacer size="7x" axis="vertical"></Spacer>
       <SubHeading>Skills</SubHeading>
+      <Spacer size="1x" axis="vertical"></Spacer>
       <ProfilePageSkillsLayout>
         {project.skills.map((skill) => (
           <Skill key={skill.id}>
@@ -79,6 +82,18 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
       </ProfilePageSkillsLayout>
       <Spacer size="7x" axis="vertical"></Spacer>
       <Separator width={"big"} alignment={"left"}></Separator>
+      <Spacer size="7x" axis="vertical"></Spacer>
+      <SubHeading>Recommendations</SubHeading>
+      <Spacer size="1x" axis="vertical"></Spacer>
+      <RecommendationsLayout>
+        {recommendation.users[0].map((user, index) => {
+          return (
+            <>
+              <SearchResultItem user={user} showSkills={false} />
+            </>
+          );
+        })}
+      </RecommendationsLayout>
     </>
   );
 };

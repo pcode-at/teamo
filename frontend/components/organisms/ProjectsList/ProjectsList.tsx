@@ -46,7 +46,9 @@ const StyledLink = styled("a", {
 
 export const ProjectsList: React.FC<Props> = ({}) => {
   const router = useRouter();
-  const { data: projects, status } = useQuery(["projects"], getProjects);
+  const { data: projects, status } = useQuery(["projects"], getProjects, {
+    refetchInterval: 5000,
+  });
 
   if (status === "loading") {
     return <div>Loading...</div>;
