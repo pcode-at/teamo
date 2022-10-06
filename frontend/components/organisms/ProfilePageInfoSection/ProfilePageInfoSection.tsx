@@ -30,6 +30,10 @@ const GeneralInfoLayout = styled("div", {
   borderRadius: "10px",
 
   color: "$neutral-100",
+
+  "@tabletAndDown": {
+    gridTemplateColumns: "1fr",
+  },
 });
 
 const GeneralInfoText = styled("div", {
@@ -48,6 +52,11 @@ const IconInfoLayout = styled("div", {
   flexDirection: "row",
   width: "100%",
   gap: "$9x",
+
+  "@tabletAndDown": {
+    flexDirection: "column",
+    gap: "$4x",
+  },
 });
 
 const GeneralInfoTextTitle = styled("h2", {

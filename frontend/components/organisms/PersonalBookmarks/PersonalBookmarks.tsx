@@ -5,6 +5,7 @@ import { styled } from "../../../stitches.config";
 import Link from "next/link";
 import { SimpleUser } from "../../molecules/SimpleUser/SimpleUser";
 import { getAllUsers } from "../../../utils/requests/user";
+import Skeleton from "react-loading-skeleton";
 
 type Props = {};
 
@@ -24,6 +25,10 @@ const ListItems = styled("div", {
   gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
   width: "100%",
   gap: "$8x",
+
+  "@tabletAndDown": {
+    gap: "$4x",
+  },
 });
 
 const StyledLink = styled("a", {
@@ -36,26 +41,29 @@ export const PersonalBookmarks: React.FC<Props> = ({}) => {
     return getAllUsers();
   });
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "error") {
-    return <div>Error</div>;
-  }
-
   return (
     <>
       <ListLayout>
         <ListTitle>Bookmarks</ListTitle>
         <ListItems>
-          {users.map((user) => (
+          {status == "success" && users.map((user) => (
             <Link key={user.identifier} href={`/profile/${user.identifier}`} passHref>
               <StyledLink>
                 <SimpleUser user={user} />
               </StyledLink>
             </Link>
           ))}
+          {status == "loading" && (
+            <>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+            </>
+          )}
+          {status == "error" && <div>Error</div>}
         </ListItems>
       </ListLayout>
     </>

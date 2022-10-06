@@ -2,7 +2,6 @@ import Link from "next/link";
 import React from "react";
 import { styled } from "../../../stitches.config";
 import SvgLogoBig from "../../atoms/svg/SvgLogoBig";
-import SvgUser from "../../atoms/svg/SvgUser";
 import { UserDropDown } from "../../atoms/UserDropDown/UserDropDown";
 
 type Props = {};
@@ -16,7 +15,12 @@ const NavbarLayout = styled("div", {
   padding: "$4x",
   backgroundColor: "$neutral-100",
   height: "11vh",
-  boxShadow: "0px 5px 20px rgba(194, 194, 194, 0.25)"
+  boxShadow: "0px 5px 20px rgba(194, 194, 194, 0.25)",
+
+  "@tabletAndDown": {
+    flexDirection: "column",
+    padding: "$1x",
+  }
 });
 
 const LogoLayout = styled("div", {

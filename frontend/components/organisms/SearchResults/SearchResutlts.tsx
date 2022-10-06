@@ -10,6 +10,7 @@ import { searchElastic } from "../../../utils/requests/search";
 import { useQuery } from "react-query";
 import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
 import { Item } from "../SearchBar/SearchBar";
+import Skeleton from "react-loading-skeleton";
 
 // a little function to help us with reordering the result
 const reorder = (list, startIndex, endIndex) => {
@@ -66,19 +67,21 @@ export const SearchResults: React.FC<Props> = ({ items, locations }) => {
   });
 
   const { data: results, status } = useQuery(
-    [
-      "search",
-      items,
-      locations,
-    ],
+    ["search", items, locations],
     () => {
-      console.log("asdf");
+      console.log(mappedItems);
       return searchElastic({ parameters: mappedItems });
     }
   );
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return (
+      <SearchResultsLayout>
+        <Skeleton width="100%" height={220}></Skeleton>
+        <Skeleton width="100%" height={220}></Skeleton>
+        <Skeleton width="100%" height={220}></Skeleton>
+      </SearchResultsLayout>
+    );
   }
 
   if (status === "error") {

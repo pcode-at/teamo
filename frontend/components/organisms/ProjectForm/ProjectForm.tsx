@@ -39,10 +39,18 @@ const InputFieldLayout = styled("div", {
   gridTemplateColumns: "1fr 1fr",
   gap: "$5x",
   padding: "$2x 0",
+
+  "@tabletAndDown": {
+    gridTemplateColumns: "1fr",
+  },
 });
 
 const SeparatorLayout = styled("div", {
   gridColumn: "span 2",
+
+  "@tabletAndDown": {
+    gridColumn: "span 1",
+  },
 });
 
 const SkillListLayout = styled("div", {

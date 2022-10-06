@@ -12,6 +12,7 @@ import { getRecommendation } from "../../../utils/requests/search";
 import { Skill } from "../../molecules/Skill/Skill";
 import { styled } from "../../../stitches.config";
 import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
+import Skeleton from "react-loading-skeleton";
 
 type Props = {};
 
@@ -25,7 +26,7 @@ const ProfilePageSkillsLayout = styled("div", {
 
 const RecommendationsLayout = styled("div", {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr 1fr",
+  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
   gridGap: "$2x",
   width: "100%",
   height: "fit-content",
@@ -46,10 +47,6 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     }
   );
 
-  if (status === "loading" || recommendationStatus === "loading") {
-    return <div>Loading...</div>;
-  }
-
   if (status === "error" || recommendationStatus === "error") {
     return <div>Error</div>;
   }
@@ -60,40 +57,62 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     <>
       <BackLink href={"/project"} label={"Back to projects"}></BackLink>
       <Spacer size="1x" axis="vertical"></Spacer>
-      <HeaderLink
-        title={project.name}
-        subtitle={project.description}
-        icon={SvgSliders}
-        iconOnClick={() => {
-          router.push(`/project/${projectId}/edit`);
-        }}
-      />
+      {status === "success" && (
+        <HeaderLink
+          title={project.name}
+          subtitle={project.description}
+          icon={SvgSliders}
+          iconOnClick={() => {
+            router.push(`/project/${projectId}/edit`);
+          }}
+        />
+      )}
+      {status == "loading" && <Skeleton width={280} height={70}></Skeleton>}
       <Spacer size="7x" axis="vertical"></Spacer>
       <Separator width={"big"} alignment={"left"}></Separator>
       <Spacer size="7x" axis="vertical"></Spacer>
       <SubHeading>Skills</SubHeading>
       <Spacer size="1x" axis="vertical"></Spacer>
-      <ProfilePageSkillsLayout>
-        {project.skills.map((skill) => (
-          <Skill key={skill.id}>
-            {skill.name}
-          </Skill>
-        ))}
-      </ProfilePageSkillsLayout>
+      {status == "success" && (
+        <ProfilePageSkillsLayout>
+          {project.skills.map((skill) => (
+            <Skill key={skill.id}>{skill.name}</Skill>
+          ))}
+        </ProfilePageSkillsLayout>
+      )}
+      {status == "loading" && (
+        <ProfilePageSkillsLayout>
+          <Skeleton width={150} height={50}></Skeleton>
+          <Skeleton width={150} height={50}></Skeleton>
+          <Skeleton width={150} height={50}></Skeleton>
+          <Skeleton width={150} height={50}></Skeleton>
+          <Skeleton width={150} height={50}></Skeleton>
+          <Skeleton width={150} height={50}></Skeleton>
+        </ProfilePageSkillsLayout>
+      )}
       <Spacer size="7x" axis="vertical"></Spacer>
       <Separator width={"big"} alignment={"left"}></Separator>
       <Spacer size="7x" axis="vertical"></Spacer>
       <SubHeading>Recommendations</SubHeading>
       <Spacer size="1x" axis="vertical"></Spacer>
-      <RecommendationsLayout>
-        {recommendation.users[0].map((user, index) => {
-          return (
-            <>
-              <SearchResultItem user={user} showSkills={false} />
-            </>
-          );
-        })}
-      </RecommendationsLayout>
+      {status == "success" && (
+        <RecommendationsLayout>
+          {recommendation.users[0].map((user, index) => {
+            return (
+              <>
+                <SearchResultItem user={user} showSkills={false} />
+              </>
+            );
+          })}
+        </RecommendationsLayout>
+      )}
+      {status == "loading" && (
+        <RecommendationsLayout>
+          <Skeleton width={"100%"} height={165}></Skeleton>
+          <Skeleton width={"100%"} height={165}></Skeleton>
+          <Skeleton width={"100%"} height={165}></Skeleton>
+        </RecommendationsLayout>
+      )}
     </>
   );
 };

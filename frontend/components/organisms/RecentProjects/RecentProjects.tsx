@@ -8,6 +8,7 @@ import { Button } from "../../atoms/Button/Button";
 import Link from "next/link";
 import { ProjectItem } from "../../molecules/ProjectItem/ProjectItem";
 import SvgEye from "../../atoms/svg/SvgEye";
+import Skeleton from "react-loading-skeleton";
 
 type Props = {};
 
@@ -24,6 +25,11 @@ const HeaderLayout = styled("div", {
   alignItems: "center",
   justifyContent: "space-between",
   width: "100%",
+
+  "@laptopAndDown": {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
 });
 
 const ListTitle = styled("h2", {
@@ -35,6 +41,10 @@ const ListItems = styled("div", {
   gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
   width: "100%",
   gap: "$8x",
+
+  "@tabletAndDown": {
+    gap: "$4x",
+  },
 });
 
 const StyledLink = styled("a", {
@@ -48,14 +58,6 @@ export const RecentProjects: React.FC<Props> = ({}) => {
   const { data: projects, status } = useQuery(["project"], () => {
     return getProjects();
   });
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "error") {
-    return <div>Error</div>;
-  }
   
   return (
     <>
@@ -67,13 +69,24 @@ export const RecentProjects: React.FC<Props> = ({}) => {
         }}>View all</Button>
       </HeaderLayout>
       <ListItems>
-        {projects.slice(0, 4).map((item) => (
+        {status == "success" && projects.slice(0, 4).map((item) => (
           <Link key={item.id} href={`/project/${item.id}`} passHref>
             <StyledLink>
               <ProjectItem title={item.name} subtitle={item.description} />
             </StyledLink>
           </Link>
         ))}
+        {status == "loading" && (
+          <>
+            <Skeleton width="100%" height={100}></Skeleton>
+            <Skeleton width="100%" height={100}></Skeleton>
+            <Skeleton width="100%" height={100}></Skeleton>
+            <Skeleton width="100%" height={100}></Skeleton>
+            <Skeleton width="100%" height={100}></Skeleton>
+            <Skeleton width="100%" height={100}></Skeleton>
+          </>
+        )}
+        {status == "error" && <div>Error</div>}
       </ListItems>
     </ListLayout>
     </>
