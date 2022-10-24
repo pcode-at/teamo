@@ -16,7 +16,7 @@ import { SkillResponse } from "src/entities/skill.entity";
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   @ApiOperation({ summary: "Create user" })
@@ -88,5 +88,20 @@ export class UserController {
   @ApiResponse({ status: 200, type: UserResponse })
   async getUserByIdentifier(@Param("identifier") identifier: string) {
     return await this.userService.getUserByIdentifier(identifier);
+  }
+
+  @Post("changeWorkHours")
+  @ApiOperation({ summary: "Change work hours" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async changeWorkHours(@Body() workHourChanges: any, @Req() request: Request) {
+    const jwt = request.headers.authorization.split(" ")[1];
+    return await this.userService.changeWorkHours(workHourChanges, jwt);
+  }
+
+  @Get("workHours/:identifier")
+  @ApiOperation({ summary: "Get work hours" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getWorkHours(@Param("identifier") identifier: string) {
+    return await this.userService.getWorkHours(identifier);
   }
 }

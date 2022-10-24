@@ -24,6 +24,7 @@ export class UserEntity {
   projectsIds: string[];
   score?: number;
   skills?: SkillEntity | SkillEntity[] | any;
+  workHourChanges?: any[];
 
   @Exclude()
   password: string;

@@ -55,6 +55,13 @@ model users {
   bookmarkedInIds   String[]            @map("projectsWhereBookMarkedIds") @db.ObjectId
   projects          projects[]          @relation(name: "projectMembers", fields: [projectsIds], references: [id])
   projectsIds       String[]            @db.ObjectId
+  defaultWorkHours  Int
+  workHourChanges   workHourChanges[]
+}
+
+type workHourChanges {
+  date  DateTime @db.Date
+  hours Float
 }
 
 model projects {

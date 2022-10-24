@@ -16,6 +16,7 @@ import { LocationEntity, LocationResponse } from "src/entities/location.entity";
 import { ElasticService } from "src/elastic/elastic.service";
 import { SkillEntity, SkillResponse } from "src/entities/skill.entity";
 import { AuthorizationEntity } from "src/auth/entities/authorization.entity";
+import { SearchDto } from "./dto/search.dto";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require("bcrypt");
 
@@ -28,7 +29,7 @@ export class UserService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
     private readonly elastic: ElasticService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password;
@@ -43,6 +44,8 @@ export class UserService {
           accessTokens: [],
           refreshTokens: [],
         },
+        defaultWorkHours: 38.5,
+        workHourChanges: [],
       },
     });
     return new UserResponse({ statusCode: 201, message: "User created successfully", data: new UserEntity(user) });
@@ -231,6 +234,47 @@ export class UserService {
       return new LocationResponse({ statusCode: 200, message: "Locations found successfully", data: locations.map(location => new LocationEntity(location)) });
     } catch {
       throw new BadRequestException("Something went wrong while getting the locations");
+    }
+  }
+
+  async changeWorkHours(changeWorkHours, jwt: string): Promise<UserResponse> {
+    const decoded = await this.jwtService.decode(jwt);
+    //@ts-ignore
+    const identifier = decoded.identifier;
+    try {
+      const user = await prisma.users.update({
+        where: {
+          identifier: identifier,
+        },
+        data: {
+          workHourChanges: changeWorkHours.workHours,
+        },
+      });
+      return new UserResponse({ statusCode: 200, message: "Work hours changed successfully", data: new UserEntity(user) });
+    } catch {
+      throw new BadRequestException("Something went wrong while changing the work hours");
+    }
+  }
+
+  async getWorkHours(identifier: string) {
+    try {
+      const user = await prisma.users.findUnique({
+        where: {
+          identifier,
+        },
+      });
+      // map through user.workHourChanges and accumulate the hours with default being users.defaultWorkHours
+      user.workHourChanges.map(change => {
+        change.hours += user.defaultWorkHours;
+      });
+
+      return new UserResponse({
+        statusCode: 200,
+        message: "Work hours found successfully",
+        data: user.workHourChanges,
+      });
+    } catch {
+      throw new BadRequestException("Something went wrong while returning the work hours");
     }
   }
 }
