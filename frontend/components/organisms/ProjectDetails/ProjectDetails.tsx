@@ -37,11 +37,15 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
   const router = useRouter();
   const projectId = router.query.projectId as string;
 
-  const { data: project, status } = useQuery(["project", projectId], () => {
-    return getProject(projectId);
-  }, {
-    enabled: !!projectId,
-  });
+  const { data: project, status } = useQuery(
+    ["project", projectId],
+    () => {
+      return getProject(projectId);
+    },
+    {
+      enabled: !!projectId,
+    }
+  );
   const { data: recommendation, status: recommendationStatus } = useQuery(
     ["recommend", projectId],
     () => {
@@ -55,7 +59,6 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
   if (status === "error" || recommendationStatus === "error") {
     return <div>Error</div>;
   }
-
 
   return (
     <>
@@ -73,49 +76,65 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
       )}
       {status == "loading" && <Skeleton width={280} height={70}></Skeleton>}
       <Spacer size="7x" axis="vertical"></Spacer>
-      <Separator width={"big"} alignment={"left"}></Separator>
-      <Spacer size="7x" axis="vertical"></Spacer>
-      <SubHeading>Skills</SubHeading>
-      <Spacer size="1x" axis="vertical"></Spacer>
-      {status == "success" && (
-        <ProfilePageSkillsLayout>
-          {project.skills.map((skill) => (
-            <Skill key={skill.id}>{skill.name}</Skill>
-          ))}
-        </ProfilePageSkillsLayout>
+      {status == "success" && project.skills.length > 0 && (
+        <>
+          <Separator width={"big"} alignment={"left"}></Separator>
+          <Spacer size="7x" axis="vertical"></Spacer>
+          <SubHeading>Skills</SubHeading>
+          <Spacer size="1x" axis="vertical"></Spacer>
+          <ProfilePageSkillsLayout>
+            {project.skills.map((skill) => (
+              <Skill key={skill.id}>{skill.name}</Skill>
+            ))}
+          </ProfilePageSkillsLayout>
+        </>
       )}
       {status == "loading" && (
-        <ProfilePageSkillsLayout>
-          <Skeleton width={150} height={50}></Skeleton>
-          <Skeleton width={150} height={50}></Skeleton>
-          <Skeleton width={150} height={50}></Skeleton>
-          <Skeleton width={150} height={50}></Skeleton>
-          <Skeleton width={150} height={50}></Skeleton>
-          <Skeleton width={150} height={50}></Skeleton>
-        </ProfilePageSkillsLayout>
+        <>
+          <Separator width={"big"} alignment={"left"}></Separator>
+          <Spacer size="7x" axis="vertical"></Spacer>
+          <ProfilePageSkillsLayout>
+            <SubHeading>Skills</SubHeading>
+            <Spacer size="1x" axis="vertical"></Spacer>
+            <Skeleton width={150} height={50}></Skeleton>
+            <Skeleton width={150} height={50}></Skeleton>
+            <Skeleton width={150} height={50}></Skeleton>
+            <Skeleton width={150} height={50}></Skeleton>
+            <Skeleton width={150} height={50}></Skeleton>
+            <Skeleton width={150} height={50}></Skeleton>
+          </ProfilePageSkillsLayout>
+        </>
       )}
       <Spacer size="7x" axis="vertical"></Spacer>
-      <Separator width={"big"} alignment={"left"}></Separator>
-      <Spacer size="7x" axis="vertical"></Spacer>
-      <SubHeading>Recommendations</SubHeading>
-      <Spacer size="1x" axis="vertical"></Spacer>
-      {recommendationStatus == "success" && (
-        <RecommendationsLayout>
-          {recommendation.users[0]?.map((user, index) => {
-            return (
-              <>
-                <SearchResultItem user={user} showSkills={false} />
-              </>
-            );
-          })}
-        </RecommendationsLayout>
+      {recommendationStatus == "success" && recommendation.users.length > 0 && (
+        <>
+          <Separator width={"big"} alignment={"left"}></Separator>
+          <Spacer size="7x" axis="vertical"></Spacer>
+          <SubHeading>Recommendations</SubHeading>
+          <Spacer size="1x" axis="vertical"></Spacer>
+          <RecommendationsLayout>
+            {recommendation.users[0]?.map((user, index) => {
+              return (
+                <>
+                  <SearchResultItem user={user} showSkills={false} />
+                </>
+              );
+            })}
+          </RecommendationsLayout>
+        </>
       )}
       {recommendationStatus == "loading" && (
-        <RecommendationsLayout>
-          <Skeleton width={"100%"} height={165}></Skeleton>
-          <Skeleton width={"100%"} height={165}></Skeleton>
-          <Skeleton width={"100%"} height={165}></Skeleton>
-        </RecommendationsLayout>
+        <>
+          <Separator width={"big"} alignment={"left"}></Separator>
+          <Spacer size="7x" axis="vertical"></Spacer>
+          <SubHeading>Recommendations</SubHeading>
+          <Spacer size="1x" axis="vertical"></Spacer>
+          <RecommendationsLayout>
+            <Skeleton width={"100%"} height={165}></Skeleton>
+            <Skeleton width={"100%"} height={165}></Skeleton>
+            <Skeleton width={"100%"} height={165}></Skeleton>
+          </RecommendationsLayout>
+        </>
       )}
     </>
   );

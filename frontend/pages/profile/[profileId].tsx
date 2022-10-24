@@ -5,11 +5,22 @@ import { ProfilePageSkills } from "../../components/organisms/ProfilePageSkills/
 import { Spacer } from "../../components/atoms/Spacer/Spacer";
 import { useRouter } from "next/router";
 import { ContentLayout } from "../project/[projectId]";
+import { ProfilePageHours } from "../../components/organisms/ProfilePageHours/ProfilePageHours";
 
 const ProfileLayout = styled("div", {
   display: "flex",
   flexDirection: "column",
   gap: "$3x",
+});
+
+const SkillsHoursLayout = styled("div", {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: "$3x",
+
+  "@laptopAndDown": {
+    gridTemplateColumns: "1fr",
+  },
 });
 
 export default function Profile() {
@@ -26,7 +37,10 @@ export default function Profile() {
           <ProfilePageInfoSection
             profileId={profileId}
           ></ProfilePageInfoSection>
-          <ProfilePageSkills profileId={profileId}></ProfilePageSkills>
+          <SkillsHoursLayout>
+            <ProfilePageSkills profileId={profileId}></ProfilePageSkills>
+            <ProfilePageHours profileId={profileId}></ProfilePageHours>
+          </SkillsHoursLayout>
         </ProfileLayout>
       </ContentLayout>
       <Spacer size="9x" axis="vertical"></Spacer>
