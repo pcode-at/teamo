@@ -1,7 +1,7 @@
 import { Navbar } from "../../../components/organisms/Navbar/Navbar";
 import { ContentLayout } from "./.";
 import { ProjectForm } from "../../../components/organisms/ProjectForm/ProjectForm";
-import { createProject, getProject, updateProject } from "../../../utils/requests/project";
+import { getProject, updateProject } from "../../../utils/requests/project";
 import { useRouter } from "next/router";
 import { useQuery } from "react-query";
 
@@ -21,8 +21,6 @@ export default function Home() {
   if (status === "error") {
     return <div>Error</div>;
   }
-
-  console.log(project);
 
   return (
     <>

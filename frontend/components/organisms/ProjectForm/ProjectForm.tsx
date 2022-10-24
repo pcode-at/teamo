@@ -154,7 +154,7 @@ export const ProjectForm: React.FC<Props> = ({
               description: inputs.description,
               skills: inputs.skills.map((skill) => skill.id),
             });
-            router.push("/project");
+            // router.push("/project");
           }}
           size="small"
           disabled={!inputs.name}

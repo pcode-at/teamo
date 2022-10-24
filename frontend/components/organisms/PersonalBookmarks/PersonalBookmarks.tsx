@@ -4,7 +4,7 @@ import { H2BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
 import { styled } from "../../../stitches.config";
 import Link from "next/link";
 import { SimpleUser } from "../../molecules/SimpleUser/SimpleUser";
-import { getAllUsers } from "../../../utils/requests/user";
+import { getAllUsers, getBookmarks } from "../../../utils/requests/user";
 import Skeleton from "react-loading-skeleton";
 
 type Props = {};
@@ -38,7 +38,7 @@ const StyledLink = styled("a", {
 
 export const PersonalBookmarks: React.FC<Props> = ({}) => {
   const { data: users, status } = useQuery(["bookmarks"], () => {
-    return getAllUsers();
+    return getBookmarks();
   });
 
   return (

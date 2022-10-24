@@ -39,11 +39,16 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
 
   const { data: project, status } = useQuery(["project", projectId], () => {
     return getProject(projectId);
+  }, {
+    enabled: !!projectId,
   });
   const { data: recommendation, status: recommendationStatus } = useQuery(
     ["recommend", projectId],
     () => {
       return getRecommendation(projectId);
+    },
+    {
+      enabled: !!projectId,
     }
   );
 
@@ -51,7 +56,6 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
     return <div>Error</div>;
   }
 
-  console.log(recommendation);
 
   return (
     <>
@@ -95,9 +99,9 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
       <Spacer size="7x" axis="vertical"></Spacer>
       <SubHeading>Recommendations</SubHeading>
       <Spacer size="1x" axis="vertical"></Spacer>
-      {status == "success" && (
+      {recommendationStatus == "success" && (
         <RecommendationsLayout>
-          {recommendation.users[0].map((user, index) => {
+          {recommendation.users[0]?.map((user, index) => {
             return (
               <>
                 <SearchResultItem user={user} showSkills={false} />
@@ -106,7 +110,7 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
           })}
         </RecommendationsLayout>
       )}
-      {status == "loading" && (
+      {recommendationStatus == "loading" && (
         <RecommendationsLayout>
           <Skeleton width={"100%"} height={165}></Skeleton>
           <Skeleton width={"100%"} height={165}></Skeleton>

@@ -11,3 +11,7 @@ export async function getLocations(){
 export async function getAllUsers() {
   return fetchData("user/all", "GET", 200);
 }
+
+export async function getBookmarks(){
+  return fetchData("user/bookmarks", "GET", 200);
+}

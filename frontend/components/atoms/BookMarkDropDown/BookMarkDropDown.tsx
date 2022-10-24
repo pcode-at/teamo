@@ -137,7 +137,6 @@ const BookMarkDropDownPureComponent: React.FC<Props> = ({ userId }) => {
     }
   }, [bookmarks, bookmarksStatus, projectsStatus]);
 
-  console.log(isOpen);
   if (bookmarksStatus === "loading" || projectsStatus === "loading" || !isOpen) {
     return (
       <>
@@ -171,31 +170,7 @@ const BookMarkDropDownPureComponent: React.FC<Props> = ({ userId }) => {
               <SvgBookmark></SvgBookmark>
             </IconButton>
           </DropdownMenuTrigger>
-
           <DropdownMenuContent sideOffset={5}>
-            <StyledCheckboxItem key={"self"}>
-              <CheckBoxInput
-                type="checkbox"
-                id={"self"}
-                name={"self"}
-                value={"self"}
-                checked={checkedItems.includes("self")}
-                onChange={(e) => {
-                  let newItems = [...checkedItems];
-                  if (e.target.checked) {
-                    newItems.push("self");
-                  } else {
-                    newItems = checkedItems.filter((i) => i !== "self");
-                  }
-                  setCheckedItems(newItems);
-                  updateBookmarks(userId, newItems);
-                }}
-              />
-              <CheckBoxLabel htmlFor={"self"}>
-                {"  "}
-                {"Own list"}
-              </CheckBoxLabel>
-            </StyledCheckboxItem>
             {projects.map((project) => (
               <StyledCheckboxItem key={project.id}>
                 <CheckBoxInput
