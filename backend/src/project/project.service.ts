@@ -247,8 +247,6 @@ export class ProjectService {
     });
 
     if (skillGroupIds.every(id => skillIds.includes(id))) {
-      console.log("stayed the same");
-
       return {
         statusCode: 200,
         message: "Successfully computed skill groups",

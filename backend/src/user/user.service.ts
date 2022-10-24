@@ -16,6 +16,7 @@ import { LocationEntity, LocationResponse } from "src/entities/location.entity";
 import { ElasticService } from "src/elastic/elastic.service";
 import { SkillEntity, SkillResponse } from "src/entities/skill.entity";
 import { AuthorizationEntity } from "src/auth/entities/authorization.entity";
+import { ProjectEntity } from "src/entities/project.entity";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require("bcrypt");
 
@@ -87,6 +88,42 @@ export class UserService {
   async recommend(projectId: string, stage: number, numberOfRecommendations: number): Promise<UserAndSkills[]> {
     const recommendedUsers = recommendUsers(projectId, stage, numberOfRecommendations);
     return null;
+  }
+
+  async getBookmarks(jwt): Promise<UserResponse> {
+    const decoded = await this.jwtService.decode(jwt);
+    //@ts-ignore
+    const identifier = decoded.identifier;
+    console.log(identifier);
+
+
+    const projects = await prisma.projects.findMany({
+      where: {
+        creator: {
+          identifier,
+        },
+      },
+      include: {
+        bookmarks: true,
+      }
+    })
+
+    const users = [];
+
+    for (const project of projects) {
+      for (const bookmark of project.bookmarks) {
+        users.push(bookmark);
+      }
+    }
+
+
+    if (projects) {
+      return new UserResponse({
+        statusCode: 200, message: "Bookmarks found successfully", data: users.map(user => new UserEntity(user))
+      });
+    }
+    return new UserResponse({ statusCode: 404, message: "Bookmarks not found" });
+
   }
 
   async findOneDetailed(jwt: string): Promise<UserResponse> {

@@ -32,6 +32,14 @@ export class UserController {
     return await this.userService.findAll();
   }
 
+  @Get('/bookmarks')
+  @ApiOperation({ summary: "Get all bookmarks" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getBookmarks(@Req() request: Request) {
+    const jwt = request.headers.authorization.split(" ")[1];
+    return await this.userService.getBookmarks(jwt);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: "Search for users" })
