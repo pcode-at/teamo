@@ -74,6 +74,7 @@ const Name = styled("a", {
   fontWeight: "bold",
   color: "$brand-500",
   cursor: "pointer",
+  textDecoration: "none",
 });
 
 const SeparatorLayout = styled("div", {
@@ -97,7 +98,7 @@ export const SearchResultItem: React.FC<Props> = ({
     <>
       <SearchResultItemLayout>
         <SearchResultItemInfoLayout>
-          <Link href={`/profile/${user.identifier}`}>
+          <Link href={`/profile/${user.identifier}`} passHref>
             <Name>{user.name}</Name>
           </Link>
           <InformationLayout>

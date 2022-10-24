@@ -67,9 +67,6 @@ export class ElasticService {
         skills: skills,
       },
     });
-
-    // console.log(result);
-
     return result;
   }
 
@@ -279,8 +276,10 @@ export class ElasticService {
             }),
           );
         } else if (
-          requiredSkillIds.includes(currentSkill.skill.id) &&
-          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 ||
+          requiredSkillIds.includes(currentSkill.skill.id) && //check for -+ 2 or -+ 1
+          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 1 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 1 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 ||
             requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 2)
         ) {
           userSkills.push(
@@ -297,6 +296,11 @@ export class ElasticService {
             }),
           );
         }
+      });
+
+      //sort by opacity
+      userSkills = userSkills.sort((a, b) => {
+        return b.opacity - a.opacity;
       });
 
       mappedUsers.push(new UserEntity({ ...userData, skills: userSkills, score: user.score }));
@@ -485,9 +489,6 @@ export class ElasticService {
         },
       });
     });
-
-    console.log(JSON.stringify(searchQuery, null, 4));
-
     let modified: boolean = false;
 
     let result = await client.search(searchQuery);
@@ -497,8 +498,6 @@ export class ElasticService {
       maxScore: result.hits.max_score,
       users: [],
     };
-
-    // console.log(result.hits.hits.length);
 
     result.hits.hits.forEach(hit => {
       resultDTO.users.push({

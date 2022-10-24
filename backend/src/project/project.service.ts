@@ -109,7 +109,7 @@ export class ProjectService {
     const { skills, ...rest } = updateProjectDto;
 
     try {
-      project = prisma.projects.update({
+      project = await prisma.projects.update({
         where: { id },
         data: {
           ...rest,
@@ -150,15 +150,15 @@ export class ProjectService {
           },
         });
       });
-
+      
+      return {
+        statusCode: 200,
+        message: "Successfully updated project",
+        data: new ProjectEntity(project),
+      };
     } catch {
       throw new BadRequestException("Something went wrong trying to update the project");
     }
-    return {
-      statusCode: 200,
-      message: "Successfully updated project",
-      data: new ProjectEntity(project),
-    };
   }
 
   async remove(id: string) {
@@ -247,8 +247,6 @@ export class ProjectService {
     });
 
     if (skillGroupIds.every(id => skillIds.includes(id))) {
-      console.log("stayed the same");
-
       return {
         statusCode: 200,
         message: "Successfully computed skill groups",
@@ -330,7 +328,11 @@ export class ProjectService {
         });
       }
     });
-    return null;
+    return {
+      statusCode: 200,
+      message: "Successfully updated bookmarks",
+      data: null,
+    };
   }
 
   async getBookmarks(identifier, request): Promise<any> {

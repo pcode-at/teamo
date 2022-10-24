@@ -19,9 +19,9 @@ export class UserEntity {
   name: string;
   photo: string;
   roles: string[];
-  projectIds: string[];
+  projectIds?: string[];
   bookmarkedInIds: string[];
-  projectsIds: string[];
+  projectsIds?: string[];
   score?: number;
   skills?: SkillEntity | SkillEntity[] | any;
   workHourChanges?: any[];
