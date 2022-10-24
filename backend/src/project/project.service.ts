@@ -109,7 +109,7 @@ export class ProjectService {
     const { skills, ...rest } = updateProjectDto;
 
     try {
-      project = prisma.projects.update({
+      project = await prisma.projects.update({
         where: { id },
         data: {
           ...rest,
@@ -150,15 +150,15 @@ export class ProjectService {
           },
         });
       });
-
+      
+      return {
+        statusCode: 200,
+        message: "Successfully updated project",
+        data: new ProjectEntity(project),
+      };
     } catch {
       throw new BadRequestException("Something went wrong trying to update the project");
     }
-    return {
-      statusCode: 200,
-      message: "Successfully updated project",
-      data: new ProjectEntity(project),
-    };
   }
 
   async remove(id: string) {

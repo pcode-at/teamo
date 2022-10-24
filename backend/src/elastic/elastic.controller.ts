@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 @Controller("api/elastic")
 @UseInterceptors(ClassSerializerInterceptor)
 export class ElasticController {
-  constructor(private readonly elastic: ElasticService) {}
+  constructor(private readonly elastic: ElasticService) { }
 
   @Post("insertUser/:id")
   async insertUser(@Param("id") identifier: string) {
@@ -44,7 +44,7 @@ export class ElasticController {
   async recommendation(@Param("id") id: string, @Param("accurate") accurate: boolean): Promise<RecommendResponse> {
     const projectData = await prisma.projects.findFirst({
       where: {
-        id: id,
+        id,
       },
       select: {
         skills: true,

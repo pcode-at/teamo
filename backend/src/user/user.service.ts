@@ -94,9 +94,6 @@ export class UserService {
     const decoded = await this.jwtService.decode(jwt);
     //@ts-ignore
     const identifier = decoded.identifier;
-    console.log(identifier);
-
-
     const projects = await prisma.projects.findMany({
       where: {
         creator: {
