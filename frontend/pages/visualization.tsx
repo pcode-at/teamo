@@ -96,7 +96,7 @@ const events = {
 };
 
 export async function getGroups() {
-  return fetchData("project/skill/groupings/62c7fbb4aba3578343a8f9a0", "GET");
+  return fetchData("project/skill/groupings/62c7fbb4aba3578343a8f9a0", "GET", 200);
 }
 
 export default function Visualization() {
