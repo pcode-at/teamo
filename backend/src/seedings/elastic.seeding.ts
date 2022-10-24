@@ -14,6 +14,7 @@ async function seedElastic() {
     await fetch(`http://localhost:3000/api/elastic/insertUser/${user.identifier}`, {
       method: "POST",
     });
+    setTimeout(() => {}, 10);
   });
 }
 

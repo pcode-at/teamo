@@ -46,7 +46,7 @@ const client = new ElasticsearchService({
 
 @Injectable()
 export class ElasticService {
-  constructor() { }
+  constructor() {}
 
   async migrateUser(user: users & { skills: (userSkills & { skill: skills })[] }) {
     const skills: SkillElastic[] = [];
@@ -381,13 +381,19 @@ export class ElasticService {
 
     if (attributes.includes("location")) {
       let searchLocations = [];
-      let locations = search.parameters.find(search => search.attribute === "location").value;
+      let locations = search.parameters.filter(search => search.attribute === "location").map(search => search.value);
 
-      if (locations instanceof Array) {
-        searchLocations = locations.map(location => location.toLowerCase());
-      } else {
-        searchLocations.push(locations.toLowerCase());
-      }
+      locations
+        .map(location => {
+          if (location instanceof Array) {
+            return location.map(loc => loc.toLowerCase());
+          } else {
+            return location.toLowerCase();
+          }
+        })
+        .forEach(location => {
+          searchLocations.push(location);
+        });
 
       searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {

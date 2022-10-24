@@ -61,6 +61,7 @@ function seedElastic() {
                                     })];
                                 case 1:
                                     _a.sent();
+                                    setTimeout(function () { }, 10);
                                     return [2 /*return*/];
                             }
                         });
