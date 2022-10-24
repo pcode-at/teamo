@@ -328,7 +328,11 @@ export class ProjectService {
         });
       }
     });
-    return null;
+    return {
+      statusCode: 200,
+      message: "Successfully updated bookmarks",
+      data: null,
+    };
   }
 
   async getBookmarks(identifier, request): Promise<any> {
