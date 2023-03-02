@@ -28,7 +28,7 @@ export class UserResponse implements HttpResponse {
     ],
     description: "Users",
   })
-  data?: UserEntity | UserEntity[];
+  data?: UserEntity | UserEntity[] | any;
 
   constructor(partial: Partial<UserResponse>) {
     Object.assign(this, partial);

@@ -1,8 +1,13 @@
 import { getAccessToken } from "../authHelper";
 
-export async function fetchData(url: string, method: string, statusCode: number, body?: any) {
+export async function fetchData(
+  url: string,
+  method: string,
+  statusCode: number,
+  body?: any
+) {
   const accessToken = await getAccessToken();
-
+  console.log(body);
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/${url}`,
     {
@@ -20,7 +25,7 @@ export async function fetchData(url: string, method: string, statusCode: number,
   }
 
   const responseBody = await response.json();
-
+  
   return responseBody.data;
 }
 

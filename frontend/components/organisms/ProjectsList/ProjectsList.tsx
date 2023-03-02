@@ -9,6 +9,7 @@ import { useQuery } from "react-query";
 import SvgPlus from "../../atoms/svg/SvgPlus";
 import { H1BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
 import { useRouter } from "next/router";
+import Skeleton from "react-loading-skeleton";
 
 type Props = {};
 
@@ -26,6 +27,11 @@ const HeaderLayout = styled("div", {
   alignItems: "center",
   justifyContent: "space-between",
   width: "100%",
+
+  "@laptopAndDown": {
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
 });
 
 const ListTitle = styled("h1", {
@@ -37,6 +43,10 @@ const ListItems = styled("div", {
   gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
   width: "100%",
   gap: "$8x",
+
+  "@tabletAndDown": {
+    gap: "$4x",
+  },
 });
 
 const StyledLink = styled("a", {
@@ -46,33 +56,51 @@ const StyledLink = styled("a", {
 
 export const ProjectsList: React.FC<Props> = ({}) => {
   const router = useRouter();
-  const { data: projects, status } = useQuery(["projects"], getProjects);
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "error") {
-    return <div>Error</div>;
-  }
+  const { data: projects, status } = useQuery(["projects"], getProjects, {
+    refetchInterval: 5000,
+  });
 
   return (
     <>
       <ListLayout>
         <HeaderLayout>
           <ListTitle>All Projects</ListTitle>
-          <Button leftIcon={SvgPlus} size={"small"} onClick={() => {
-            router.push("/project/create");
-          }}>Create project</Button>
+          <Button
+            leftIcon={SvgPlus}
+            size={"small"}
+            onClick={() => {
+              router.push("/project/create");
+            }}
+          >
+            Create project
+          </Button>
         </HeaderLayout>
         <ListItems>
-          {projects.map((item) => (
-            <Link key={item.id} href={`/project/${item.id}`} passHref>
-              <StyledLink>
-                <ProjectItem title={item.name} subtitle={item.description} />
-              </StyledLink>
-            </Link>
-          ))}
+          {status == "success" &&
+            projects.map((item) => (
+              <Link key={item.id} href={`/project/${item.id}`} passHref>
+                <StyledLink>
+                  <ProjectItem title={item.name} subtitle={item.description} />
+                </StyledLink>
+              </Link>
+            ))}
+          {status == "loading" && (
+            <>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+              <Skeleton width="100%" height={120}></Skeleton>
+            </>
+          )}
+          {status == "error" && <div>Error</div>}
         </ListItems>
       </ListLayout>
     </>

@@ -6,10 +6,9 @@ import { AddSkillDTO } from "./dto/add-skill.dto";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaClient } from "@prisma/client";
+import { PrismaClientValidationError } from "@prisma/client/runtime";
 import { UpdateProjectDto } from "./dto/update-project.dto";
-import { UserService } from "src/user/user.service";
 import { getSkillGroupingsForProject } from "src/algorithms/grouping.algorithm";
-import { use } from "passport";
 
 const prisma = new PrismaClient();
 
@@ -19,14 +18,12 @@ export class ProjectService {
 
   async create(createProject: CreateProjectDto, request): Promise<ProjectResponse> {
     let project;
-    //get bearer authorization from request
     let bearer = request.headers.authorization.split(" ")[1];
     const decoded = await this.jwtService.decode(bearer);
     //@ts-ignore
     const identifier = decoded.identifier;
 
     const user = await prisma.users.findUnique({ where: { identifier } });
-
     const { skills, ...rest } = createProject;
 
     try {
@@ -112,7 +109,7 @@ export class ProjectService {
     const { skills, ...rest } = updateProjectDto;
 
     try {
-      project = prisma.projects.update({
+      project = await prisma.projects.update({
         where: { id },
         data: {
           ...rest,
@@ -153,15 +150,15 @@ export class ProjectService {
           },
         });
       });
-
+      
+      return {
+        statusCode: 200,
+        message: "Successfully updated project",
+        data: new ProjectEntity(project),
+      };
     } catch {
       throw new BadRequestException("Something went wrong trying to update the project");
     }
-    return {
-      statusCode: 200,
-      message: "Successfully updated project",
-      data: new ProjectEntity(project),
-    };
   }
 
   async remove(id: string) {
@@ -250,8 +247,6 @@ export class ProjectService {
     });
 
     if (skillGroupIds.every(id => skillIds.includes(id))) {
-      console.log("stayed the same");
-
       return {
         statusCode: 200,
         message: "Successfully computed skill groups",
@@ -299,4 +294,74 @@ export class ProjectService {
       data: new SkillGroupEntity(nodes, edges),
     };
   }
+
+  async bookmark(userIdentifier, bookmarks, request): Promise<ProjectResponse> {
+
+    let bearer = request.headers.authorization.split(" ")[1];
+    const decoded = await this.jwtService.decode(bearer);
+    //@ts-ignore
+    const identifier = decoded.identifier;
+
+    const userId = await (await prisma.users.findUnique({ where: { identifier: userIdentifier }, select: { id: true } })).id;
+
+    const projects = await prisma.projects.findMany();
+
+    projects.forEach(async (project) => {
+      if (project.bookmarkIds.includes(userId) && !bookmarks.includes(project.id)) {
+        await prisma.projects.update({
+          where: { id: project.id },
+          data: {
+            bookmarkIds: {
+              set: project.bookmarkIds.filter(id => id != userId)
+            },
+          },
+        });
+      }
+      if (!project.bookmarkIds.includes(userId) && bookmarks.includes(project.id)) {
+        await prisma.projects.update({
+          where: { id: project.id },
+          data: {
+            bookmarkIds: {
+              push: userId
+            },
+          },
+        });
+      }
+    });
+    return {
+      statusCode: 200,
+      message: "Successfully updated bookmarks",
+      data: null,
+    };
+  }
+
+  async getBookmarks(identifier, request): Promise<any> {
+
+    // let bearer = request.headers.authorization.split(" ")[1];
+    // const decoded = await this.jwtService.decode(bearer);
+    // //@ts-ignore
+    // const identifier = decoded.identifier;
+
+    const userId = await (await prisma.users.findUnique({ where: { identifier }, select: { id: true } })).id;
+
+    const projects = await prisma.projects.findMany();
+
+    let bookmarks = [];
+
+    projects.forEach((project) => {
+      if (project.bookmarkIds.includes(userId)) {
+        bookmarks.push({
+          projectId: project.id,
+          projectName: project.name,
+        });
+      }
+    });
+
+    return {
+      statusCode: 200,
+      message: "Successfully fetched bookmarks",
+      data: bookmarks,
+    };
+  }
 }
+

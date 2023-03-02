@@ -18,6 +18,10 @@ const LinkLayout = styled("a", {
     overflow: "hidden",
 
     backgroundColor: "$neutral-200",
+
+    "@tabletAndDown": {
+      flexDirection: "column",
+    },
 });
 
 const LinkTextLayout = styled("span", {
@@ -45,6 +49,10 @@ const LinkButtonLayout = styled("div", {
 
     backgroundColor: "$brand-400",
     color: "$neutral-100",
+
+    "@tabletAndDown": {
+      width: "100%",
+    },
 });
 
 

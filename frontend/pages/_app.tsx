@@ -4,6 +4,8 @@ import ProtectedRoute from "../components/atoms/ProtectedRoute";
 import { globalCss } from "../stitches.config";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+import "../utils/skeleton.css";
+import { SkeletonTheme } from "react-loading-skeleton";
 
 const globalStyles = globalCss({
   "*": {
@@ -27,10 +29,16 @@ function App({ Component, pageProps }: AppProps) {
 
   return (
     <ProtectedRoute router={router}>
-      <QueryClientProvider client={queryClient}>
-        <Component {...pageProps} router={router} />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
+      <SkeletonTheme
+        baseColor="var(--colors-brand-100)"
+        highlightColor="var(--colors-brand-200)"
+        duration={1.3}
+      >
+        <QueryClientProvider client={queryClient}>
+          <Component {...pageProps} router={router} />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </SkeletonTheme>
     </ProtectedRoute>
   );
 }

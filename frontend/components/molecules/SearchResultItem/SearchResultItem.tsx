@@ -1,41 +1,44 @@
-import React, { useEffect } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import React from "react";
 import { styled } from "../../../stitches.config";
-import { InputField } from "../../atoms/InputField/InputField";
 import { Separator } from "../../atoms/Separator/Separator";
-import SvgBookmark from "../../atoms/svg/SvgBookmark";
 import SvgBriefcase from "../../atoms/svg/SvgBriefcase";
-import SvgCross from "../../atoms/svg/SvgCross";
 import SvgMapPin from "../../atoms/svg/SvgMapPin";
-import SvgMove2 from "../../atoms/svg/SvgMove2";
 import { IconInfoSection } from "../IconInfoSection/IconInfoSection";
 import { Skill } from "../Skill/Skill";
 
+const BookMarkDropDown = dynamic(
+  () => import("../../atoms/BookMarkDropDown/BookMarkDropDown")
+);
+
 export type User = {
   birthDate: Date;
-    departments: string[];
-    email: string;
-    gender: string;
-    identifier: string;
-    location: string;
-    phoneNumber: string;
-    name: string;
-    photo: string;
-    roles: string[];
-    projectIds: string[];
-    bookmarkedInIds: string[];
-    projectsIds: string[];
-    score?: number;
-    skills: {
-      rating: string;
-      opacity: number;
-      skill: {
-        name: string;
-      };
-    }[];
+  departments: string[];
+  email: string;
+  gender: string;
+  identifier: string;
+  location: string;
+  phoneNumber: string;
+  name: string;
+  photo: string;
+  roles: string[];
+  projectIds: string[];
+  bookmarkedInIds: string[];
+  projectsIds: string[];
+  score?: number;
+  skills: {
+    rating: string;
+    opacity: number;
+    skill: {
+      name: string;
+    };
+  }[];
 };
 
 type Props = {
   user: User;
+  showSkills?: boolean;
 };
 
 const SearchResultItemLayout = styled("div", {
@@ -66,10 +69,12 @@ const SearchResultItemInfoLayout = styled("div", {
   minWidth: "230px",
 });
 
-const Name = styled("span", {
+const Name = styled("a", {
   fontSize: "1.5rem",
   fontWeight: "bold",
   color: "$brand-500",
+  cursor: "pointer",
+  textDecoration: "none",
 });
 
 const SeparatorLayout = styled("div", {
@@ -85,37 +90,17 @@ const InformationLayout = styled("div", {
   gap: "$3x",
 });
 
-const IconButtonLayout = styled("div", {});
-
-const IconButton = styled("button", {
-  display: "flex",
-  width: "36px",
-  height: "36px",
-  padding: "$1x",
-  border: "none",
-  backgroundColor: "$neutral-100",
-  borderRadius: "100%",
-  color: "$brand-500",
-  transition: "all 0.2s",
-  cursor: "pointer",
-
-  "&:hover": {
-    backgroundColor: "$brand-100",
-  },
-});
-
-const IconLayout = styled("div", {
-  display: "flex",
-  width: "20px",
-  height: "20px",
-});
-
-export const SearchResultItem: React.FC<Props> = ({ user }) => {
+export const SearchResultItem: React.FC<Props> = ({
+  user,
+  showSkills = true,
+}) => {
   return (
     <>
       <SearchResultItemLayout>
         <SearchResultItemInfoLayout>
-          <Name>{user.name}</Name>
+          <Link href={`/profile/${user.identifier}`} passHref>
+            <Name>{user.name}</Name>
+          </Link>
           <InformationLayout>
             <IconInfoSection
               size="small"
@@ -128,13 +113,7 @@ export const SearchResultItem: React.FC<Props> = ({ user }) => {
               label={user.location}
             ></IconInfoSection>
           </InformationLayout>
-          <IconButtonLayout>
-            <IconButton>
-              <IconLayout>
-                <SvgBookmark></SvgBookmark>
-              </IconLayout>
-            </IconButton>
-          </IconButtonLayout>
+          <BookMarkDropDown userId={user.identifier}></BookMarkDropDown>
         </SearchResultItemInfoLayout>
         <SeparatorLayout>
           <Separator
@@ -143,13 +122,15 @@ export const SearchResultItem: React.FC<Props> = ({ user }) => {
             orientation="vertical"
           ></Separator>
         </SeparatorLayout>
-        <SearchResultItemSkillsLayout>
-          {user.skills.map((skill, index) => (
-            <Skill key={index} opacity={skill.opacity} rating={skill.rating}>
-              {skill.skill.name}
-            </Skill>
-          ))}
-        </SearchResultItemSkillsLayout>
+        {showSkills && (
+          <SearchResultItemSkillsLayout>
+            {user.skills.map((skill, index) => (
+              <Skill key={index} opacity={skill.opacity} rating={skill.rating}>
+                {skill.skill.name}
+              </Skill>
+            ))}
+          </SearchResultItemSkillsLayout>
+        )}
       </SearchResultItemLayout>
     </>
   );

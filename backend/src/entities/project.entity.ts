@@ -15,10 +15,9 @@ export class ProjectResponse implements HttpResponse {
     example: [
       {
         name: "Project Bluebird",
-        description: "Project Bluebird is a CIA project that researched interragtion methods.",
+        description: "Project Bluebird is a CIA project that researched interrogation methods.",
         creationDate: "1951-05-12",
         lastEdited: "1981-02-04",
-        status: "Discontinued",
       },
     ],
     description: "Projects",

@@ -1,7 +1,7 @@
 import { fetchData } from "./default";
 
-export async function getUser() {
-  return fetchData("user", "GET", 200);
+export async function getUser(profileId: string = "") {
+  return fetchData("user/" + profileId, "GET", 200);
 }
 
 export async function getLocations(){
@@ -10,4 +10,12 @@ export async function getLocations(){
 
 export async function getAllUsers() {
   return fetchData("user/all", "GET", 200);
+}
+
+export async function getBookmarks(){
+  return fetchData("user/bookmarks", "GET", 200);
+}
+
+export async function getWorkHours(profileId: string = ""){
+  return fetchData("user/workHours/" + profileId, "GET", 200);
 }

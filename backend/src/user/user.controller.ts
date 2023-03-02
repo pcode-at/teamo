@@ -16,7 +16,7 @@ import { SkillResponse } from "src/entities/skill.entity";
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   @ApiOperation({ summary: "Create user" })
@@ -32,6 +32,14 @@ export class UserController {
     return await this.userService.findAll();
   }
 
+  @Get('/bookmarks')
+  @ApiOperation({ summary: "Get all bookmarks" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getBookmarks(@Req() request: Request) {
+    const jwt = request.headers.authorization.split(" ")[1];
+    return await this.userService.getBookmarks(jwt);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: "Search for users" })
@@ -39,13 +47,6 @@ export class UserController {
   findOne(@Req() request: Request) {
     const jwt = request.headers.authorization.split(" ")[1];
     return this.userService.findOneDetailed(jwt);
-  }
-
-  @Get()
-  @ApiOperation({ summary: "Search for users" })
-  @ApiResponse({ status: 200, type: UserResponse })
-  async getUserByIdentifier(@Param("identifier") identifier: string) {
-    return await this.userService.getUserByIdentifier(identifier);
   }
 
   @Patch(":id")
@@ -88,5 +89,27 @@ export class UserController {
   @ApiResponse({ status: 200, type: LocationResponse })
   async getLocations(): Promise<LocationResponse> {
     return await this.userService.getLocations();
+  }
+
+  @Get(":identifier")
+  @ApiOperation({ summary: "Search for users" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getUserByIdentifier(@Param("identifier") identifier: string) {
+    return await this.userService.getUserByIdentifier(identifier);
+  }
+
+  @Post("changeWorkHours")
+  @ApiOperation({ summary: "Change work hours" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async changeWorkHours(@Body() workHourChanges: any, @Req() request: Request) {
+    const jwt = request.headers.authorization.split(" ")[1];
+    return await this.userService.changeWorkHours(workHourChanges, jwt);
+  }
+
+  @Get("workHours/:identifier")
+  @ApiOperation({ summary: "Get work hours" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getWorkHours(@Param("identifier") identifier: string) {
+    return await this.userService.getWorkHours(identifier);
   }
 }

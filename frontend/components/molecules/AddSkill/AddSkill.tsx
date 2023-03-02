@@ -83,6 +83,13 @@ export const AddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
   if (status === "error") {
     return <p>Error</p>;
   }
+
+  let filteredSkills = skills.filter(
+    (element) =>
+      element.name.toLowerCase().includes(skill.toLowerCase()) &&
+      !items.find((item) => item.name === element.name)
+  );
+
   console.log(skills);
   return (
     <SearchLayout>
@@ -101,23 +108,22 @@ export const AddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
         </AddSkillInfoLayout>
       </SearchAddSkillLayout>
       <SkillListLayout>
-        {skills
-          .filter(
-            (element) =>
-              element.name.toLowerCase().includes(skill.toLowerCase()) &&
-              !items.find((item) => item.name === element.name)
-          )
-          .map((currentSkill) => (
-            <SkillListItemLayout
-              key={currentSkill.id}
-              onClick={() => {
-                addSearchSkill(currentSkill.name, currentSkill.id);
-                setSkill("");
-              }}
-            >
-              {currentSkill.name}
-            </SkillListItemLayout>
-          ))}
+        {filteredSkills.splice(0, 20).map((currentSkill) => (
+          <SkillListItemLayout
+            key={currentSkill.id}
+            onClick={() => {
+              addSearchSkill(currentSkill.name, currentSkill.id);
+              setSkill("");
+            }}
+          >
+            {currentSkill.name}
+          </SkillListItemLayout>
+        ))}
+        {filteredSkills.length > 20 && (
+          <SkillListItemLayout key={"more"}>
+            {`+ ${filteredSkills.length - 20} more`}
+          </SkillListItemLayout>
+        )}
       </SkillListLayout>
     </SearchLayout>
   );

@@ -19,8 +19,24 @@ export class ProjectController {
   @ApiOperation({ summary: "Create project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
   @UseGuards(JwtAuthGuard)
-  create(@Body() createProjectDto: CreateProjectDto, @Req() request): Promise<ProjectResponse> {
+  async create(@Body() createProjectDto: CreateProjectDto, @Req() request): Promise<ProjectResponse> {
     return this.projectService.create(createProjectDto, request);
+  }
+
+  @Patch('bookmark/:id')
+  @ApiOperation({ summary: "Bookmark a user to a project" })
+  @ApiResponse({ status: 201, type: ProjectResponse })
+  @UseGuards(JwtAuthGuard)
+  async bookmark(@Body() bookmarks: string[], @Param('id') id: string, @Req() request): Promise<ProjectResponse> {
+    return this.projectService.bookmark(id, bookmarks, request);
+  }
+
+  @Get('bookmark/:id')
+  @ApiOperation({ summary: "Get all bookmarks for a project" })
+  @ApiResponse({ status: 200, type: ProjectResponse })
+  @UseGuards(JwtAuthGuard)
+  async getBookmarks(@Param("id") userId: string, @Req() request): Promise<ProjectResponse> {
+    return this.projectService.getBookmarks(userId, request);
   }
 
   @Get()
