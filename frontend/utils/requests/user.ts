@@ -12,6 +12,23 @@ export async function getAllUsers() {
   return fetchData("user/all", "GET", 200);
 }
 
+export async function createUser(user: {
+  identifier: string,
+  password: string,
+  name: string,
+  email: string;
+  phoneNumber: string,
+  birthDate: string,
+  gender: string;
+  photo: string;
+  roles: string[];
+  departments: string[];
+  location: string;
+}) {
+  console.log(user);
+  return fetchData("user", "POST", 200, user);
+}
+
 export async function getBookmarks(){
   return fetchData("user/bookmarks", "GET", 200);
 }

@@ -35,10 +35,14 @@ const StyledInputField = styled("input", {
   background: "$neutral-200",
   outline: "none",
   lineHeight: "1.5rem",
-  color: "black",
+  color: "$neutral-700",
 
   ["&::placeholder"]: {
     ...BodyDefaultTabletAndUpStyle,
+  },
+
+  ["&::first-letter"]: {
+    textTransform: "uppercase",
   },
 
   variants: {

@@ -10,7 +10,7 @@ type Props = {
   icon: any;
   label: string;
   href?: string;
-  size?: "small" | "medium";
+  size?: "small" | "medium" | "large";
 };
 
 const IconInfoLayout = styled("div", {
@@ -45,6 +45,10 @@ const IconLayout = styled("div", {
       medium: {
         width: "25px",
         height: "25px",
+      },
+      large: {
+        width: "100px",
+        height: "100px",
       },
     },
   },

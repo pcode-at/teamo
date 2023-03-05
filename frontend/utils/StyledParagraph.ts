@@ -34,6 +34,15 @@ export const H3BoldTabletAndUpStyle = {
   lineHeight: "$l",
 };
 
+export const BodyMediumBoldTabletAndUpStyle = {
+  fontFamily: "$default",
+  fontSize: "$m",
+  fontWeight: "$bold",
+  textDecoration: "none",
+  lineHeight: "$m",
+  letterSpacing: "$wide",
+};
+
 export const BodyMediumTabletAndUpStyle = {
   fontFamily: "$default",
   fontSize: "$m",

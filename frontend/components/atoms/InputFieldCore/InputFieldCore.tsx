@@ -7,6 +7,7 @@ type Props = {
   required?: boolean;
   label?: string;
   showLabel?: boolean;
+  size?: "small" | "medium";
 };
 
 const InputLayout = styled("div", {
@@ -22,9 +23,20 @@ const InputFieldLayout = styled("div", {
   border: "none",
   gap: "20px",
   borderRadius: "$1x",
-  padding: "$2x $3x",
-
   background: "$neutral-200",
+  variants: {
+    size: {
+      small: {
+        padding: "0",
+        width: "fit-content",
+      },
+
+      medium: {
+        padding: "$2x $3x",
+        width: "100%",
+      },
+    },
+  },
 });
 
 const ImageLayout = styled("div", {
@@ -47,6 +59,7 @@ export const InputFieldCore: React.FC<Props> = ({
   required = false,
   label = "",
   showLabel = true,
+  size = "medium",
 }) => {
   const Icon = icon;
 
@@ -57,7 +70,7 @@ export const InputFieldCore: React.FC<Props> = ({
           {label} {required && <Required>*</Required>}
         </InputFieldLabel>
       )}
-      <InputFieldLayout>
+      <InputFieldLayout size={size}>
         {icon && (
           <ImageLayout>
             <Icon />

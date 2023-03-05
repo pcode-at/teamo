@@ -2,6 +2,11 @@ import React from "react";
 import { useQuery } from "react-query";
 import { styled } from "../../../stitches.config";
 import { getSkills } from "../../../utils/requests/skills";
+import {
+  BodyDefaultTabletAndUpStyle,
+  H2BoldTabletAndUpStyle,
+  H3BoldTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
 import { InputField } from "../../atoms/InputField/InputField";
 
 type Props = {
@@ -11,6 +16,15 @@ type Props = {
     id: string;
   }[];
 };
+
+const HeaderLayout = styled("div", {
+  width: "100%",
+});
+
+const Headline = styled("h1", {
+  ...H3BoldTabletAndUpStyle,
+  padding: "0 0 $2x 0",
+});
 
 const SearchAddSkillLayout = styled("div", {
   display: "flex",
@@ -26,8 +40,7 @@ const SearchAddSkillLayout = styled("div", {
 
 const AddSkillInfoLayout = styled("div", {
   display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
+  flexDirection: "column",
   width: "100%",
 });
 
@@ -46,9 +59,9 @@ const SkillListLayout = styled("div", {
 });
 
 const SkillListItemLayout = styled("button", {
+  ...BodyDefaultTabletAndUpStyle,
   display: "flex",
   width: "fit-content",
-
   borderRadius: "$1x",
   backgroundColor: "$brand-100",
   cursor: "pointer",
@@ -56,7 +69,6 @@ const SkillListItemLayout = styled("button", {
   border: "none",
   color: "$brand-500",
   fontSize: "1rem",
-  fontWeight: "bold",
   textAlign: "left",
   textDecoration: "none",
   transition: "all 0.2s",
