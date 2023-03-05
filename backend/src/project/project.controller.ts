@@ -1,22 +1,42 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, ClassSerializerInterceptor, Req, UseGuards } from "@nestjs/common";
 import { ProjectService } from "./project.service";
 import { CreateProjectDto } from "./dto/create-project.dto";
 import { UpdateProjectDto } from "./dto/update-project.dto";
 import { ProjectResponse } from "src/entities/project.entity";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { AddSkillDTO } from "./dto/add-skill.dto";
+import { SkillGroupResponse } from "./dto/find-skillgroups.dto";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
 @Controller("api/project")
 @ApiTags("project")
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService) { }
 
   @Post()
   @ApiOperation({ summary: "Create project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
-  create(@Body() createProjectDto: CreateProjectDto): Promise<ProjectResponse> {
-    return this.projectService.create(createProjectDto);
+  @UseGuards(JwtAuthGuard)
+  async create(@Body() createProjectDto: CreateProjectDto, @Req() request): Promise<ProjectResponse> {
+    return this.projectService.create(createProjectDto, request);
+  }
+
+  @Patch('bookmark/:id')
+  @ApiOperation({ summary: "Bookmark a user to a project" })
+  @ApiResponse({ status: 201, type: ProjectResponse })
+  @UseGuards(JwtAuthGuard)
+  async bookmark(@Body() bookmarks: string[], @Param('id') id: string, @Req() request): Promise<ProjectResponse> {
+    return this.projectService.bookmark(id, bookmarks, request);
+  }
+
+  @Get('bookmark/:id')
+  @ApiOperation({ summary: "Get all bookmarks for a project" })
+  @ApiResponse({ status: 200, type: ProjectResponse })
+  @UseGuards(JwtAuthGuard)
+  async getBookmarks(@Param("id") userId: string, @Req() request): Promise<ProjectResponse> {
+    return this.projectService.getBookmarks(userId, request);
   }
 
   @Get()
@@ -45,5 +65,16 @@ export class ProjectController {
   @ApiResponse({ status: 200, type: ProjectResponse })
   remove(@Param("id") id: string): Promise<ProjectResponse> {
     return this.projectService.remove(id);
+  }
+
+  @Post("skill/add")
+  addSkill(@Body() skillRating: AddSkillDTO): Promise<ProjectResponse> {
+    return this.projectService.addSkill(skillRating);
+  }
+
+  @Get("skill/groupings/:id")
+  getSkillGroupings(@Param("id") projectId: string): Promise<SkillGroupResponse> {
+    let test = this.projectService.getSkillGroupings(projectId);
+    return test;
   }
 }

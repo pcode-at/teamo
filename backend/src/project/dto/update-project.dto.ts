@@ -12,9 +12,5 @@ export class UpdateProjectDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    lastEdited: Date;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    status: string;
+    skills: any[];
 }

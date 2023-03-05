@@ -43,7 +43,7 @@ const StyledFallback = styled(AvatarPrimitive.Fallback, {
 export const Avatar: React.FC<Props> = ({ src, name }) => (
   <StyledAvatar>
     <StyledImage src={src} alt={name} />
-    <StyledFallback delayMs={600}>
+    <StyledFallback delayMs={100}>
       {name
         .split(" ")
         .map((word) => word[0])

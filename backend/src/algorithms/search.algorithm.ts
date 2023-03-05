@@ -40,7 +40,7 @@ export function searchForUsers(skills: (userSkills & { skill: skills; user: user
         paramterRating.sort((a, b) => parseInt(a) - parseInt(b));
         rating = (parseInt(paramterRating[0]) - parseInt(paramterRating[1])) / 2;
       } else {
-        rating = paramterRating;
+        rating = Number(paramterRating);
       }
     }
 
@@ -58,7 +58,7 @@ export function searchForUsers(skills: (userSkills & { skill: skills; user: user
       let skillAndRating = new SkillAndRating();
 
       skillAndRating.skillMatrix = user.skill.skillMatrix;
-      skillAndRating.rating = rating.toString();
+      skillAndRating.rating = rating;
       skillAndRating.name = user.skill.name;
 
       userResult.skills.push(skillAndRating);
@@ -70,7 +70,7 @@ export function searchForUsers(skills: (userSkills & { skill: skills; user: user
       let skillAndRating = new SkillAndRating();
 
       skillAndRating.skillMatrix = user.skill.skillMatrix;
-      skillAndRating.rating = rating.toString();
+      skillAndRating.rating = rating;
       skillAndRating.name = user.skill.name;
 
       userResult.skills.push(skillAndRating);

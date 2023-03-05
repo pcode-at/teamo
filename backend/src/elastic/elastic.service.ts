@@ -1,12 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { ElasticsearchService } from "@nestjs/elasticsearch";
-import { PrismaClient, skills, users, userSkills } from "@prisma/client";
 import * as fs from "fs";
+
+import { PrismaClient, skills, userSkills, users } from "@prisma/client";
+import { RecommendEntity, RecommendResponse } from "src/entities/recommend.entity";
 import { SearchEntity, SearchResponse } from "src/entities/search.entity";
-import { SkillEntity } from "src/entities/skill.entity";
-import { UserEntity } from "src/entities/user.entity";
+
+import { ElasticsearchService } from "@nestjs/elasticsearch";
+import { Injectable } from "@nestjs/common";
 import { SearchDto } from "src/user/dto/search.dto";
 import { SkillDto } from "src/user/dto/skill.dto";
+import { SkillEntity } from "src/entities/skill.entity";
+import { UserEntity } from "src/entities/user.entity";
 
 const prisma = new PrismaClient();
 
@@ -50,7 +53,7 @@ export class ElasticService {
 
     user.skills.forEach(skill => {
       skills.push({
-        rating: skill.rating,
+        rating: Number(skill.rating),
         skill: skill.skill.id,
       });
     });
@@ -64,9 +67,6 @@ export class ElasticService {
         skills: skills,
       },
     });
-
-    // console.log(result);
-
     return result;
   }
 
@@ -124,89 +124,119 @@ export class ElasticService {
     });
   }
 
-  async recommend(skillsNeeded: SkillElastic[], accurate: boolean, peopleNeeded: number) {
-    let skillsPerPerson = 1;
+  async recommend(skillGroups: SkillElastic[][], accurate: boolean): Promise<RecommendResponse> {
+    const results = await this.prepareRecommend(skillGroups, accurate);
 
-    if (accurate) skillsPerPerson = skillsNeeded.length / peopleNeeded;
+    let mappedUsers = [] as UserEntity[][];
+    let i = 0;
+    for (const userGroup of results.users) {
+      mappedUsers[i] = [];
+      for (const user of userGroup) {
+        let userData = await this.getUserData(user.identifier);
 
-    const searchQuery = {
-      index: "users",
-      body: {
-        query: {
-          function_score: {
-            boost_mode: "replace",
-            query: {
-              bool: {
-                should: [],
-                minimum_should_match: Math.floor(skillsPerPerson),
-                must: [],
-              },
-            },
-            score_mode: "sum",
-            functions: [
-              {
-                script_score: {
-                  script: "_score",
-                },
-              },
-            ],
-          },
-        },
-      },
+        mappedUsers[i].push(new UserEntity({ ...userData, skills: userData.skills, score: user.score }));
+      }
+      i++;
+    }
+
+    mappedUsers = mappedUsers.filter(userGroup => userGroup.length > 0);
+
+    return new RecommendResponse({
+      statusCode: 201,
+      message: "Successfully found users",
+      data: new RecommendEntity({
+        users: mappedUsers,
+      }),
+    });
+  }
+
+  async prepareRecommend(skillGroups: SkillElastic[][], accurate: boolean) {
+    const resultDTO = {
+      users: [[]],
     };
 
-    searchQuery.body.query.function_score.query.bool.should.push({
-      match_all: {},
-    });
-
-    skillsNeeded.forEach(paramter => {
-      searchQuery.body.query.function_score.query.bool.should.push({
-        nested: {
-          path: "skills",
+    for (const group of skillGroups) {
+      const searchQuery = {
+        size: 5,
+        index: "users",
+        body: {
           query: {
             function_score: {
-              boost_mode: "sum",
-              score_mode: "multiply",
+              boost_mode: "replace",
+              query: {
+                bool: {
+                  should: [],
+                  must: [],
+                },
+              },
+              score_mode: "sum",
               functions: [
                 {
-                  exp: {
-                    "skills.rating": {
-                      offset: 1,
-                      origin: paramter.rating,
-                      scale: 1,
-                    },
+                  script_score: {
+                    script: "_score",
                   },
                 },
               ],
-              query: {
-                bool: {
-                  should: [
-                    {
-                      match: {
-                        "skills.skill": paramter.skill as string,
+            },
+          },
+        },
+      };
+
+      let field = searchQuery.body.query.function_score.query.bool.should;
+
+      field.push({
+        match_all: {},
+      });
+
+      group.forEach(paramter => {
+        field.push({
+          nested: {
+            path: "skills",
+            query: {
+              function_score: {
+                boost_mode: "sum",
+                score_mode: "multiply",
+                functions: [
+                  {
+                    exp: {
+                      "skills.rating": {
+                        offset: 1,
+                        origin: paramter.rating,
+                        scale: 1,
                       },
                     },
-                  ],
+                  },
+                ],
+                query: {
+                  bool: {
+                    should: [
+                      {
+                        match: {
+                          "skills.skill": paramter.skill as string,
+                        },
+                      },
+                    ],
+                  },
                 },
               },
             },
           },
-        },
+        });
       });
-    });
 
-    const result = await client.search(searchQuery);
+      const result = await client.search(searchQuery);
 
-    const resultDTO = {
-      users: [],
-    };
+      const resultToPush = [];
 
-    result.hits.hits.forEach(hit => {
-      resultDTO.users.push({
-        identifier: hit._id,
-        score: hit._score,
+      result.hits.hits.forEach(hit => {
+        resultToPush.push({
+          identifier: hit._id,
+          score: hit._score,
+        });
       });
-    });
+
+      resultDTO.users.push(resultToPush);
+    }
 
     return resultDTO;
   }
@@ -246,8 +276,10 @@ export class ElasticService {
             }),
           );
         } else if (
-          requiredSkillIds.includes(currentSkill.skill.id) &&
-          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 ||
+          requiredSkillIds.includes(currentSkill.skill.id) && //check for -+ 2 or -+ 1
+          (requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 1 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 1 ||
+            requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) + 2 ||
             requiredSkills.find(skill => skill.id === currentSkill.skill.id).rating == Number(currentSkill.rating) - 2)
         ) {
           userSkills.push(
@@ -264,6 +296,11 @@ export class ElasticService {
             }),
           );
         }
+      });
+
+      //sort by opacity
+      userSkills = userSkills.sort((a, b) => {
+        return b.opacity - a.opacity;
       });
 
       mappedUsers.push(new UserEntity({ ...userData, skills: userSkills, score: user.score }));
@@ -344,13 +381,19 @@ export class ElasticService {
 
     if (attributes.includes("location")) {
       let searchLocations = [];
-      let locations = search.parameters.find(search => search.attribute === "location").value;
+      let locations = search.parameters.filter(search => search.attribute === "location").map(search => search.value);
 
-      if (locations instanceof Array) {
-        searchLocations = locations.map(location => location.toLowerCase());
-      } else {
-        searchLocations.push(locations.toLowerCase());
-      }
+      locations
+        .map(location => {
+          if (location instanceof Array) {
+            return location.map(loc => loc.toLowerCase());
+          } else {
+            return location.toLowerCase();
+          }
+        })
+        .forEach(location => {
+          searchLocations.push(location);
+        });
 
       searchQuery.body.query.function_score.query.bool.filter.push({
         terms: {
@@ -446,9 +489,6 @@ export class ElasticService {
         },
       });
     });
-
-    console.log(JSON.stringify(searchQuery, null, 4));
-
     let modified: boolean = false;
 
     let result = await client.search(searchQuery);
@@ -458,8 +498,6 @@ export class ElasticService {
       maxScore: result.hits.max_score,
       users: [],
     };
-
-    // console.log(result.hits.hits.length);
 
     result.hits.hits.forEach(hit => {
       resultDTO.users.push({
@@ -472,45 +510,7 @@ export class ElasticService {
   }
 }
 
-class SkillElastic {
+export class SkillElastic {
   rating: number;
   skill: string;
 }
-
-// client.diagnostic.on("request", (err, result) => {
-//   const { id } = result.meta.request;
-//   const { context } = result.meta;
-//   if (err) {
-//     console.log({ error: err, reqId: id, context });
-//   }
-// });
-
-// client.diagnostic.on("request", (err, result) => {
-//   if (err) {
-//     console.log("Error:");
-//     console.error(err);
-//   } else {
-//     console.log("Info:");
-//     console.info(result);
-//   }
-// });
-
-// client.diagnostic.on("serialization", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("deserialization", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("response", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("sniff", (err, result) => {
-//   console.log(err, result);
-// });
-
-// client.diagnostic.on("resurrect", (err, result) => {
-//   console.log(err, result);
-// });

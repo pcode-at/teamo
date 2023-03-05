@@ -136,7 +136,6 @@ export const SearchBar: React.FC<Props> = ({ items, setItems, setLocations }) =>
     });
   }
 
-  const [checkedItems, setCheckedItems] = React.useState<string[]>([]);
   const { data: locations, status } = useQuery(["locations"], getLocations);
 
   if (status === "loading") {
@@ -160,7 +159,6 @@ export const SearchBar: React.FC<Props> = ({ items, setItems, setLocations }) =>
             };
           })}
           setCheckedItems={(value) => {
-            setCheckedItems(value);
             setLocations(value);
           }}
         ></DropDown>

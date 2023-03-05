@@ -55,6 +55,13 @@ model users {
   bookmarkedInIds   String[]            @map("projectsWhereBookMarkedIds") @db.ObjectId
   projects          projects[]          @relation(name: "projectMembers", fields: [projectsIds], references: [id])
   projectsIds       String[]            @db.ObjectId
+  defaultWorkHours  Int
+  workHourChanges   workHourChanges[]
+}
+
+type workHourChanges {
+  date  DateTime @db.Date
+  hours Float
 }
 
 model projects {
@@ -72,6 +79,7 @@ model projects {
   skillIds     String[]      @db.ObjectId
   bookmarks    users[]       @relation(name: "projectMembers", fields: [bookmarkIds], references: [id])
   bookmarkIds  String[]      @db.ObjectId
+  skillGroups  SkillGroup
 }
 
 model skillRating {
@@ -81,4 +89,20 @@ model skillRating {
   rating        Int
   projects      projects @relation(fields: [projectsId], references: [id])
   projectsId    String   @db.ObjectId
+}
+
+type SkillGroup {
+  nodes Node[]
+  edges Edge[]
+}
+
+type Node {
+  id    String
+  label String
+}
+
+type Edge {
+  from  String
+  to    String
+  label String
 }

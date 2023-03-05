@@ -96,47 +96,47 @@ export const AddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
     return <p>Error</p>;
   }
 
-  return (
-    <>
-      <SearchLayout>
-        <SearchAddSkillLayout>
-          <AddSkillInfoLayout>
-            <HeaderLayout>
-              <Headline>Search for a skill</Headline>
-            </HeaderLayout>
+  let filteredSkills = skills.filter(
+    (element) =>
+      element.name.toLowerCase().includes(skill.toLowerCase()) &&
+      !items.find((item) => item.name === element.name)
+  );
 
-            <InputField
-              inputType={"text"}
-              value={skill}
-              onChange={(value) => {
-                setSkill(value);
-              }}
-              label={"Name of skill"}
-              showLabel={true}
-              size="fitParent"
-            ></InputField>
-          </AddSkillInfoLayout>
-        </SearchAddSkillLayout>
-        <SkillListLayout>
-          {skills
-            .filter(
-              (element) =>
-                element.name.toLowerCase().includes(skill.toLowerCase()) &&
-                !items.find((item) => item.name === element.name)
-            )
-            .map((currentSkill) => (
-              <SkillListItemLayout
-                key={currentSkill.id}
-                onClick={() => {
-                  addSearchSkill(currentSkill.name, currentSkill.id);
-                  setSkill("");
-                }}
-              >
-                {currentSkill.name}
-              </SkillListItemLayout>
-            ))}
-        </SkillListLayout>
-      </SearchLayout>
-    </>
+  console.log(skills);
+  return (
+    <SearchLayout>
+      <SearchAddSkillLayout>
+        <AddSkillInfoLayout>
+          <InputField
+            inputType={"text"}
+            value={skill}
+            onChange={(value) => {
+              setSkill(value);
+            }}
+            label={"Search skill"}
+            showLabel={false}
+            size="fitParent"
+          ></InputField>
+        </AddSkillInfoLayout>
+      </SearchAddSkillLayout>
+      <SkillListLayout>
+        {filteredSkills.splice(0, 20).map((currentSkill) => (
+          <SkillListItemLayout
+            key={currentSkill.id}
+            onClick={() => {
+              addSearchSkill(currentSkill.name, currentSkill.id);
+              setSkill("");
+            }}
+          >
+            {currentSkill.name}
+          </SkillListItemLayout>
+        ))}
+        {filteredSkills.length > 20 && (
+          <SkillListItemLayout key={"more"}>
+            {`+ ${filteredSkills.length - 20} more`}
+          </SkillListItemLayout>
+        )}
+      </SkillListLayout>
+    </SearchLayout>
   );
 };

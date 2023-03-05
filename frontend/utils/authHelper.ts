@@ -35,7 +35,7 @@ export async function login(identifier, password) {
   return false;
 }
 
-export async function logout() {
+export function logout() {
   cookie.remove("accessToken");
   cookie.remove("refreshToken");
 }
@@ -65,7 +65,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string> {
   );
 
   const responseBody = await response.json();
-  if (responseBody.data.accessToken) {
+  if (responseBody.data && responseBody.data.accessToken) {
     setCookie("accessToken", responseBody.data.accessToken, 1 / 96);
     return responseBody.data.accessToken;
   }

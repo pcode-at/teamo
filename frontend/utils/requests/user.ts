@@ -1,7 +1,7 @@
 import { fetchData } from "./default";
 
-export async function getUser() {
-  return fetchData("user", "GET", 200);
+export async function getUser(profileId: string = "") {
+  return fetchData("user/" + profileId, "GET", 200);
 }
 
 export async function getLocations(){
@@ -27,4 +27,12 @@ export async function createUser(user: {
 }) {
   console.log(user);
   return fetchData("user", "POST", 200, user);
+}
+
+export async function getBookmarks(){
+  return fetchData("user/bookmarks", "GET", 200);
+}
+
+export async function getWorkHours(profileId: string = ""){
+  return fetchData("user/workHours/" + profileId, "GET", 200);
 }

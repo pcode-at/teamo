@@ -18,14 +18,18 @@ const SimpleUserLayout = styled("div", {
   display: "flex",
   flexDirection: "column",
   gap: "$2x",
-  padding: "$2x",
-  borderRadius: "$1x",
+  padding: "$3x",
+  borderRadius: "$3x",
   backgroundColor: "$neutral-200",
-  height: "100%",
+  transition: "all 0.2s",
+
+  "&:hover": {
+    backgroundColor: "$neutral-300",
+  },
 });
 
 const Name = styled("span", {
-  ...BodyMediumBoldTabletAndUpStyle,
+  ...H3BoldTabletAndUpStyle,
   color: "$neutral-700",
 });
 

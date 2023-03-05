@@ -30,6 +30,10 @@ const GeneralInfoLayout = styled("div", {
   borderRadius: "10px",
 
   color: "$neutral-100",
+
+  "@tabletAndDown": {
+    gridTemplateColumns: "1fr",
+  },
 });
 
 const GeneralInfoText = styled("div", {
@@ -48,18 +52,21 @@ const IconInfoLayout = styled("div", {
   flexDirection: "row",
   width: "100%",
   gap: "$9x",
+
+  "@tabletAndDown": {
+    flexDirection: "column",
+    gap: "$4x",
+  },
 });
 
 const GeneralInfoTextTitle = styled("h2", {
   ...H2BoldTabletAndUpStyle,
 });
 
-const PersonalInfoTextTitle = styled("h3", {
+export const PersonalInfoTextTitle = styled("h3", {
   ...H3BoldTabletAndUpStyle,
-});
 
-const GeneralInfoTextSubtitle = styled("div", {
-  ...BodyDefaultTabletAndUpStyle,
+  width: "100%",
 });
 
 const AvatarLayout = styled("div", {
@@ -68,7 +75,9 @@ const AvatarLayout = styled("div", {
 });
 
 export const ProfilePageInfoSection: React.FC<Props> = ({ profileId }) => {
-  const { data: profile, status } = useQuery("profile", getUser);
+  const { data: profile, status } = useQuery(["profile", profileId], () =>
+    getUser(profileId)
+  );
 
   if (status === "loading") {
     return <div>Loading...</div>;
@@ -121,7 +130,6 @@ export const ProfilePageInfoSection: React.FC<Props> = ({ profileId }) => {
       <Spacer size="3x"></Spacer>
       <Separator width={"big"} alignment={"center"}></Separator>
       <Spacer size="3x"></Spacer>
-      <PersonalInfoTextTitle>Skills</PersonalInfoTextTitle>
     </>
   );
 };
