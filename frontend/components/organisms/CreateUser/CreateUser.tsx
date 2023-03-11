@@ -3,16 +3,11 @@ import React, { useState } from "react";
 import { styled } from "../../../stitches.config";
 import { createUser } from "../../../utils/requests/user";
 import {
-  H1BoldTabletAndUpStyle,
   H2BoldTabletAndUpStyle,
 } from "../../../utils/StyledParagraph";
 import { Button } from "../../atoms/Button/Button";
 import { InputField } from "../../atoms/InputField/InputField";
 import { Separator } from "../../atoms/Separator/Separator";
-import SvgCalendar from "../../atoms/svg/SvgCalendar";
-import SvgMail from "../../atoms/svg/SvgMail";
-import SvgPhone from "../../atoms/svg/SvgPhone";
-import SvgUser from "../../atoms/svg/SvgUser";
 import { AddSkill } from "../../molecules/AddSkill/AddSkill";
 import { BackLink } from "../../molecules/BackLink/BackLink";
 import { EditableSkill } from "../../molecules/EditableSkill/EditableSkill";

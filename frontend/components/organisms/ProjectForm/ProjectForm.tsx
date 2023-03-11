@@ -14,7 +14,7 @@ import { BackLink } from "../../molecules/BackLink/BackLink";
 import { Skill } from "../../molecules/Skill/Skill";
 
 type Props = {
-  saveFunction: (project: any) => void;
+  saveFunction: (project: any) => any;
   defaultInput: {
     name: string;
     description: string;
@@ -76,10 +76,13 @@ export const ProjectForm: React.FC<Props> = ({
 }) => {
   const router = useRouter();
   const [inputs, setInputs] = useState(defaultInput);
-  console.log(inputs);
+
   return (
     <>
-      <BackLink href="/project" label="Back to projects"></BackLink>
+      <BackLink
+        href={"/project/" + router.query.projectId}
+        label="Back to project"
+      ></BackLink>
       <HeaderLayout>
         <Headline>{siteName}</Headline>
       </HeaderLayout>
@@ -148,13 +151,17 @@ export const ProjectForm: React.FC<Props> = ({
           <Separator width={"big"} alignment={"left"}></Separator>
         </SeparatorLayout>
         <Button
-          onClick={() => {
-            saveFunction({
+          onClick={async () => {
+            const response = await saveFunction({
               name: inputs.name,
               description: inputs.description,
               skills: inputs.skills.map((skill) => skill.id),
             });
-            // router.push("/project");
+
+            if (response) {
+              alert("Project saved");
+              // router.push("/project/" + router.query.projectId);
+            }
           }}
           size="small"
           disabled={!inputs.name}

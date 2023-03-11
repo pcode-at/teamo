@@ -57,7 +57,12 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
   );
 
   if (status === "error" || recommendationStatus === "error") {
-    return <div>Error</div>;
+    return <>
+
+    <BackLink href={"/project"} label={"Back to projects"}></BackLink>
+    <Spacer size="1x" axis="vertical"></Spacer>
+    <p>An error occurred while loading the data, please try again.</p>
+    </>;
   }
 
   return (
