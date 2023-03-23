@@ -6,7 +6,6 @@ import { IsStrongPassword } from "src/decorators/IsStrongPassword";
 export class UpdateUserDto {
 
     @ApiProperty()
-    @IsStrongPassword()
     password: string;
 
     @ApiProperty()
