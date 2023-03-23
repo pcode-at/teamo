@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Param, Post, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { SkillEntity, SkillResponse } from "src/entities/skill.entity";
 import { SkillService } from "./skill.service";
@@ -8,7 +8,7 @@ import { SkillService } from "./skill.service";
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class SkillController {
-  constructor(private readonly skillService: SkillService) {}
+  constructor(private readonly skillService: SkillService) { }
 
   // @UseGuards(JwtAuthGuard)
   @Get()
@@ -30,5 +30,13 @@ export class SkillController {
   @ApiResponse({ status: 200, type: SkillResponse })
   async create(@Body() skill): Promise<SkillResponse> {
     return await this.skillService.create(skill);
+  }
+
+  //delete skill by i
+  @Delete(":id")
+  @ApiOperation({ summary: "Delete skill by id" })
+  @ApiResponse({ status: 200, type: SkillResponse })
+  async delete(@Param("id") id: string): Promise<SkillResponse> {
+    return await this.skillService.delete(id);
   }
 }

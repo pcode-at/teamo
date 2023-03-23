@@ -40,4 +40,33 @@ export class SkillService {
       data: new SkillEntity(newSkill),
     });
   }
+
+  async delete(id: string): Promise<SkillResponse> {
+
+    //delete skill from all projects
+    await prisma.skillRating.deleteMany({
+      where: {
+        skillId: id,
+      },
+    });
+
+    //delte skill from all users
+    await prisma.userSkills.deleteMany({
+      where: {
+        skillsId: id,
+      },
+    });
+
+    await prisma.skills.delete({
+      where: {
+        id,
+      },
+    });
+
+    return new SkillResponse({
+      statusCode: 200,
+      message: "Skill deleted successfully",
+      data: null,
+    });
+  }
 }

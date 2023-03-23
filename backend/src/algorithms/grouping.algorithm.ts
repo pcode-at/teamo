@@ -97,6 +97,7 @@ export async function getSkillGroupingsForProject(projectId: string): Promise<Ma
     skillSystem.set(skillId.toString(), new SkillNode(skillId.toString()));
   }
 
+
   percentages.forEach((skillMap, skillId) => {
     skillMap.compatibility.forEach(compatibility => {
       const skillNode = skillSystem.get(skillId.toString());
@@ -108,6 +109,8 @@ export async function getSkillGroupingsForProject(projectId: string): Promise<Ma
 
   return skillSystem;
 }
+
+
 
 type SkillMap = {
   compatibility: SkillCompatibility[];
