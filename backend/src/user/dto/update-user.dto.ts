@@ -7,7 +7,6 @@ export class UpdateUserDto {
 
     @ApiProperty()
     @IsStrongPassword()
-    @IsNotEmpty()
     password: string;
 
     @ApiProperty()
@@ -35,7 +34,6 @@ export class UpdateUserDto {
 
     @ApiProperty()
     @IsOptional()
-    @IsNotEmpty()
     photo: string;
 
     @ApiProperty()

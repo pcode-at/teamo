@@ -30,7 +30,7 @@ export class UserService {
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
     private readonly elastic: ElasticService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password;
@@ -228,6 +228,19 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
     let user;
+
+    let oldUser;
+
+    try {
+      oldUser = await prisma.users.findUnique({
+        where: {
+          identifier: id,
+        },
+      });
+    } catch {
+      throw new BadRequestException("Something went wrong while updating the user");
+    }
+
     try {
       user = await prisma.users.update({
         where: {
@@ -235,6 +248,7 @@ export class UserService {
         },
         data: {
           ...updateUserDto,
+          password: oldUser.password,
           birthDate: new Date(updateUserDto.birthDate.toString()),
         },
       });
