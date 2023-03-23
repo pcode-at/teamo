@@ -25,6 +25,10 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
+
+
+
+
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
@@ -199,6 +203,25 @@ export class UserService {
       throw new BadRequestException("Something went wrong while adding a skill");
     }
     return new SkillResponse({ statusCode: 200, message: "Skill added successfully", data: new SkillEntity(user) });
+  }
+
+
+  async replaceSkills(skills: SkillDto[]): Promise<SkillResponse> {
+    //delete all skills from user
+    await prisma.userSkills.deleteMany({
+      where: {
+        user: {
+          identifier: skills[0].identifier,
+        },
+      },
+    });
+
+    const skillResponses = [];
+    for (const skill of skills) {
+      skillResponses.push(await this.addSkill(skill));
+    }
+
+    return new SkillResponse({ statusCode: 200, message: "Skills added successfully", data: null });
   }
 
   async getSkillsForUser(identifier: string) {
