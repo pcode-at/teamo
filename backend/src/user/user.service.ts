@@ -259,6 +259,10 @@ export class UserService {
       throw new BadRequestException("Something went wrong while updating the user");
     }
 
+    let workHourChanges = updateUserDto.workHourChanges;
+
+    delete updateUserDto.workHourChanges;
+
     try {
       user = await prisma.users.update({
         where: {
@@ -268,6 +272,7 @@ export class UserService {
           ...updateUserDto,
           password: oldUser.password,
           birthDate: new Date(updateUserDto.birthDate.toString()),
+          workHourChanges: workHourChanges,
         },
       });
     } catch {

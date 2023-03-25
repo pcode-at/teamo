@@ -1,7 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber } from "class-validator";
-import { Date } from "mongoose";
 import { IsStrongPassword } from "src/decorators/IsStrongPassword";
+
+interface WorkHour {
+  date: Date | string;
+  hours: number;
+}
 
 export class UpdateUserDto {
   @ApiProperty()
@@ -44,4 +48,12 @@ export class UpdateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   location: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  workHourChanges: WorkHour[];
+
+  @ApiProperty()
+  @IsNotEmpty()
+  defaultWorkHours: number;
 }
