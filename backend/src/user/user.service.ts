@@ -25,16 +25,12 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
-
-
-
-
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
     private readonly elastic: ElasticService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password;
@@ -204,7 +200,6 @@ export class UserService {
     }
     return new SkillResponse({ statusCode: 200, message: "Skill added successfully", data: new SkillEntity(user) });
   }
-
 
   async replaceSkills(skills: SkillDto[]): Promise<SkillResponse> {
     //delete all skills from user

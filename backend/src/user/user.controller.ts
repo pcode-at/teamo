@@ -16,7 +16,7 @@ import { SkillResponse } from "src/entities/skill.entity";
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   @ApiOperation({ summary: "Create user" })
@@ -32,7 +32,7 @@ export class UserController {
     return await this.userService.findAll();
   }
 
-  @Get('/bookmarks')
+  @Get("/bookmarks")
   @ApiOperation({ summary: "Get all bookmarks" })
   @ApiResponse({ status: 200, type: UserResponse })
   async getBookmarks(@Req() request: Request) {
@@ -47,6 +47,13 @@ export class UserController {
   findOne(@Req() request: Request) {
     const jwt = request.headers.authorization.split(" ")[1];
     return this.userService.findOneDetailed(jwt);
+  }
+
+  @Patch("replaceSkills")
+  @ApiOperation({ summary: "Replace skills of user" })
+  @ApiResponse({ status: 200, type: SkillResponse })
+  async addSkills(@Body() skills: SkillDto[]): Promise<SkillResponse> {
+    return await this.userService.replaceSkills(skills);
   }
 
   @Patch(":id")
@@ -68,13 +75,6 @@ export class UserController {
   @ApiResponse({ status: 200, type: SkillResponse })
   async addSkill(@Body() skill: SkillDto): Promise<SkillResponse> {
     return await this.userService.addSkill(skill);
-  }
-
-  @Patch("replaceSkills")
-  @ApiOperation({ summary: "Replace skills of user" })
-  @ApiResponse({ status: 200, type: SkillResponse })
-  async addSkills(@Body() skills: SkillDto[]): Promise<SkillResponse> {
-    return await this.userService.replaceSkills(skills);
   }
 
   @Get("skill/:skillId")
