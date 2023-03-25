@@ -4,47 +4,44 @@ import { Date } from "mongoose";
 import { IsStrongPassword } from "src/decorators/IsStrongPassword";
 
 export class UpdateUserDto {
+  @ApiProperty()
+  password: string;
 
-    @ApiProperty()
-    password: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  name: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    name: string;
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
-    @ApiProperty()
-    @IsEmail()
-    @IsNotEmpty()
-    email: string;
+  @ApiProperty()
+  @IsOptional()
+  phoneNumber: string;
 
-    @ApiProperty()
-    @IsOptional()
-    @IsPhoneNumber()
-    @IsNotEmpty()
-    phoneNumber: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  birthDate: Date;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    birthDate: Date;
+  @ApiProperty()
+  @IsNotEmpty()
+  gender: string;
 
-    @ApiProperty()
-    @IsNotEmpty()
-    gender: string;
+  @ApiProperty()
+  @IsOptional()
+  photo: string;
 
-    @ApiProperty()
-    @IsOptional()
-    photo: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  roles: string[];
 
-    @ApiProperty()
-    @IsNotEmpty()
-    roles: string[];
+  @ApiProperty()
+  @IsOptional()
+  @IsNotEmpty()
+  departments: string[];
 
-    @ApiProperty()
-    @IsOptional()
-    @IsNotEmpty()
-    departments: string[];
-
-    @ApiProperty()
-    @IsNotEmpty()
-    location: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  location: string;
 }
