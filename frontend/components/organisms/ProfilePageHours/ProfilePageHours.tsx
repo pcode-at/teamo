@@ -39,19 +39,22 @@ export const ProfilePageHours: React.FC<Props> = ({ profileId }) => {
 
   return (
     <>
-      <ProfilePageSkillsLayout>
-        <PersonalInfoTextTitle>Available hours</PersonalInfoTextTitle>
-        <HoursLayout>
-          <b>Date</b>
-          <b>Hours/Week</b>
-          {hours.map((hour) => (
-            <>
-              <div>{new Date(hour.date).toLocaleDateString()}</div>
-              <div>{hour.hours}</div>
-            </>
-          ))}
-        </HoursLayout>
-      </ProfilePageSkillsLayout>
+      {hours.length === 0 && <div>No working hours available</div>}
+      {hours.length > 0 && (
+        <ProfilePageSkillsLayout>
+          <PersonalInfoTextTitle>Available hours</PersonalInfoTextTitle>
+          <HoursLayout>
+            <b>Date</b>
+            <b>Hours/Week</b>
+            {hours.map((hour) => (
+              <>
+                <div>from {new Date(hour.date).toLocaleDateString()}</div>
+                <div>{hour.hours}</div>
+              </>
+            ))}
+          </HoursLayout>
+        </ProfilePageSkillsLayout>
+      )}
     </>
   );
 };

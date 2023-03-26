@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { styled } from "../../../stitches.config";
 import {
   BodyMediumBoldTabletAndUpStyle,
@@ -47,11 +47,11 @@ export const SimpleUser: React.FC<Props> = ({ user }) => {
       <SimpleUserLayout>
         <Name>{user.name}</Name>
         <InformationLayout>
-          <IconInfoSection
+          {/* <IconInfoSection
             size="small"
             icon={SvgBriefcase}
             label="UI/UX"
-          ></IconInfoSection>
+          ></IconInfoSection> */}
           <IconInfoSection
             size="small"
             icon={SvgMapPin}

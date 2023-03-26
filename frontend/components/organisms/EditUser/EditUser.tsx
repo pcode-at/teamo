@@ -1,16 +1,23 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useQuery } from "react-query";
 import { styled } from "../../../stitches.config";
-import { createUser } from "../../../utils/requests/user";
+import {
+  getUser,
+  replaceSkills,
+  updateUser,
+} from "../../../utils/requests/user";
 import { H2BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
 import { Button } from "../../atoms/Button/Button";
 import { InputField } from "../../atoms/InputField/InputField";
 import { Separator } from "../../atoms/Separator/Separator";
+import SvgCross from "../../atoms/svg/SvgCross";
 import { AddSkill } from "../../molecules/AddSkill/AddSkill";
 import { BackLink } from "../../molecules/BackLink/BackLink";
 import { EditableSkill } from "../../molecules/EditableSkill/EditableSkill";
 import { LocationInput } from "../../molecules/LocationInput/LocationInput";
 import { ToggleGroup } from "../../molecules/ToggleGroup/ToggleGroup";
+import { PersonalInfoTextTitle } from "../ProfilePageInfoSection/ProfilePageInfoSection";
 
 type Props = {};
 
@@ -48,8 +55,35 @@ const SkillListLayout = styled("div", {
   height: "fit-content",
 });
 
-export const CreateUser: React.FC<Props> = ({}) => {
+const ProfilePageSkillsLayout = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start",
+  width: "100%",
+  flexWrap: "wrap",
+  gap: "$3x",
+});
+
+const HoursLayout = styled("div", {
+  display: "grid",
+  gridTemplateColumns: "3fr 1fr 1fr",
+  gap: "$5x",
+  padding: "$1x 0",
+});
+
+const DeleteHoursLayout = styled("button", {
+  display: "flex",
+  width: "18px",
+  height: "18px",
+  border: "none",
+  backgroundColor: "transparent",
+  cursor: "pointer",
+  alignSelf: "center",
+});
+
+export const EditUser: React.FC<Props> = ({}) => {
   const router = useRouter();
+  const userUUID = router.query.userUUID as string;
   const [inputs, setInputs] = useState({
     name: "",
     birthDate: "",
@@ -59,14 +93,34 @@ export const CreateUser: React.FC<Props> = ({}) => {
     email: "",
     phoneNumber: "",
     skills: [],
-    password: "",
+    workHourChanges: [],
+    defaultWorkHours: "",
   });
+  const { status } = useQuery(["user", userUUID], () => getUser(userUUID), {
+    onSuccess: (data) => {
+      console.log(data);
+      setInputs({
+        name: data.name,
+        birthDate: data.birthDate,
+        location: data.location,
+        gender: data.gender,
+        identifier: data.identifier,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        skills: data.skills,
+        workHourChanges: data.workHourChanges,
+        defaultWorkHours: data.defaultWorkHours,
+      });
+    },
+  });
+
+  console.log(inputs);
 
   return (
     <>
       <HeaderLayout>
         <BackLink href="/admin/user" label="Back to users"></BackLink>
-        <Headline>Create a user</Headline>
+        <Headline>Edit user</Headline>
       </HeaderLayout>
 
       <InputFieldLayout>
@@ -161,17 +215,6 @@ export const CreateUser: React.FC<Props> = ({}) => {
           ></InputField>
         </RightColumnLayout>
 
-        <InputField
-          // icon={SvgMail}
-          inputType={"text"}
-          onChange={(value) => {
-            setInputs({ ...inputs, password: value });
-          }}
-          value={inputs.password}
-          label="Password"
-          required={true}
-        ></InputField>
-
         {/*  <LocationInput></LocationInput> */}
 
         <SeparatorLayout>
@@ -226,18 +269,125 @@ export const CreateUser: React.FC<Props> = ({}) => {
                   });
                 }}
               >
-                {skill.name}
+                {skill.skill ? skill.skill.name : skill.name}
               </EditableSkill>
             ))}
           </SkillListLayout>
         </RightColumnLayout>
 
+        <SeparatorLayout>
+          <Separator width={"big"} alignment={"left"}></Separator>
+        </SeparatorLayout>
+
+        <ProfilePageSkillsLayout>
+          <PersonalInfoTextTitle>Available hours</PersonalInfoTextTitle>
+          <Button
+            onClick={() => {
+              setInputs({
+                ...inputs,
+                workHourChanges: [
+                  ...inputs.workHourChanges,
+                  {
+                    date: new Date().toISOString(),
+                    hours: 0,
+                  },
+                ],
+              });
+            }}
+          >
+            Add hour change
+          </Button>
+          <HoursLayout>
+            <b>Date</b>
+            <b>Hours/Week</b>
+            <b>Remove Change</b>
+            {inputs.workHourChanges.map((hour) => (
+              <>
+                <InputField
+                  // icon={SvgMail}
+                  inputType={"date"}
+                  onChange={(value) => {
+                    let correctedWorkHours = inputs.workHourChanges.map(
+                      (workHour) => {
+                        if (workHour.date === hour.date) {
+                          return {
+                            ...workHour,
+                            date: new Date(value).toISOString(),
+                          };
+                        }
+                        return workHour;
+                      }
+                    );
+                    setInputs({
+                      ...inputs,
+                      workHourChanges: correctedWorkHours,
+                    });
+                  }}
+                  value={new Date(hour.date).toISOString().slice(0, 10)}
+                  required={true}
+                ></InputField>
+                <InputField
+                  // icon={SvgMail}
+                  inputType={"number"}
+                  onChange={(value) => {
+                    let correctedWorkHours = inputs.workHourChanges.map(
+                      (workHour) => {
+                        if (workHour.date === hour.date) {
+                          return {
+                            ...workHour,
+                            hours: Number(value),
+                          };
+                        }
+                        return workHour;
+                      }
+                    );
+                    setInputs({
+                      ...inputs,
+                      workHourChanges: correctedWorkHours,
+                    });
+                  }}
+                  value={hour.hours}
+                  required={true}
+                ></InputField>
+                <DeleteHoursLayout
+                  onClick={(e) => {
+                    setInputs({
+                      ...inputs,
+                      workHourChanges: inputs.workHourChanges.filter(
+                        (item) => item.date !== hour.date
+                      ),
+                    });
+                  }}
+                >
+                  <SvgCross></SvgCross>
+                </DeleteHoursLayout>
+              </>
+            ))}
+          </HoursLayout>
+        </ProfilePageSkillsLayout>
+
+        <RightColumnLayout>
+          <InputField
+            inputType={"number"}
+            onChange={(value) => {
+              setInputs({ ...inputs, defaultWorkHours: value });
+            }}
+            value={inputs.defaultWorkHours}
+            label="Default work hours per week"
+            min="0"
+            max="200"
+          ></InputField>
+        </RightColumnLayout>
+
+        <SeparatorLayout>
+          <Separator width={"big"} alignment={"left"}></Separator>
+        </SeparatorLayout>
         <Button
           onClick={() => {
             try {
-              createUser({
+              updateUser({
                 identifier: inputs.identifier,
-                password: inputs.password,
+                password: "",
                 name: inputs.name,
                 email: inputs.email,
                 phoneNumber: inputs.phoneNumber,
@@ -247,6 +397,19 @@ export const CreateUser: React.FC<Props> = ({}) => {
                 roles: [""],
                 departments: [""],
                 location: inputs.location,
+                workHourChanges: inputs.workHourChanges,
+                defaultWorkHours: Number(inputs.defaultWorkHours),
+              }).then((data) => {
+                replaceSkills(
+                  inputs.skills.map((skill) => {
+                    console.log(skill);
+                    return {
+                      skill: skill.skill ? skill.skill.id : skill.id,
+                      rating: Number(skill.rating),
+                      identifier: inputs.identifier,
+                    };
+                  })
+                );
               });
 
               router.push("/admin/user");
@@ -256,7 +419,7 @@ export const CreateUser: React.FC<Props> = ({}) => {
           }}
           disabled={isDisabled(inputs)}
         >
-          Create User
+          Edit user
         </Button>
       </InputFieldLayout>
     </>
@@ -264,6 +427,18 @@ export const CreateUser: React.FC<Props> = ({}) => {
 };
 
 function isDisabled(input): boolean {
+  // return true if any of the inputs is empty or the rating of the skill is empty except for gender, birthdate, phonenumber
+  /* const [inputs, setInputs] = useState({
+    name: "",
+    birthdate: "",
+    location: "",
+    gender: "",
+    identifier: "",
+    email: "",
+    phoneNumber: "",
+    skills: [],
+  }); */
+
   let skillDisabled = false;
   input.skills.forEach((skill) => {
     if (skill.rating == "") {

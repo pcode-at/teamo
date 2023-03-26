@@ -53,24 +53,29 @@ export const LocationInput: React.FC<Props> = ({ value, onChange }) => {
           label="Location"
           value={value}
         ></InputField>
-
-        <LocationLayout>
-          {locations
-            .filter(
-              (location) =>
-                location.location !== value &&
-                location.location.toLowerCase().includes(value.toLowerCase())
-            )
-            .map((location) => (
-              <Checkbox
-                onChange={() => {
-                  return onChange(location.location);
-                }}
-              >
-                {location.location}
-              </Checkbox>
-            ))}
-        </LocationLayout>
+        {locations.filter(
+          (location) =>
+            location.location !== value &&
+            location.location.toLowerCase().includes(value.toLowerCase())
+        ).length > 0 && (
+          <LocationLayout>
+            {locations
+              .filter(
+                (location) =>
+                  location.location !== value &&
+                  location.location.toLowerCase().includes(value.toLowerCase())
+              )
+              .map((location) => (
+                <Checkbox
+                  onChange={() => {
+                    return onChange(location.location);
+                  }}
+                >
+                  {location.location}
+                </Checkbox>
+              ))}
+          </LocationLayout>
+        )}
       </LocationInputLayout>
     </>
   );

@@ -104,11 +104,6 @@ export const SearchResultItem: React.FC<Props> = ({
           <InformationLayout>
             <IconInfoSection
               size="small"
-              icon={SvgBriefcase}
-              label="UI/UX"
-            ></IconInfoSection>
-            <IconInfoSection
-              size="small"
               icon={SvgMapPin}
               label={user.location}
             ></IconInfoSection>

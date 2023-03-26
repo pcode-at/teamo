@@ -170,7 +170,17 @@ export const UserDropDown: React.FC<Props> = ({}) => {
                   <IconLayout>
                     <SvgSettings></SvgSettings>
                   </IconLayout>
-                  ADMIN
+                  ADMIN - USERS
+                </StyledItemLink>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/admin/skill" passHref>
+                <StyledItemLink>
+                  <IconLayout>
+                    <SvgSettings></SvgSettings>
+                  </IconLayout>
+                  ADMIN - SKILLS
                 </StyledItemLink>
               </Link>
             </DropdownMenuItem>

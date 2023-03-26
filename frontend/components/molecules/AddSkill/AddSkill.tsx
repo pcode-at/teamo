@@ -102,7 +102,6 @@ export const AddSkill: React.FC<Props> = ({ addSearchSkill, items }) => {
       !items.find((item) => item.name === element.name)
   );
 
-  console.log(skills);
   return (
     <SearchLayout>
       <SearchAddSkillLayout>

@@ -1,5 +1,4 @@
-import { useQuery } from "react-query";
-import { ProjectsList } from "../../components/organisms/ProjectsList/ProjectsList";
+import { SkillEditList } from "../../components/molecules/SkillEditList/SkillEditList";
 import { Navbar } from "../../components/organisms/Navbar/Navbar";
 
 export default function Home() {
@@ -7,7 +6,7 @@ export default function Home() {
     <>
       <Navbar></Navbar>
 
-      <ProjectsList />
+      <SkillEditList></SkillEditList>
     </>
   );
 }

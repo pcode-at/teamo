@@ -17,6 +17,8 @@ type Props = {
     value: string;
     label: string;
   }[];
+  value: string;
+  onValueChange: (value: string) => void;
 };
 
 const StyledToggleGroup = styled(ToggleGroupPrimitive.Root, {
@@ -64,6 +66,8 @@ export const ToggleGroup: React.FC<Props> = ({
   label,
   showLabel,
   elements,
+  value,
+  onValueChange,
 }) => {
   return (
     <InputFieldCore
@@ -76,12 +80,14 @@ export const ToggleGroup: React.FC<Props> = ({
         type="single"
         defaultValue="center"
         aria-label="Gender"
+        value={value}
       >
         {elements.map((element) => (
           <ToggleGroupItem
             value={element.value}
             aria-label={element.label}
             key={element.value}
+            onClick={() => onValueChange(element.value)}
           >
             {element.label}
           </ToggleGroupItem>

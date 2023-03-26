@@ -7,6 +7,9 @@ export async function getSkills() {
 export async function createSkill(skill: {
   name: string;
 }){
-  console.log(skill);
   return fetchData("skill", "POST", 201, skill);
+}
+
+export async function deleteSkill(id: string) {
+  return fetchData(`skill/${id}`, "DELETE", 200);
 }
