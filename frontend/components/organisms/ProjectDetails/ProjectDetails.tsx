@@ -6,13 +6,19 @@ import { Spacer } from "../../atoms/Spacer/Spacer";
 import { Separator } from "../../atoms/Separator/Separator";
 import { SubHeading } from "../../atoms/SubHeading/SubHeading";
 import { useQuery } from "react-query";
-import { getProject } from "../../../utils/requests/project";
+import {
+  getBookmarksOfProject,
+  getProject,
+} from "../../../utils/requests/project";
 import { useRouter } from "next/router";
 import { getRecommendation } from "../../../utils/requests/search";
 import { Skill } from "../../molecules/Skill/Skill";
 import { styled } from "../../../stitches.config";
 import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
 import Skeleton from "react-loading-skeleton";
+import { H2BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import Link from "next/link";
+import { SimpleUser } from "../../molecules/SimpleUser/SimpleUser";
 
 type Props = {};
 
@@ -31,6 +37,33 @@ const RecommendationsLayout = styled("div", {
   width: "100%",
   height: "fit-content",
   maxHeight: "100%",
+});
+
+const ListLayout = styled("div", {
+  display: "flex",
+  flexDirection: "column",
+  width: "100%",
+  gap: "$4x",
+});
+
+const ListTitle = styled("h2", {
+  ...H2BoldTabletAndUpStyle,
+});
+
+const ListItems = styled("div", {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+  width: "100%",
+  gap: "$8x",
+
+  "@tabletAndDown": {
+    gap: "$4x",
+  },
+});
+
+const StyledLink = styled("a", {
+  textDecoration: "none",
+  color: "$neutral-800",
 });
 
 export const ProjectDetails: React.FC<Props> = ({}) => {
@@ -55,15 +88,27 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
       enabled: !!projectId,
     }
   );
+  const { data: bookmarks, status: bookmarksStatus } = useQuery(
+    ["bookmarks", projectId],
+    () => {
+      return getBookmarksOfProject(projectId);
+    },
+    {
+      enabled: !!projectId,
+    }
+  );
 
   if (status === "error" || recommendationStatus === "error") {
-    return <>
-
-    <BackLink href={"/project"} label={"Back to projects"}></BackLink>
-    <Spacer size="1x" axis="vertical"></Spacer>
-    <p>An error occurred while loading the data, please try again.</p>
-    </>;
+    return (
+      <>
+        <BackLink href={"/project"} label={"Back to projects"}></BackLink>
+        <Spacer size="1x" axis="vertical"></Spacer>
+        <p>An error occurred while loading the data, please try again.</p>
+      </>
+    );
   }
+
+  console.log(bookmarks);
 
   return (
     <>
@@ -141,6 +186,34 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
           </RecommendationsLayout>
         </>
       )}
+      <ListLayout>
+        <ListTitle>Bookmarks</ListTitle>
+        <ListItems>
+          {bookmarksStatus == "success" &&
+            bookmarks.map((user) => (
+              <Link
+                key={user.identifier}
+                href={`/profile/${user.identifier}`}
+                passHref
+              >
+                <StyledLink>
+                  <SimpleUser user={user} />
+                </StyledLink>
+              </Link>
+            ))}
+          {bookmarksStatus == "loading" && (
+            <>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+              <Skeleton width="100%" height={130}></Skeleton>
+            </>
+          )}
+          {bookmarksStatus == "error" && <div>Error</div>}
+        </ListItems>
+      </ListLayout>
     </>
   );
 };

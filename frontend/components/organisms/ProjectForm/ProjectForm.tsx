@@ -159,8 +159,8 @@ export const ProjectForm: React.FC<Props> = ({
             });
 
             if (response) {
-              alert("Project saved");
-              // router.push("/project/" + router.query.projectId);
+              // alert("Project saved");
+              router.push("/project/" + router.query.projectId);
             }
           }}
           size="small"

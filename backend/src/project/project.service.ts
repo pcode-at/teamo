@@ -150,7 +150,9 @@ export class ProjectService {
           },
         });
       });
-      
+
+      await this.getSkillGroupings(id);
+
       return {
         statusCode: 200,
         message: "Successfully updated project",

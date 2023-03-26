@@ -12,6 +12,10 @@ export async function getProject(id: string){
   return fetchData("project/" + id, "GET", 200);
 }
 
+export async function getBookmarksOfProject(id: string){
+  return fetchData("project/bookmark/" + id, "GET", 200);
+}
+
 export async function createProject(project: {
   name: string;
   description: string;

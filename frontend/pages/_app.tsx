@@ -36,7 +36,6 @@ function App({ Component, pageProps }: AppProps) {
       >
         <QueryClientProvider client={queryClient}>
           <Component {...pageProps} router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </SkeletonTheme>
     </ProtectedRoute>
