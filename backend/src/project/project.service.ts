@@ -239,6 +239,8 @@ export class ProjectService {
       },
     });
 
+    console.log(skills);
+
     let skillGroupIds = [];
     let skillIds = [];
     skills.skillGroups.nodes.forEach(skillGroup => {
@@ -248,7 +250,11 @@ export class ProjectService {
       skillIds.push(skill.skill.id);
     });
 
-    if (skillGroupIds.every(id => skillIds.includes(id))) {
+    console.log(skillGroupIds);
+    console.log(skillIds);
+
+    if (skillGroupIds.length > 0 && skillGroupIds.every(id => skillIds.includes(id))) {
+      console.log("Skill groups already exist");
       return {
         statusCode: 200,
         message: "Successfully computed skill groups",
