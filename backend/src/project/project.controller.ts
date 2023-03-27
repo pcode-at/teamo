@@ -34,7 +34,7 @@ export class ProjectController {
   @Get('bookmark/:id')
   @ApiOperation({ summary: "Get all bookmarks for a project" })
   @ApiResponse({ status: 200, type: ProjectResponse })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   async getBookmarks(@Param("id") userId: string, @Req() request): Promise<ProjectResponse> {
     return this.projectService.getBookmarks(userId, request);
   }

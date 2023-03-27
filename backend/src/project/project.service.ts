@@ -337,32 +337,27 @@ export class ProjectService {
     };
   }
 
-  async getBookmarks(identifier, request): Promise<any> {
+  async getBookmarks(id, request): Promise<any> {
 
     // let bearer = request.headers.authorization.split(" ")[1];
     // const decoded = await this.jwtService.decode(bearer);
     // //@ts-ignore
     // const identifier = decoded.identifier;
 
-    const userId = await (await prisma.users.findUnique({ where: { identifier }, select: { id: true } })).id;
 
-    const projects = await prisma.projects.findMany();
+    //find users from project with the project id
 
-    let bookmarks = [];
-
-    projects.forEach((project) => {
-      if (project.bookmarkIds.includes(userId)) {
-        bookmarks.push({
-          projectId: project.id,
-          projectName: project.name,
-        });
-      }
+    const users = await prisma.projects.findUnique({
+      where: { id },
+      select: {
+        bookmarks: true
+      },
     });
 
     return {
       statusCode: 200,
       message: "Successfully fetched bookmarks",
-      data: bookmarks,
+      data: users,
     };
   }
 }
