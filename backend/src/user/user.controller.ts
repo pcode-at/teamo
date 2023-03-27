@@ -16,7 +16,7 @@ import { SkillResponse } from "src/entities/skill.entity";
 @Controller("api/user")
 @UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   @ApiOperation({ summary: "Create user" })
@@ -119,4 +119,12 @@ export class UserController {
   async getWorkHours(@Param("identifier") identifier: string) {
     return await this.userService.getWorkHours(identifier);
   }
+
+  @Get("bookmark/:id")
+  @ApiOperation({ summary: "Get bookmarks that user is in" })
+  @ApiResponse({ status: 200, type: UserResponse })
+  async getBookmarksForUser(@Param("id") userId: string, @Req() request) {
+    return await this.userService.getBookmarksForUser(userId, request);
+  }
+
 }

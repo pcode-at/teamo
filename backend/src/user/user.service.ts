@@ -25,12 +25,13 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class UserService {
+
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
     private readonly jwtService: JwtService,
     private readonly elastic: ElasticService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponse> {
     let password = createUserDto.password;
@@ -50,6 +51,31 @@ export class UserService {
       },
     });
     return new UserResponse({ statusCode: 201, message: "User created successfully", data: new UserEntity(user) });
+  }
+
+
+
+  async getBookmarksForUser(identifier: string, request): Promise<any> {
+    const userId = await (await prisma.users.findUnique({ where: { identifier }, select: { id: true } })).id;
+
+    const projects = await prisma.projects.findMany();
+
+    let bookmarks = [];
+
+    projects.forEach((project) => {
+      if (project.bookmarkIds.includes(userId)) {
+        bookmarks.push({
+          projectId: project.id,
+          projectName: project.name,
+        });
+      }
+    });
+
+    return {
+      statusCode: 200,
+      message: "Successfully fetched bookmarks",
+      data: bookmarks,
+    };
   }
 
   async findAll(): Promise<UserResponse> {
