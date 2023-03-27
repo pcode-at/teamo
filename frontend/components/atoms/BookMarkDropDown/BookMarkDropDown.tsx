@@ -6,6 +6,7 @@ import SvgBookmark from "../svg/SvgBookmark";
 import { useQuery } from "react-query";
 import { getProjects } from "../../../utils/requests/project";
 import { getBookmarks, updateBookmarks } from "../../../utils/requests/project";
+import { getBookmarksOfUser } from "../../../utils/requests/user";
 
 const slideUpAndFade = keyframes({
   "0%": { opacity: 0, transform: "translateY(2px)" },
@@ -119,7 +120,7 @@ const BookMarkDropDownPureComponent: React.FC<Props> = ({ userId }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { data: bookmarks, status: bookmarksStatus } = useQuery(
     ["bookmarks", userId],
-    () => getBookmarks(userId),
+    () => getBookmarksOfUser(userId),
     {
       enabled: isOpen,
     }

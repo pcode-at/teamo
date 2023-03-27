@@ -16,7 +16,9 @@ import { Skill } from "../../molecules/Skill/Skill";
 import { styled } from "../../../stitches.config";
 import { SearchResultItem } from "../../molecules/SearchResultItem/SearchResultItem";
 import Skeleton from "react-loading-skeleton";
-import { H2BoldTabletAndUpStyle } from "../../../utils/StyledParagraph";
+import {
+  H3BoldTabletAndUpStyle,
+} from "../../../utils/StyledParagraph";
 import Link from "next/link";
 import { SimpleUser } from "../../molecules/SimpleUser/SimpleUser";
 
@@ -47,7 +49,7 @@ const ListLayout = styled("div", {
 });
 
 const ListTitle = styled("h2", {
-  ...H2BoldTabletAndUpStyle,
+  ...H3BoldTabletAndUpStyle,
 });
 
 const ListItems = styled("div", {
@@ -187,10 +189,12 @@ export const ProjectDetails: React.FC<Props> = ({}) => {
         </>
       )}
       <ListLayout>
+        <Spacer size="3x" axis="vertical"></Spacer>
+        <Separator width={"big"} alignment={"left"}></Separator>
         <ListTitle>Bookmarks</ListTitle>
         <ListItems>
           {bookmarksStatus == "success" &&
-            bookmarks.map((user) => (
+            bookmarks.bookmarks.map((user) => (
               <Link
                 key={user.identifier}
                 href={`/profile/${user.identifier}`}

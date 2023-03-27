@@ -46,6 +46,10 @@ export async function getBookmarks() {
   return fetchData("user/bookmarks", "GET", 200);
 }
 
+export async function getBookmarksOfUser(profileId: string = "") {
+  return fetchData("user/bookmark/" + profileId, "GET", 200);
+}
+
 export async function getWorkHours(profileId: string = "") {
   return fetchData("user/workHours/" + profileId, "GET", 200);
 }
